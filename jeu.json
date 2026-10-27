@@ -1,0 +1,379 @@
+{
+  "_aide": "Règles du mode Aventure : niveaux, parcours, badges, plan sur 12 semaines. Modifiable librement.",
+  "xp": {
+    "par_100m": 10,
+    "seance_10min": 50,
+    "seance_guidee_terminee": 100,
+    "seance_du_plan": 50,
+    "quete": 150,
+    "badge": 100,
+    "precision_cadence_max": 100
+  },
+  "niveaux": [
+    "Moussaillon",
+    "Mousse",
+    "Matelot",
+    "Rameur",
+    "Barreur",
+    "Chef de nage",
+    "Capitaine",
+    "Navigateur",
+    "Loup de Loire",
+    "Amiral",
+    "Légende de la Loire"
+  ],
+  "_niveaux": "XP pour atteindre le niveau n (n >= 2) : 500 × n × (n − 1) / 2",
+  "parcours": {
+    "nom": "La descente de la Loire, de Saumur à l'océan",
+    "_note": "distances le long du fleuve, approximatives",
+    "escales": [
+      {
+        "km": 0,
+        "nom": "Saumur",
+        "texte": "Départ sous le château. Bon vent !"
+      },
+      {
+        "km": 14,
+        "nom": "Gennes",
+        "texte": "Premiers coteaux, premières ampoules ?"
+      },
+      {
+        "km": 24,
+        "nom": "Saint-Rémy-la-Varenne",
+        "texte": "Les bancs de sable apparaissent."
+      },
+      {
+        "km": 30,
+        "nom": "Saint-Mathurin-sur-Loire",
+        "texte": "La levée de la Loire veille sur vous."
+      },
+      {
+        "km": 46,
+        "nom": "Les Ponts-de-Cé",
+        "texte": "Le plus long pont de France sous la proue."
+      },
+      {
+        "km": 52,
+        "nom": "Bouchemaine",
+        "texte": "La Maine vous rejoint : Angers est tout près."
+      },
+      {
+        "km": 58,
+        "nom": "Savennières",
+        "texte": "Pause dans les vignes (avec modération)."
+      },
+      {
+        "km": 68,
+        "nom": "Chalonnes-sur-Loire",
+        "texte": "À deux pas de Chemillé : vous êtes chez vous !"
+      },
+      {
+        "km": 78,
+        "nom": "Montjean-sur-Loire",
+        "texte": "Les gabares vous saluent."
+      },
+      {
+        "km": 92,
+        "nom": "Saint-Florent-le-Vieil",
+        "texte": "L'abbaye domine le fleuve."
+      },
+      {
+        "km": 106,
+        "nom": "Ancenis",
+        "texte": "Mi-parcours bien passé, on ne lâche rien."
+      },
+      {
+        "km": 115,
+        "nom": "Oudon",
+        "texte": "La tour d'Oudon en ligne de mire."
+      },
+      {
+        "km": 135,
+        "nom": "Nantes",
+        "texte": "La grande ville ! L'éléphant vous attend."
+      },
+      {
+        "km": 150,
+        "nom": "Le Pellerin",
+        "texte": "L'estuaire s'élargit."
+      },
+      {
+        "km": 170,
+        "nom": "Paimbœuf",
+        "texte": "Le vent de mer se lève."
+      },
+      {
+        "km": 190,
+        "nom": "Saint-Nazaire",
+        "texte": "L'océan ! Vous avez descendu la Loire à la rame."
+      }
+    ]
+  },
+  "badges": [
+    {
+      "id": "premiere",
+      "icone": "🚣",
+      "nom": "Premiers coups de rame",
+      "texte": "Faire une première séance"
+    },
+    {
+      "id": "km1",
+      "icone": "📏",
+      "nom": "Le kilomètre",
+      "texte": "1 km au total"
+    },
+    {
+      "id": "km10",
+      "icone": "🔟",
+      "nom": "Dix bornes",
+      "texte": "10 km au total"
+    },
+    {
+      "id": "km42",
+      "icone": "🏅",
+      "nom": "Marathon d'eau",
+      "texte": "42,2 km au total"
+    },
+    {
+      "id": "km100",
+      "icone": "💯",
+      "nom": "Centurion",
+      "texte": "100 km au total"
+    },
+    {
+      "id": "seance5k",
+      "icone": "🌊",
+      "nom": "Grande traversée",
+      "texte": "5 km en une séance"
+    },
+    {
+      "id": "seance30",
+      "icone": "⏱️",
+      "nom": "Endurant",
+      "texte": "Une séance de 30 min"
+    },
+    {
+      "id": "semaine3",
+      "icone": "📅",
+      "nom": "Régulier",
+      "texte": "3 séances dans la même semaine"
+    },
+    {
+      "id": "serie4",
+      "icone": "🔥",
+      "nom": "Inarrêtable",
+      "texte": "4 semaines de suite à 3 séances"
+    },
+    {
+      "id": "matinal",
+      "icone": "🌅",
+      "nom": "Lève-tôt",
+      "texte": "Une séance avant 8 h"
+    },
+    {
+      "id": "guide5",
+      "icone": "🧭",
+      "nom": "Bon élève",
+      "texte": "5 séances guidées terminées"
+    },
+    {
+      "id": "reprise",
+      "icone": "🩹",
+      "nom": "Reprise réussie",
+      "texte": "Les 2 semaines de reprise du plan terminées"
+    },
+    {
+      "id": "fractionne",
+      "icone": "⚡",
+      "nom": "Coup de fouet",
+      "texte": "Terminer un fractionné ou une pyramide"
+    },
+    {
+      "id": "metronome",
+      "icone": "🥁",
+      "nom": "Métronome",
+      "texte": "Une séance guidée avec 80 % du temps dans la cadence cible"
+    },
+    {
+      "id": "horloger",
+      "icone": "⌚",
+      "nom": "Horloger",
+      "texte": "5 séances à 80 % de cadence tenue"
+    },
+    {
+      "id": "record1000",
+      "icone": "🏆",
+      "nom": "Record battu",
+      "texte": "Améliorer son Test 1000 m"
+    },
+    {
+      "id": "kcal1000",
+      "icone": "🔋",
+      "nom": "1000 kcal",
+      "texte": "1000 kcal dépensées au total"
+    },
+    {
+      "id": "kcal5000",
+      "icone": "⚙️",
+      "nom": "Chaudière",
+      "texte": "5000 kcal dépensées au total"
+    },
+    {
+      "id": "poids1",
+      "icone": "🪶",
+      "nom": "Premier kilo",
+      "texte": "−1 kg depuis le départ"
+    },
+    {
+      "id": "poids3",
+      "icone": "🎈",
+      "nom": "Plus léger",
+      "texte": "−3 kg depuis le départ"
+    },
+    {
+      "id": "poids_obj",
+      "icone": "🎯",
+      "nom": "Objectif atteint",
+      "texte": "Poids objectif atteint"
+    },
+    {
+      "id": "chalonnes",
+      "icone": "🏡",
+      "nom": "Retour au pays",
+      "texte": "Arriver à Chalonnes-sur-Loire"
+    },
+    {
+      "id": "nantes",
+      "icone": "🐘",
+      "nom": "Escale à Nantes",
+      "texte": "Arriver à Nantes"
+    },
+    {
+      "id": "ocean",
+      "icone": "🌅",
+      "nom": "L'océan",
+      "texte": "Arriver à Saint-Nazaire"
+    }
+  ],
+  "plan": {
+    "nom": "Retour en forme : 12 semaines",
+    "_note": "3 séances par semaine, avec un jour de repos entre deux. Semaines 1-2 : reprise douce après blessure.",
+    "semaines": [
+      {
+        "theme": "Reprise douce",
+        "seances": [
+          "reprise15",
+          "reprise15",
+          "reprise15"
+        ]
+      },
+      {
+        "theme": "Reprise douce",
+        "seances": [
+          "reprise20",
+          "reprise20",
+          "reprise20"
+        ]
+      },
+      {
+        "theme": "On installe le rythme",
+        "seances": [
+          "endurance20",
+          "technique",
+          "endurance20"
+        ]
+      },
+      {
+        "theme": "On installe le rythme",
+        "seances": [
+          "endurance20",
+          "technique",
+          "endurance30"
+        ]
+      },
+      {
+        "theme": "Endurance",
+        "seances": [
+          "endurance30",
+          "technique",
+          "endurance30"
+        ]
+      },
+      {
+        "theme": "Premier fractionné",
+        "seances": [
+          "endurance30",
+          "fractionne3030",
+          "endurance30"
+        ]
+      },
+      {
+        "theme": "Point d'étape",
+        "seances": [
+          "test1000",
+          "endurance30",
+          "endurance40"
+        ]
+      },
+      {
+        "theme": "On monte en puissance",
+        "seances": [
+          "endurance40",
+          "pyramide",
+          "endurance30"
+        ]
+      },
+      {
+        "theme": "On monte en puissance",
+        "seances": [
+          "endurance40",
+          "4x500",
+          "endurance30"
+        ]
+      },
+      {
+        "theme": "Costaud",
+        "seances": [
+          "endurance40",
+          "seuil",
+          "endurance40"
+        ]
+      },
+      {
+        "theme": "Costaud",
+        "seances": [
+          "endurance40",
+          "pyramide",
+          "endurance40"
+        ]
+      },
+      {
+        "theme": "Bilan",
+        "seances": [
+          "test1000",
+          "endurance40",
+          "seuil"
+        ]
+      }
+    ]
+  },
+  "quetes": [
+    {
+      "id": "plan",
+      "texte": "Faire les 3 séances du plan de la semaine"
+    },
+    {
+      "id": "km",
+      "texte": "Ramer {km} km dans la semaine"
+    },
+    {
+      "id": "pesee",
+      "texte": "Se peser une fois dans la semaine (le matin, à jeun)"
+    },
+    {
+      "id": "cadence",
+      "texte": "Tenir la cadence cible 75 % du temps sur 2 séances"
+    }
+  ],
+  "_xp": "precision_cadence_max : XP en plus selon le % du temps passé dans la cadence cible (100 % = tout le bonus)"
+}

@@ -26,6 +26,7 @@ sys.path.insert(0, os.path.join(ICI, "lib"))
 sys.path.insert(0, ICI)
 
 from bleak.exc import BleakError  # noqa: E402
+import jeu  # noqa: E402
 import smartrow_ble as sr  # noqa: E402
 
 PORT = 8765
@@ -46,6 +47,8 @@ class Seance:
     def nouvelle(self):
         self.debut = datetime.datetime.now()
         self.programme = None  # nom de la séance guidée suivie
+        self.termine = False   # séance guidée menée jusqu'au bout
+        self.precision = None  # % du temps passé dans la cadence cible
         self.points = []      # un relevé par seconde
         self.coups = []       # une courbe de force par coup
         self._derniere_sec = 0
@@ -106,6 +109,7 @@ class Seance:
         os.makedirs(DOSSIER, exist_ok=True)
         with open(self.fichier, "w", encoding="utf-8") as f:
             json.dump({"debut": self.debut.isoformat(timespec="seconds"), "programme": self.programme,
+                       "termine": self.termine, "precision_cadence": self.precision,
                        "resume": self.resume(),
                        "points": self.points, "coups": self.coups}, f)
         self._modifiee = False
@@ -131,8 +135,11 @@ async def serveur_web(seance, capteur, hote):
     async def client(lecteur, ecrivain):
         try:
             ligne = (await lecteur.readline()).decode("latin-1").split()
-            while (await lecteur.readline()) not in (b"\r\n", b"\n", b""):
-                pass
+            longueur = 0
+            while (entete := await lecteur.readline()) not in (b"\r\n", b"\n", b""):
+                if entete.lower().startswith(b"content-length:"):
+                    longueur = int(entete.split(b":")[1])
+            donnees = await lecteur.readexactly(longueur) if 0 < longueur < 100000 else b""
             chemin, _, requete = (ligne[1] if len(ligne) > 1 else "/").partition("?")
             params = urllib.parse.parse_qs(requete)
             if chemin == "/flux":
@@ -155,6 +162,21 @@ async def serveur_web(seance, capteur, hote):
                 seance.nouvelle()
                 seance.programme = params.get("programme", [None])[0]
                 corps, type_ = b"{}", "application/json"
+            elif chemin == "/fin" and ligne[0] == "POST":
+                seance.termine = True
+                pc = params.get("precision", [""])[0]
+                seance.precision = int(pc) if pc.isdigit() else None
+                seance._modifiee = True
+                seance.sauver()
+                corps, type_ = b"{}", "application/json"
+            elif chemin == "/jeu":
+                corps, type_ = json.dumps(jeu.etat(), ensure_ascii=False, default=str).encode(), "application/json"
+            elif chemin == "/profil" and ligne[0] == "POST":
+                jeu.enregistrer_profil(json.loads(donnees or b"{}"))
+                corps, type_ = b"{}", "application/json"
+            elif chemin == "/pesee" and ligne[0] == "POST":
+                jeu.ajouter_pesee(float(params["kg"][0].replace(",", ".")))
+                corps, type_ = b"{}", "application/json"
             elif chemin == "/programmes":
                 with open(os.path.join(ICI, "programmes.json"), "rb") as f:
                     corps, type_ = f.read(), "application/json"
@@ -164,12 +186,12 @@ async def serveur_web(seance, capteur, hote):
             ecrivain.write(f"HTTP/1.1 200 OK\r\nContent-Type: {type_}\r\nContent-Length: {len(corps)}\r\n"
                            f"Connection: close\r\n\r\n".encode() + corps)
             await ecrivain.drain()
-        except (OSError, IndexError):
+        except (OSError, IndexError, ValueError, KeyError, asyncio.IncompleteReadError):
             ecrivain.write(b"HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\n\r\n")
         finally:
             ecrivain.close()
 
-    return await asyncio.start_server(client, hote, PORT)
+    return await asyncio.start_server(client, hote, int(_option("--port", PORT)))
 
 
 # --- Liaison avec le SmartRow, reconnexion automatique ------------------------
@@ -250,7 +272,7 @@ async def principal(hote, rejeu=None, vitesse=1.0):
     for sig in (signal.SIGINT, signal.SIGTERM):
         boucle.add_signal_handler(sig, arret.set)
     web = await serveur_web(seance, capteur, hote)
-    print(f"Ouvrez http://localhost:{PORT} dans le navigateur. Ctrl+C pour quitter.")
+    print(f"Ouvrez http://localhost:{_option('--port', PORT)} dans le navigateur. Ctrl+C pour quitter.")
 
     async def sauvegarde_reguliere():
         while True:

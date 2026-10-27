@@ -6,7 +6,9 @@ SmartRow.**
 L'application lit le SmartRow en Bluetooth et affiche la séance en direct dans
 le navigateur. On peut l'utiliser sur le PC, ou sur une tablette ou un
 téléphone posé devant le rameur. Elle propose aussi des **séances guidées**,
-avec consignes vocales et bips. Tout est enregistré sur l'ordinateur : aucun
+avec consignes vocales, bips et **métronome de cadence**, ainsi qu'un **mode
+Aventure** pour rester motivé : niveaux, descente de la Loire, badges,
+quêtes, suivi du poids et récompenses personnelles. Tout est enregistré sur l'ordinateur : aucun
 compte ni service en ligne n'est nécessaire.
 
 Projet non officiel, sans lien avec WaterRower ni SmartRow.
@@ -30,9 +32,11 @@ Projet non officiel, sans lien avec WaterRower ni SmartRow.
 
 | Séance | Niveau | Contenu |
 |---|---|---|
+| Reprise douce 15 min | Reprise | 4 min calme, 8 min facile, 3 min calme, cadence 16–20 |
+| Reprise 20 min | Reprise | 2 × 5 min faciles, avec une pause en ramant |
 | Découverte 12 min | Débutant | 3 min calme, 6 min facile, 3 min calme |
 | Technique : changer de cadence | Débutant | Alternance 18–20 / 22–26 c/min avec la même force : on regarde la courbe |
-| Endurance 20 min | Tous niveaux | 20 min faciles et régulières, la base de la progression |
+| Endurance 20 / 30 / 40 min | Tous niveaux | Longue, facile et régulière : la base de la progression et de la perte de poids |
 | Fractionné 30/30 × 10 | Intermédiaire | 10 × (30 s fort / 30 s léger) |
 | Pyramide 1-2-3-2-1 | Intermédiaire | Efforts de 1 à 3 min, récupération moitié moins longue |
 | 4 × 500 m | Intermédiaire | Tenir la même allure sur 4 répétitions, 2 min de repos |
@@ -50,6 +54,76 @@ Comment ça marche :
   dans la cible, d'orange sinon.
 - Une voix annonce chaque étape, avec des bips à 3-2-1. La voix peut être
   coupée.
+
+## Suivre la bonne cadence
+
+![Jauge de cadence pendant une séance guidée](captures/jauge-cadence.png)
+
+- Chaque étape guidée a une **cadence cible**, par exemple 22–24 coups/min.
+- La tuile **Cadence** affiche une jauge : la zone verte est la cible,
+  l'aiguille montre votre cadence. Un conseil s'affiche dessous :
+  *« Accélérez un peu »*, *« Ralentissez, allongez le retour »* ou
+  *« Cadence parfaite »*.
+- **Métronome** (en haut de l'écran) :
+  - un « tic » marque l'attaque, un « toc » plus doux la fin de la poussée,
+    pour respecter le rythme 1/3 de poussée, 2/3 de retour ;
+  - en mode *auto*, il suit la cible de chaque étape ;
+  - on peut aussi choisir une cadence fixe de 18 à 30 pour une séance libre.
+- Pendant une séance guidée, l'application mesure le **% du temps passé
+  dans la cible**. Ce pourcentage rapporte jusqu'à 100 XP, des badges
+  (*Métronome*, *Horloger*) et une quête de la semaine.
+
+Repères de cadence :
+
+| Cadence | Usage |
+|---|---|
+| 16–20 | échauffement, retour au calme, reprise |
+| 20–22 | endurance, perte de poids : l'allure qu'on tient longtemps |
+| 22–26 | effort soutenu, seuil |
+| 26–30 | fractionné, sprint |
+
+Le mieux est de ramer **long et puissant** plutôt que vite : la puissance
+vient des jambes, pas du nombre de coups.
+
+## Mode Aventure
+
+![Mode Aventure (données d'exemple)](captures/aventure.png)
+
+*Capture faite avec des données d'exemple.*
+
+- **XP et niveaux**, de *Moussaillon* à *Légende de la Loire*. On gagne de
+  l'XP avec la distance, les séances terminées, les séances du plan, la
+  cadence tenue, les quêtes et les badges.
+- **La descente de la Loire** : les kilomètres ramés font avancer un bateau
+  de Saumur à Saint-Nazaire, en 190 km et 16 escales (distances
+  approximatives).
+- **Plan « Retour en forme » sur 12 semaines** :
+  - 3 séances par semaine ;
+  - **2 semaines de reprise douce** au début, prévues pour un retour de
+    blessure ;
+  - puis de l'endurance de plus en plus longue, la plus efficace pour
+    perdre du poids, et un peu de fractionné ;
+  - les séances de la semaine se lancent en un clic.
+- **Quêtes de la semaine** : faire les 3 séances du plan, une distance qui
+  augmente chaque semaine, tenir la cadence, se peser.
+- **24 badges** : distance, régularité, lève-tôt, record au test 1000 m,
+  kilos perdus, escales…
+- **Poids** :
+  - pesée hebdomadaire ;
+  - courbe comparée à un rythme sain de 0,5 kg par semaine ;
+  - estimation des kcal dépensées (formule ACSM).
+- **Mes récompenses** : vous écrivez ce que vous vous offrirez à −2 kg, à
+  l'escale de Chalonnes, au niveau 5… Elles se débloquent toutes seules,
+  avec des confettis.
+
+Le profil et les pesées restent sur l'ordinateur, dans `donnees/`, qui n'est
+pas publié. Les règles du jeu sont dans [`jeu.json`](jeu.json) et faciles à
+modifier.
+
+> Le rameur aide, mais la perte de poids se joue surtout dans l'assiette et
+> la régularité. Après une blessure, reprenez doucement et arrêtez en cas de
+> douleur. En cas de doute, demandez l'avis d'un médecin ou d'un
+> kinésithérapeute.
 
 Les séances sont décrites dans [`programmes.json`](programmes.json) et
 faciles à modifier. Une étape dure un temps (`temps`, en secondes) ou une
@@ -96,6 +170,7 @@ python3 rameur.py --rejouer exemples/seance-260m.log
 | `rameur.py` | application : Bluetooth, petit serveur web, enregistrement |
 | `page.html` | l'affichage dans le navigateur, avec les séances guidées |
 | `programmes.json` | les séances guidées |
+| `jeu.py`, `jeu.json` | mode Aventure : XP, niveaux, parcours, badges, quêtes, plan, poids |
 | `smartrow_ble.py` | connexion au SmartRow et décodage des messages |
 | `ecouter.py` | outil de diagnostic : affiche et enregistre les messages bruts |
 | `exemples/seance-260m.log` | une vraie séance enregistrée, pour les essais |

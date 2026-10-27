@@ -60,7 +60,53 @@
   .prog span { color: var(--doux); font-size: 13px; }
   .reglage { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 8px; color: var(--doux); font-size: 14px; }
   input { background: #0f1418; color: var(--texte); border: 1px solid #2c3944; border-radius: 6px; padding: 6px 8px; width: 80px; font-size: 15px; }
+  .jauge { position: relative; height: 18px; background: #26313a; border-radius: 9px; margin-top: 8px; }
+  .jauge .zone { position: absolute; top: 0; bottom: 0; background: rgba(76,195,138,.45); border-radius: 9px; }
+  .jauge .aiguille { position: absolute; top: -4px; width: 4px; height: 26px; background: var(--texte); border-radius: 2px; transition: left .4s; }
+  #c-conseil { font-size: 15px; margin-top: 6px; min-height: 1.2em; font-weight: 600; }
+  select { background: var(--carte); color: var(--texte); border: 1px solid #2c3944; border-radius: 8px; padding: 7px; font-size: 14px; }
+  .vue-cachee { display: none !important; }
+  #a-journal td:not(:nth-child(2)) { white-space: nowrap; }
+  #vue-aventure { grid-template-columns: repeat(2, 1fr); }
+  #vue-aventure .large { grid-column: span 2 / span 2; }
+  .niv { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .medaille { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center;
+              background: radial-gradient(circle at 35% 30%, #ffe08a, #e0a526 60%, #a8720f); color: #3a2600;
+              font-size: 30px; font-weight: 800; box-shadow: 0 0 0 4px #2c3944; flex: none; }
+  .niv h2 { margin: 0; font-size: 26px; }
+  .xpbarre { height: 14px; background: #26313a; border-radius: 7px; overflow: hidden; margin-top: 6px; }
+  .xpbarre div { height: 100%; background: linear-gradient(90deg, #e0a526, #ffe08a); }
+  .chiffres { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 12px; }
+  .chiffres b { display: block; font-size: 24px; }
+  .chiffres span { color: var(--doux); font-size: 13px; }
+  .quete { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+  .quete .coche { width: 24px; height: 24px; border-radius: 6px; border: 2px solid #3a4a56; display: grid; place-items: center; flex: none; }
+  .quete.ok .coche { background: var(--ok); border-color: var(--ok); }
+  .quete .mini { flex: 1; }
+  .mini .xpbarre { height: 6px; }
+  .mini .xpbarre div { background: var(--eau); }
+  .lancer { margin: 4px 6px 4px 0; }
+  .badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; margin-top: 10px; }
+  .badge { text-align: center; padding: 10px 6px; border-radius: 10px; background: #1f2a33; }
+  .badge i { font-style: normal; font-size: 32px; display: block; }
+  .badge b { display: block; font-size: 13px; margin-top: 4px; }
+  .badge span { font-size: 11px; color: var(--doux); }
+  .badge.verrou { opacity: .35; filter: grayscale(1); }
+  .recomp { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+  .recomp input { flex: 1; width: auto; }
+  .recomp .cond { color: var(--doux); font-size: 13px; width: 150px; flex: none; }
+  .recomp.obtenue .cond { color: var(--ok); font-weight: 600; }
+  svg text { fill: var(--doux); font-size: 12px; font-family: inherit; }
+  #celebration { position: fixed; inset: 0; background: rgba(5,8,10,.82); display: none; place-items: center; z-index: 10; }
+  #celebration .boite { background: var(--carte); border-radius: 16px; padding: 28px 32px; max-width: 520px; width: calc(100% - 32px); text-align: center; }
+  #celebration .gros { font-size: 56px; font-weight: 800; color: #ffd166; }
+  #celebration ul { list-style: none; padding: 0; text-align: left; }
+  #celebration li { margin: 8px 0; font-size: 17px; }
+  .confetti { position: fixed; top: -40px; font-size: 26px; animation: tombe linear forwards; z-index: 11; pointer-events: none; }
+  @keyframes tombe { to { transform: translateY(110vh) rotate(540deg); } }
   @media (max-width: 640px) {
+    #vue-aventure { grid-template-columns: 1fr; }
+    #vue-aventure .large { grid-column: auto; }
     main { grid-template-columns: 1fr 1fr; }
     #guide, #choix, .grande, .courbe, #historique { grid-column: span 2 / span 2; }
     .grande { grid-template-columns: 1fr; }
@@ -72,11 +118,17 @@
   <h1>🚣 Rameur</h1>
   <div class="etat"><span class="pastille" id="pastille"></span><span id="connexion">Recherche du SmartRow…</span></div>
   <div class="espace"></div>
+  <label class="etat">🥁 Métronome
+    <select id="metro">
+      <option value="auto">auto (séance guidée)</option><option value="0">coupé</option>
+      <option>18</option><option>20</option><option>22</option><option>24</option><option>26</option><option>28</option><option>30</option>
+    </select></label>
+  <button id="btn-aventure">🏆 Aventure</button>
   <button id="btn-seances">Séances guidées</button>
   <button id="btn-histo">Historique</button>
   <button id="btn-nouvelle">Nouvelle séance</button>
 </header>
-<main>
+<main id="vue-rameur">
   <div class="tuile" id="choix"><div class="nom">Choisir une séance guidée</div>
     <div class="reglage">Allure de référence /500 m :
       <input id="ref" placeholder="2:45"> <span id="ref-aide"></span></div>
@@ -100,12 +152,68 @@
   <div class="tuile"><div class="nom">Puissance</div><div class="val"><span id="watts">0</span><small>W</small></div>
     <div class="sous">moyenne <span id="watts-moy">0</span> W</div></div>
   <div class="tuile" id="t-cadence"><div class="nom">Cadence</div><div class="val"><span id="cadence">0</span><small>c/min</small></div>
-    <div class="sous"><span id="coups">0</span> coups</div></div>
+    <div class="sous"><span id="coups">0</span> coups · cible <span id="c-cible">libre</span></div>
+    <div class="jauge"><div class="zone" id="c-zone"></div><div class="aiguille" id="c-aiguille"></div></div>
+    <div id="c-conseil"></div></div>
   <div class="tuile courbe"><div class="nom">Courbe de force du dernier coup</div><canvas id="toile"></canvas></div>
   <div class="tuile" id="historique"><div class="nom">Séances enregistrées</div>
     <table><thead><tr><th>Date</th><th>Séance</th><th>Distance</th><th>Temps</th><th>Allure moy.</th><th>Watts moy.</th><th>Coups</th></tr></thead>
     <tbody id="lignes"></tbody></table></div>
 </main>
+<main id="vue-aventure" class="vue-cachee">
+  <div class="tuile large">
+    <div class="niv"><div class="medaille" id="a-num">1</div>
+      <div style="flex:1;min-width:220px"><h2 id="a-nom">Moussaillon</h2>
+        <div class="sous" id="a-xp"></div><div class="xpbarre"><div id="a-xpbarre"></div></div></div></div>
+    <div class="chiffres">
+      <div><b id="a-km">0</b><span>km ramés</span></div><div><b id="a-seances">0</b><span>séances</span></div>
+      <div><b id="a-kcal">0</b><span>kcal dépensées (estimation)</span></div><div><b id="a-temps">0</b><span>de rame</span></div>
+    </div>
+  </div>
+  <div class="tuile">
+    <div class="nom" id="a-semaine">Cette semaine</div>
+    <h3 id="a-theme" style="margin:6px 0 10px"></h3>
+    <div id="a-afaire"></div>
+    <div id="a-quetes" style="margin-top:10px"></div>
+  </div>
+  <div class="tuile">
+    <div class="nom">Poids</div>
+    <div class="chiffres" style="margin-top:4px">
+      <div><b id="p-actuel">–</b><span>actuel (kg)</span></div><div><b id="p-perdu">–</b><span>perdus</span></div>
+      <div><b id="p-reste">–</b><span>restant pour l'objectif</span></div></div>
+    <div class="xpbarre" style="margin-top:10px"><div id="p-barre" style="background:var(--ok)"></div></div>
+    <svg id="p-graphe" viewBox="0 0 480 150" style="width:100%;height:150px;margin-top:8px"></svg>
+    <div class="reglage">Pesée du jour : <input id="p-kg" placeholder="75,5"> kg <button id="p-ok">Enregistrer</button></div>
+    <div class="sous" id="p-conseil" style="margin-top:6px"></div>
+  </div>
+  <div class="tuile large">
+    <div class="nom" id="r-nom">Parcours</div>
+    <svg id="r-carte" viewBox="0 0 1000 150" style="width:100%;height:auto;margin-top:6px"></svg>
+    <div id="r-texte" style="margin-top:4px"></div>
+  </div>
+  <div class="tuile">
+    <div class="nom">Mes récompenses</div>
+    <div class="sous" style="margin:6px 0">Écrivez ce que vous vous offrirez : elles se débloquent toutes seules.</div>
+    <div id="recomps"></div>
+    <button id="recomp-ok" style="margin-top:6px">Enregistrer mes récompenses</button>
+  </div>
+  <div class="tuile">
+    <div class="nom">Dernières séances</div>
+    <table><tbody id="a-journal"></tbody></table>
+  </div>
+  <div class="tuile large"><div class="nom" id="b-titre">Badges</div><div class="badges" id="badges"></div></div>
+  <div class="tuile large">
+    <div class="nom">Profil</div>
+    <div class="reglage">Prénom <input id="f-prenom" style="width:120px">
+      Taille <input id="f-taille" style="width:60px"> cm
+      Poids de départ <input id="f-depart" style="width:60px"> kg
+      Objectif <input id="f-objectif" style="width:60px"> kg
+      Début du plan <input id="f-debut" type="date" style="width:150px">
+      <button id="f-ok">Enregistrer</button></div>
+  </div>
+</main>
+<div id="celebration"><div class="boite"><div id="c-titre" style="font-size:22px;font-weight:700">Séance terminée !</div>
+  <div class="gros" id="c-xp">+0 XP</div><ul id="c-liste"></ul><button id="c-ok">Super !</button></div></div>
 <script>
 const $ = id => document.getElementById(id);
 const mmss = s => (s == null || s <= 0) ? "–:––" : Math.floor(s / 60) + ":" + String(Math.floor(s % 60)).padStart(2, "0");
@@ -153,6 +261,7 @@ flux.onmessage = ev => {
   $("cadence").textContent = arret ? 0 : Math.round(e.cadence || 0);
   $("coups").textContent = e.coups || 0;
   ciblesEnDirect(e, arret);
+  jaugeCadence(e.cadence, arret);
   const cle = JSON.stringify(e.courbe || []);
   if (cle !== derniereCourbe) {
     derniereCourbe = cle;
@@ -163,8 +272,10 @@ flux.onmessage = ev => {
 
 $("btn-nouvelle").onclick = async () => {
   if (!confirm("Enregistrer la séance en cours et remettre le compteur à zéro ?")) return;
+  const A = jeuAvant || await lireJeu();
   await fetch("/nouvelle", { method: "POST" });
   courbes = []; dessiner();
+  const J = await lireJeu(); celebrer(A, J, "Séance enregistrée"); jeuAvant = J;
 };
 
 $("btn-histo").onclick = async () => {
@@ -245,6 +356,7 @@ async function chargerProgrammes() {
   }
   $("ref").value = ref;
 }
+$("metro").onchange = () => { try { audio = audio || new AudioContext(); audio.resume(); } catch (e) {} };
 $("ref").onchange = () => stocker("allure_ref", $("ref").value);
 
 $("btn-seances").onclick = async () => {
@@ -257,6 +369,8 @@ $("btn-seances").onclick = async () => {
 async function demarrer(p) {
   if (!confirm(`Démarrer « ${p.nom} » ? Le compteur sera remis à zéro.`)) return;
   await fetch("/nouvelle?programme=" + encodeURIComponent(p.nom), { method: "POST" });
+  jeuAvant = await lireJeu();
+  precision = { dans: 0, total: 0 };
   courbes = []; dessiner();
   guide = { p, etapes: aplatir(p.etapes), i: 0, debut: null, t0: 0, d0: 0, dernierBip: null };
   $("choix").style.display = "none";
@@ -291,8 +405,14 @@ function etapeSuivante() {
     $("g-zone").textContent = "Terminé 👏";
     $("g-reste").textContent = ""; $("g-barre").style.width = "100%";
     $("g-note").textContent = `${guide.p.nom} : ${Math.round(dernier.distance_m || 0)} m en ${temps(dernier.temps_s)}.`;
-    $("g-cibles").textContent = ""; $("g-suite").textContent = "";
+    $("g-cibles").textContent = precision.total >= 30 ? `🥁 Cadence tenue ${Math.round(100 * precision.dans / precision.total)} % du temps` : "";
+    $("g-suite").textContent = "";
     guide = { fini: true };
+    setTimeout(async () => {
+      const pc = precision.total >= 30 ? Math.round(100 * precision.dans / precision.total) : "";
+      await fetch("/fin?precision=" + pc, { method: "POST" });
+      const J = await lireJeu(); celebrer(jeuAvant, J, "Séance terminée !"); jeuAvant = J;
+    }, 1500);
     return;
   }
   bip(1000, 350);
@@ -342,6 +462,243 @@ $("btn-stop").onclick = () => {
   guide = null; $("guide").style.display = "none";
   ciblesEnDirect({}, true);
 };
+
+// --- Mode Aventure -------------------------------------------------------------
+let jeuAvant = null, nomsProgrammes = {};
+const esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const kgfr = v => (v == null ? "–" : Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 1 }));
+async function lireJeu() { return (await fetch("/jeu")).json(); }
+
+$("btn-aventure").onclick = async () => {
+  const av = $("vue-aventure").classList.toggle("vue-cachee") === false;
+  $("vue-rameur").classList.toggle("vue-cachee", av);
+  $("btn-aventure").textContent = av ? "🚣 Rameur" : "🏆 Aventure";
+  if (av) afficherAventure(await lireJeu());
+};
+
+function libelleCondition(c) {
+  const [g, v] = c.split(":");
+  if (g === "poids") return v === "objectif" ? "Objectif de poids" : `${v.replace("-", "−")} kg`;
+  if (g === "escale") return `Escale : ${v}`;
+  if (g === "niveau") return `Niveau ${v}`;
+  if (g === "km") return `${v} km au total`;
+  return c;
+}
+
+async function afficherAventure(J) {
+  await chargerProgrammes();
+  programmes.forEach(p => nomsProgrammes[p.id] = p);
+  const N = J.niveau, P = J.poids, T = J.totaux;
+  $("a-num").textContent = N.numero;
+  $("a-nom").textContent = (J.profil.prenom ? J.profil.prenom + ", " : "") + N.nom;
+  $("a-xp").textContent = `${N.xp} XP · encore ${N.xp_suivant - N.xp} XP pour le niveau ${N.numero + 1}`;
+  $("a-xpbarre").style.width = (100 * (N.xp - N.xp_debut) / (N.xp_suivant - N.xp_debut)) + "%";
+  $("a-km").textContent = kgfr(T.km); $("a-seances").textContent = T.seances;
+  $("a-kcal").textContent = T.kcal; $("a-temps").textContent = temps(T.temps_s);
+
+  // semaine
+  const S = J.semaine;
+  $("a-semaine").textContent = S.numero <= S.nb_semaines ? `Semaine ${S.numero} / ${S.nb_semaines} du plan` : "Plan terminé";
+  $("a-theme").textContent = S.theme;
+  $("a-afaire").innerHTML = S.a_faire.length
+    ? "<div class='sous'>Séances du plan à faire (un jour de repos entre deux) :</div>" +
+      S.a_faire.map(id => `<button class="lancer" data-id="${id}">▶ ${esc(nomsProgrammes[id]?.nom || id)}</button>`).join("")
+    : (S.plan.length ? "<div style='color:var(--ok)'>✔ Toutes les séances du plan sont faites cette semaine. Repos ou séance bonus !</div>" : "");
+  document.querySelectorAll(".lancer").forEach(b => b.onclick = () => {
+    $("btn-aventure").click(); demarrer(nomsProgrammes[b.dataset.id]);
+  });
+  $("a-quetes").innerHTML = "<div class='sous'>Quêtes de la semaine (+150 XP chacune) :</div>" + J.quetes.map(q => `
+    <div class="quete ${q.ok ? "ok" : ""}"><div class="coche">${q.ok ? "✓" : ""}</div>
+      <div class="mini">${esc(q.texte)}<div class="xpbarre"><div style="width:${Math.min(100, 100 * q.fait / q.but)}%"></div></div></div>
+      <span class="sous">${kgfr(q.fait)} / ${kgfr(q.but)}</span></div>`).join("");
+
+  // poids
+  $("p-actuel").textContent = kgfr(P.actuel);
+  $("p-perdu").textContent = (P.perdu > 0 ? "−" : "") + kgfr(Math.abs(P.perdu)) + " kg";
+  $("p-reste").textContent = kgfr(Math.max(0, P.actuel - P.objectif)) + " kg";
+  $("p-barre").style.width = Math.max(0, Math.min(100, 100 * P.perdu / P.a_perdre)) + "%";
+  grapheP(J);
+  const semainesRestantes = Math.ceil(Math.max(0, P.actuel - P.objectif) / 0.5);
+  $("p-conseil").textContent = P.actuel > P.objectif
+    ? `À un rythme sain de 0,5 kg par semaine : objectif dans environ ${semainesRestantes} semaines. Pesez-vous le même jour, le matin.`
+    : "Objectif atteint ! Bravo 🎉";
+
+  // parcours
+  carte(J.parcours);
+
+  // récompenses
+  $("recomps").innerHTML = J.recompenses.map((r, i) => `
+    <div class="recomp ${r.obtenue ? "obtenue" : ""}"><span>${r.obtenue ? "🎁" : "🔒"}</span>
+      <span class="cond">${esc(libelleCondition(r.condition))}</span>
+      <input data-i="${i}" value="${esc(r.texte)}"></div>`).join("");
+
+  // journal
+  $("a-journal").innerHTML = J.journal.map(j => `<tr><td>${new Date(j.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}</td>
+    <td style="text-align:left">${esc(j.programme)}</td><td>${kgfr(j.distance_m / 1000)} km</td><td>${j.kcal} kcal</td>
+    <td>${j.precision != null ? "🥁 " + j.precision + " %" : ""}</td><td style="color:#ffd166">+${j.xp} XP</td></tr>`).join("") || "<tr><td>Aucune séance pour l'instant.</td></tr>";
+
+  // badges
+  const obtenus = J.badges.filter(b => b.obtenu).length;
+  $("b-titre").textContent = `Badges · ${obtenus} / ${J.badges.length}`;
+  $("badges").innerHTML = J.badges.map(b => `<div class="badge ${b.obtenu ? "" : "verrou"}" title="${esc(b.texte)}">
+    <i>${b.icone}</i><b>${esc(b.nom)}</b><span>${esc(b.texte)}</span></div>`).join("");
+
+  // profil
+  const Pr = J.profil;
+  $("f-prenom").value = Pr.prenom || ""; $("f-taille").value = Pr.taille_cm;
+  $("f-depart").value = Pr.poids_depart_kg; $("f-objectif").value = Pr.poids_objectif_kg; $("f-debut").value = Pr.debut;
+  jeuAvant = J;
+}
+
+function carte(R) {
+  const W = 1000, x = km => 30 + km / R.total_km * (W - 60), y = xx => 75 + 22 * Math.sin(xx / 85);
+  let d = "";
+  for (let xx = 20; xx <= W - 20; xx += 10) d += (d ? " L" : "M") + xx + " " + y(xx).toFixed(1);
+  const principales = ["Saumur", "Les Ponts-de-Cé", "Chalonnes-sur-Loire", "Ancenis", "Nantes", "Saint-Nazaire"];
+  let svg = `<path d="${d}" stroke="#2b6f8f" stroke-width="16" fill="none" stroke-linecap="round"/>`;
+  const fait = Math.min(R.km, R.total_km);
+  let d2 = "";
+  for (let xx = 20; xx <= x(fait); xx += 5) d2 += (d2 ? " L" : "M") + xx + " " + y(xx).toFixed(1);
+  if (d2) svg += `<path d="${d2}" stroke="#3fb6e8" stroke-width="16" fill="none" stroke-linecap="round"/>`;
+  R.escales.forEach((e, i) => {
+    const ex = x(e.km), ey = y(ex), ok = e.km <= R.km;
+    svg += `<circle cx="${ex}" cy="${ey}" r="6" fill="${ok ? "#ffd166" : "#0f1418"}" stroke="#ffd166" stroke-width="2"><title>${esc(e.nom)} (km ${e.km})</title></circle>`;
+    if (principales.includes(e.nom) || (R.prochaine && e.nom === R.prochaine.nom)) {
+      const haut = i % 2 === 0;
+      svg += `<text x="${ex}" y="${haut ? ey - 18 : ey + 28}" text-anchor="middle">${esc(e.nom)}</text>`;
+    }
+  });
+  const bx = x(fait);
+  svg += `<text x="${bx}" y="${y(bx) + 9}" text-anchor="middle" style="font-size:26px">🚣</text>`;
+  $("r-carte").innerHTML = svg;
+  $("r-nom").textContent = `${R.nom} · ${kgfr(R.km)} / ${R.total_km} km`;
+  $("r-texte").innerHTML = (R.derniere ? `📍 <b>${esc(R.derniere.nom)}</b> : ${esc(R.derniere.texte)} ` : "") +
+    (R.prochaine ? `<span class="sous">· Prochaine escale : ${esc(R.prochaine.nom)} dans ${kgfr(R.prochaine.km - R.km)} km</span>` : "");
+}
+
+function grapheP(J) {
+  const P = J.poids, pes = P.pesees, deb = new Date(J.profil.debut);
+  const fin = new Date(deb.getTime() + 12 * 7 * 864e5);
+  const dates = pes.map(p => new Date(p.date));
+  const tmax = Math.max(fin, ...dates), t0 = Math.min(deb, ...dates);
+  const vmin = Math.min(P.objectif, ...pes.map(p => p.kg)) - 1, vmax = Math.max(P.depart, ...pes.map(p => p.kg)) + 1;
+  const X = t => 40 + (t - t0) / (tmax - t0) * 430, Y = v => 10 + (vmax - v) / (vmax - vmin) * 120;
+  let svg = `<line x1="40" x2="470" y1="${Y(P.objectif)}" y2="${Y(P.objectif)}" stroke="#4cc38a" stroke-dasharray="6 5"/>
+    <text x="0" y="${Y(P.objectif) + 4}">${kgfr(P.objectif)}</text><text x="0" y="${Y(P.depart) + 4}">${kgfr(P.depart)}</text>
+    <line x1="${X(deb)}" y1="${Y(P.depart)}" x2="${X(fin)}" y2="${Y(P.depart - 6)}" stroke="#5b6b78" stroke-dasharray="2 4"><title>rythme 0,5 kg/semaine</title></line>`;
+  if (pes.length) {
+    svg += `<polyline fill="none" stroke="#3fb6e8" stroke-width="3" points="${pes.map(p => X(new Date(p.date)) + "," + Y(p.kg)).join(" ")}"/>`;
+    svg += pes.map(p => `<circle cx="${X(new Date(p.date))}" cy="${Y(p.kg)}" r="4" fill="#3fb6e8"><title>${p.date} : ${kgfr(p.kg)} kg</title></circle>`).join("");
+  } else svg += `<text x="140" y="80">Ajoutez votre première pesée ci-dessous</text>`;
+  $("p-graphe").innerHTML = svg;
+}
+
+$("p-ok").onclick = async () => {
+  const v = parseFloat(($("p-kg").value || "").replace(",", "."));
+  if (!(v > 30 && v < 250)) { alert("Poids invalide"); return; }
+  await fetch("/pesee?kg=" + v, { method: "POST" });
+  $("p-kg").value = "";
+  const J = await lireJeu(); celebrer(jeuAvant, J, "Pesée enregistrée"); afficherAventure(J);
+};
+$("recomp-ok").onclick = async () => {
+  const r = jeuAvant.profil.recompenses.map((x, i) => ({ ...x, texte: document.querySelector(`#recomps input[data-i="${i}"]`).value }));
+  await fetch("/profil", { method: "POST", body: JSON.stringify({ recompenses: r }) });
+  afficherAventure(await lireJeu());
+};
+$("f-ok").onclick = async () => {
+  const n = id => parseFloat(($(id).value || "").replace(",", "."));
+  await fetch("/profil", { method: "POST", body: JSON.stringify({ prenom: $("f-prenom").value.trim(), taille_cm: n("f-taille"),
+    poids_depart_kg: n("f-depart"), poids_objectif_kg: n("f-objectif"), debut: $("f-debut").value }) });
+  afficherAventure(await lireJeu());
+};
+
+// Célébration : compare l'état du jeu avant et après
+function celebrer(A, B, titre) {
+  if (!A || !B) return;
+  const gains = [];
+  if (B.niveau.numero > A.niveau.numero) gains.push(`⭐ Niveau ${B.niveau.numero} : <b>${esc(B.niveau.nom)}</b> !`);
+  const avant = new Set(A.badges.filter(b => b.obtenu).map(b => b.id));
+  B.badges.filter(b => b.obtenu && !avant.has(b.id)).forEach(b => gains.push(`${b.icone} Badge <b>${esc(b.nom)}</b>`));
+  if (B.parcours.derniere && (!A.parcours.derniere || B.parcours.derniere.nom !== A.parcours.derniere.nom))
+    gains.push(`📍 Escale à <b>${esc(B.parcours.derniere.nom)}</b> : ${esc(B.parcours.derniere.texte)}`);
+  const recA = new Set(A.recompenses.filter(r => r.obtenue).map(r => r.condition));
+  B.recompenses.filter(r => r.obtenue && !recA.has(r.condition)).forEach(r => gains.push(`🎁 Récompense débloquée : <b>${esc(r.texte)}</b>`));
+  B.quetes.forEach((q, i) => { if (q.ok && !(A.quetes[i] || {}).ok) gains.push(`✅ Quête réussie : ${esc(q.texte)}`); });
+  const xp = B.niveau.xp - A.niveau.xp;
+  if (!xp && !gains.length) return;
+  $("c-titre").textContent = titre;
+  $("c-xp").textContent = `+${xp} XP`;
+  $("c-liste").innerHTML = gains.map(g => `<li>${g}</li>`).join("");
+  $("celebration").style.display = "grid";
+  for (let i = 0; i < 40; i++) {
+    const c = document.createElement("div");
+    c.className = "confetti"; c.textContent = ["🎉", "✨", "⭐", "💧", "🏅"][i % 5];
+    c.style.left = Math.random() * 100 + "vw"; c.style.animationDuration = 2 + Math.random() * 2.5 + "s";
+    c.style.animationDelay = Math.random() * .8 + "s";
+    document.body.appendChild(c); setTimeout(() => c.remove(), 5500);
+  }
+  if (gains.length) dire(gains.length > 1 ? `Bravo ! ${xp} points d'expérience et ${gains.length} nouveautés.` : `Bravo ! ${xp} points d'expérience.`);
+}
+$("c-ok").onclick = () => $("celebration").style.display = "none";
+
+// --- Cadence : cible, jauge, métronome, précision ---------------------------------
+const CAD_MIN = 14, CAD_MAX = 36;
+const posCad = c => Math.max(0, Math.min(100, (c - CAD_MIN) / (CAD_MAX - CAD_MIN) * 100));
+let precision = { dans: 0, total: 0 };
+function cibleCadence() {
+  const m = $("metro").value;
+  if (guide && !guide.fini && guide.etapes) {
+    const e = guide.etapes[guide.i];
+    if (m === "auto" || m === "0") return e && e.cadence ? e.cadence : null;
+  }
+  if (m !== "auto" && m !== "0") return [+m - 1, +m + 1];
+  return null;
+}
+function jaugeCadence(cad, arret) {
+  const c = cibleCadence();
+  $("c-cible").textContent = c ? `${c[0]}–${c[1]}` : "libre";
+  $("c-zone").style.display = c ? "block" : "none";
+  if (c) { $("c-zone").style.left = posCad(c[0] - .5) + "%"; $("c-zone").style.width = (posCad(c[1] + .5) - posCad(c[0] - .5)) + "%"; }
+  $("c-aiguille").style.left = `calc(${posCad(arret ? CAD_MIN : cad || CAD_MIN)}% - 2px)`;
+  let t = "", col = "";
+  if (c && !arret && cad) {
+    if (cad < c[0] - .5) { t = "↑ Accélérez un peu"; col = "var(--force)"; }
+    else if (cad > c[1] + .5) { t = "↓ Ralentissez, allongez le retour"; col = "var(--force)"; }
+    else { t = "✓ Cadence parfaite"; col = "var(--ok)"; }
+  }
+  $("c-conseil").textContent = t; $("c-conseil").style.color = col;
+}
+// Précision : secondes passées dans la cible pendant les étapes guidées avec cadence
+setInterval(() => {
+  if (!guide || guide.fini || guide.debut == null || dernier.arret !== false) return;
+  const e = guide.etapes[guide.i];
+  if (!e || !e.cadence || !dernier.cadence) return;
+  precision.total++;
+  if (dernier.cadence >= e.cadence[0] - .5 && dernier.cadence <= e.cadence[1] + .5) precision.dans++;
+}, 1000);
+
+// Métronome : « tic » à l'attaque, « toc » doux à la fin de la poussée (1/3 du cycle)
+let metroProchain = 0;
+function son(t, freq, vol, ms) {
+  const o = audio.createOscillator(), g = audio.createGain();
+  o.type = "triangle"; o.frequency.value = freq; o.connect(g); g.connect(audio.destination);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + ms / 1000);
+  o.start(t); o.stop(t + ms / 1000 + .02);
+}
+setInterval(() => {
+  const c = cibleCadence();
+  const actif = c && $("metro").value !== "0" && !(guide && guide.etapes && guide.etapes[guide.i]?.zone === "repos");
+  if (!actif) { metroProchain = 0; return; }
+  try { audio = audio || new AudioContext(); } catch (e) { return; }
+  const periode = 60 / ((c[0] + c[1]) / 2);
+  if (metroProchain < audio.currentTime) metroProchain = audio.currentTime + .05;
+  while (metroProchain < audio.currentTime + .3) {
+    son(metroProchain, 1200, .35, 60);                 // attaque
+    son(metroProchain + periode / 3, 600, .15, 50);    // fin de poussée, début du retour
+    metroProchain += periode;
+  }
+}, 100);
+lireJeu().then(J => jeuAvant = J);
 dessiner();
 </script>
 </body>

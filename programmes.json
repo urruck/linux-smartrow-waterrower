@@ -1,23 +1,159 @@
 {
   "_aide": "Séances guidées. Chaque étape dure un temps (secondes) ou une distance (mètres). Zones d'effort : calme, facile, modere, soutenu, fort ; l'allure visée est calculée à partir de l'allure de référence choisie dans l'appli. cadence = [min, max] en coups/min.",
   "zones": {
-    "calme":   {"nom": "Calme",   "ecart_allure_s": 30, "couleur": "#7d8f9c"},
-    "facile":  {"nom": "Facile",  "ecart_allure_s": 18, "couleur": "#4cc38a"},
-    "modere":  {"nom": "Modéré",  "ecart_allure_s": 8,  "couleur": "#3fb6e8"},
-    "soutenu": {"nom": "Soutenu", "ecart_allure_s": 0,  "couleur": "#f2a33a"},
-    "fort":    {"nom": "Fort",    "ecart_allure_s": -6, "couleur": "#e5675a"},
-    "repos":   {"nom": "Repos",   "ecart_allure_s": null, "couleur": "#5b6b78"}
+    "calme": {
+      "nom": "Calme",
+      "ecart_allure_s": 30,
+      "couleur": "#7d8f9c"
+    },
+    "facile": {
+      "nom": "Facile",
+      "ecart_allure_s": 18,
+      "couleur": "#4cc38a"
+    },
+    "modere": {
+      "nom": "Modéré",
+      "ecart_allure_s": 8,
+      "couleur": "#3fb6e8"
+    },
+    "soutenu": {
+      "nom": "Soutenu",
+      "ecart_allure_s": 0,
+      "couleur": "#f2a33a"
+    },
+    "fort": {
+      "nom": "Fort",
+      "ecart_allure_s": -6,
+      "couleur": "#e5675a"
+    },
+    "repos": {
+      "nom": "Repos",
+      "ecart_allure_s": null,
+      "couleur": "#5b6b78"
+    }
   },
   "programmes": [
+    {
+      "id": "reprise15",
+      "nom": "Reprise douce 15 min",
+      "niveau": "Reprise",
+      "but": "Remettre le corps en route sans forcer. Douleur à l'entorse = on arrête.",
+      "etapes": [
+        {
+          "temps": 240,
+          "zone": "calme",
+          "cadence": [
+            16,
+            18
+          ],
+          "note": "Mouvement lent, sans forcer à l'attaque"
+        },
+        {
+          "temps": 480,
+          "zone": "facile",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Facile : vous devez pouvoir parler. Écoutez votre articulation."
+        },
+        {
+          "temps": 180,
+          "zone": "calme",
+          "cadence": [
+            16,
+            18
+          ],
+          "note": "Retour au calme, puis étirements doux"
+        }
+      ]
+    },
+    {
+      "id": "reprise20",
+      "nom": "Reprise 20 min",
+      "niveau": "Reprise",
+      "but": "Un peu plus long, toujours facile. Arrêt immédiat en cas de douleur.",
+      "etapes": [
+        {
+          "temps": 240,
+          "zone": "calme",
+          "cadence": [
+            16,
+            18
+          ],
+          "note": "Échauffement lent"
+        },
+        {
+          "temps": 300,
+          "zone": "facile",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Facile et régulier"
+        },
+        {
+          "temps": 60,
+          "zone": "calme",
+          "cadence": [
+            16,
+            18
+          ],
+          "note": "Petite pause en ramant"
+        },
+        {
+          "temps": 300,
+          "zone": "facile",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Facile et régulier"
+        },
+        {
+          "temps": 300,
+          "zone": "calme",
+          "cadence": [
+            16,
+            18
+          ],
+          "note": "Retour au calme"
+        }
+      ]
+    },
     {
       "id": "decouverte",
       "nom": "Découverte 12 min",
       "niveau": "Débutant",
       "but": "Prendre le rythme : jambes, puis dos, puis bras ; retour bras, dos, jambes. Long retour, poussée franche.",
       "etapes": [
-        {"temps": 180, "zone": "calme", "cadence": [18, 20], "note": "Échauffement, mouvement ample"},
-        {"temps": 360, "zone": "facile", "cadence": [20, 22], "note": "Régulier, respirez à chaque coup"},
-        {"temps": 180, "zone": "calme", "cadence": [18, 20], "note": "Retour au calme"}
+        {
+          "temps": 180,
+          "zone": "calme",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Échauffement, mouvement ample"
+        },
+        {
+          "temps": 360,
+          "zone": "facile",
+          "cadence": [
+            20,
+            22
+          ],
+          "note": "Régulier, respirez à chaque coup"
+        },
+        {
+          "temps": 180,
+          "zone": "calme",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Retour au calme"
+        }
       ]
     },
     {
@@ -26,13 +162,69 @@
       "niveau": "Débutant",
       "but": "Garder la même force par coup en changeant seulement le rythme. Idéal pour regarder la courbe de force.",
       "etapes": [
-        {"temps": 240, "zone": "calme", "cadence": [18, 20], "note": "Échauffement"},
-        {"temps": 120, "zone": "facile", "cadence": [18, 20], "note": "Lent et long : courbe bien ronde"},
-        {"temps": 120, "zone": "modere", "cadence": [22, 24], "note": "Même force, rythme plus vif"},
-        {"temps": 120, "zone": "facile", "cadence": [18, 20], "note": "Lent et long"},
-        {"temps": 120, "zone": "modere", "cadence": [24, 26], "note": "Plus vif, sans se précipiter au retour"},
-        {"temps": 120, "zone": "facile", "cadence": [18, 20], "note": "Lent et long"},
-        {"temps": 180, "zone": "calme", "cadence": [18, 20], "note": "Retour au calme"}
+        {
+          "temps": 240,
+          "zone": "calme",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Échauffement"
+        },
+        {
+          "temps": 120,
+          "zone": "facile",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Lent et long : courbe bien ronde"
+        },
+        {
+          "temps": 120,
+          "zone": "modere",
+          "cadence": [
+            22,
+            24
+          ],
+          "note": "Même force, rythme plus vif"
+        },
+        {
+          "temps": 120,
+          "zone": "facile",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Lent et long"
+        },
+        {
+          "temps": 120,
+          "zone": "modere",
+          "cadence": [
+            24,
+            26
+          ],
+          "note": "Plus vif, sans se précipiter au retour"
+        },
+        {
+          "temps": 120,
+          "zone": "facile",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Lent et long"
+        },
+        {
+          "temps": 180,
+          "zone": "calme",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Retour au calme"
+        }
       ]
     },
     {
@@ -41,9 +233,121 @@
       "niveau": "Tous niveaux",
       "but": "Effort continu et confortable, on peut parler. La base de la progression.",
       "etapes": [
-        {"temps": 180, "zone": "calme", "cadence": [18, 20], "note": "Échauffement"},
-        {"temps": 1200, "zone": "facile", "cadence": [20, 22], "note": "Allure stable, ne pas accélérer"},
-        {"temps": 180, "zone": "calme", "cadence": [18, 20], "note": "Retour au calme"}
+        {
+          "temps": 180,
+          "zone": "calme",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Échauffement"
+        },
+        {
+          "temps": 1200,
+          "zone": "facile",
+          "cadence": [
+            20,
+            22
+          ],
+          "note": "Allure stable, ne pas accélérer"
+        },
+        {
+          "temps": 180,
+          "zone": "calme",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Retour au calme"
+        }
+      ]
+    },
+    {
+      "id": "endurance30",
+      "nom": "Endurance 30 min",
+      "niveau": "Tous niveaux",
+      "but": "La séance « brûle-graisses » : longue, facile, régulière.",
+      "etapes": [
+        {
+          "temps": 300,
+          "zone": "calme",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Échauffement"
+        },
+        {
+          "temps": 1200,
+          "zone": "facile",
+          "cadence": [
+            20,
+            22
+          ],
+          "note": "Allure facile : on peut parler"
+        },
+        {
+          "temps": 300,
+          "zone": "calme",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Retour au calme"
+        }
+      ]
+    },
+    {
+      "id": "endurance40",
+      "nom": "Endurance 40 min",
+      "niveau": "Intermédiaire",
+      "but": "Longue sortie facile, le meilleur allié de la perte de poids.",
+      "etapes": [
+        {
+          "temps": 300,
+          "zone": "calme",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Échauffement"
+        },
+        {
+          "temps": 900,
+          "zone": "facile",
+          "cadence": [
+            20,
+            22
+          ],
+          "note": "Facile et régulier"
+        },
+        {
+          "temps": 600,
+          "zone": "modere",
+          "cadence": [
+            22,
+            24
+          ],
+          "note": "Un peu plus appuyé"
+        },
+        {
+          "temps": 300,
+          "zone": "facile",
+          "cadence": [
+            20,
+            22
+          ],
+          "note": "On relâche"
+        },
+        {
+          "temps": 300,
+          "zone": "calme",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Retour au calme"
+        }
       ]
     },
     {
@@ -52,12 +356,47 @@
       "niveau": "Intermédiaire",
       "but": "10 fois 30 s fort, 30 s léger. Court et efficace pour le cardio.",
       "etapes": [
-        {"temps": 300, "zone": "calme", "cadence": [18, 20], "note": "Échauffement"},
-        {"repeter": 10, "etapes": [
-          {"temps": 30, "zone": "fort", "cadence": [26, 28], "note": "Fort !"},
-          {"temps": 30, "zone": "calme", "cadence": [18, 20], "note": "Léger, on récupère en ramant"}
-        ]},
-        {"temps": 300, "zone": "calme", "cadence": [18, 20], "note": "Retour au calme"}
+        {
+          "temps": 300,
+          "zone": "calme",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Échauffement"
+        },
+        {
+          "repeter": 10,
+          "etapes": [
+            {
+              "temps": 30,
+              "zone": "fort",
+              "cadence": [
+                26,
+                28
+              ],
+              "note": "Fort !"
+            },
+            {
+              "temps": 30,
+              "zone": "calme",
+              "cadence": [
+                18,
+                20
+              ],
+              "note": "Léger, on récupère en ramant"
+            }
+          ]
+        },
+        {
+          "temps": 300,
+          "zone": "calme",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Retour au calme"
+        }
       ]
     },
     {
@@ -66,17 +405,89 @@
       "niveau": "Intermédiaire",
       "but": "Efforts de 1 à 3 min, récupération moitié moins longue.",
       "etapes": [
-        {"temps": 300, "zone": "calme", "cadence": [18, 20], "note": "Échauffement"},
-        {"temps": 60, "zone": "fort", "cadence": [26, 28], "note": "1 minute"},
-        {"temps": 30, "zone": "repos", "note": "Récupération"},
-        {"temps": 120, "zone": "soutenu", "cadence": [24, 26], "note": "2 minutes"},
-        {"temps": 60, "zone": "repos", "note": "Récupération"},
-        {"temps": 180, "zone": "soutenu", "cadence": [24, 26], "note": "3 minutes, le sommet"},
-        {"temps": 90, "zone": "repos", "note": "Récupération"},
-        {"temps": 120, "zone": "soutenu", "cadence": [24, 26], "note": "2 minutes"},
-        {"temps": 60, "zone": "repos", "note": "Récupération"},
-        {"temps": 60, "zone": "fort", "cadence": [26, 28], "note": "Dernière minute !"},
-        {"temps": 300, "zone": "calme", "cadence": [18, 20], "note": "Retour au calme"}
+        {
+          "temps": 300,
+          "zone": "calme",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Échauffement"
+        },
+        {
+          "temps": 60,
+          "zone": "fort",
+          "cadence": [
+            26,
+            28
+          ],
+          "note": "1 minute"
+        },
+        {
+          "temps": 30,
+          "zone": "repos",
+          "note": "Récupération"
+        },
+        {
+          "temps": 120,
+          "zone": "soutenu",
+          "cadence": [
+            24,
+            26
+          ],
+          "note": "2 minutes"
+        },
+        {
+          "temps": 60,
+          "zone": "repos",
+          "note": "Récupération"
+        },
+        {
+          "temps": 180,
+          "zone": "soutenu",
+          "cadence": [
+            24,
+            26
+          ],
+          "note": "3 minutes, le sommet"
+        },
+        {
+          "temps": 90,
+          "zone": "repos",
+          "note": "Récupération"
+        },
+        {
+          "temps": 120,
+          "zone": "soutenu",
+          "cadence": [
+            24,
+            26
+          ],
+          "note": "2 minutes"
+        },
+        {
+          "temps": 60,
+          "zone": "repos",
+          "note": "Récupération"
+        },
+        {
+          "temps": 60,
+          "zone": "fort",
+          "cadence": [
+            26,
+            28
+          ],
+          "note": "Dernière minute !"
+        },
+        {
+          "temps": 300,
+          "zone": "calme",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Retour au calme"
+        }
       ]
     },
     {
@@ -85,12 +496,43 @@
       "niveau": "Intermédiaire",
       "but": "Tenir la même allure sur les 4 répétitions : partir raisonnable.",
       "etapes": [
-        {"temps": 300, "zone": "calme", "cadence": [18, 20], "note": "Échauffement"},
-        {"repeter": 4, "etapes": [
-          {"distance": 500, "zone": "soutenu", "cadence": [24, 26], "note": "500 m à allure régulière"},
-          {"temps": 120, "zone": "repos", "note": "Récupération 2 min"}
-        ]},
-        {"temps": 300, "zone": "calme", "cadence": [18, 20], "note": "Retour au calme"}
+        {
+          "temps": 300,
+          "zone": "calme",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Échauffement"
+        },
+        {
+          "repeter": 4,
+          "etapes": [
+            {
+              "distance": 500,
+              "zone": "soutenu",
+              "cadence": [
+                24,
+                26
+              ],
+              "note": "500 m à allure régulière"
+            },
+            {
+              "temps": 120,
+              "zone": "repos",
+              "note": "Récupération 2 min"
+            }
+          ]
+        },
+        {
+          "temps": 300,
+          "zone": "calme",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Retour au calme"
+        }
       ]
     },
     {
@@ -99,12 +541,47 @@
       "niveau": "Confirmé",
       "but": "Effort soutenu mais contrôlé : on ne peut dire que quelques mots.",
       "etapes": [
-        {"temps": 300, "zone": "calme", "cadence": [18, 20], "note": "Échauffement"},
-        {"repeter": 3, "etapes": [
-          {"temps": 360, "zone": "soutenu", "cadence": [22, 24], "note": "6 minutes au seuil"},
-          {"temps": 120, "zone": "calme", "cadence": [18, 20], "note": "Récupération en ramant"}
-        ]},
-        {"temps": 300, "zone": "calme", "cadence": [18, 20], "note": "Retour au calme"}
+        {
+          "temps": 300,
+          "zone": "calme",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Échauffement"
+        },
+        {
+          "repeter": 3,
+          "etapes": [
+            {
+              "temps": 360,
+              "zone": "soutenu",
+              "cadence": [
+                22,
+                24
+              ],
+              "note": "6 minutes au seuil"
+            },
+            {
+              "temps": 120,
+              "zone": "calme",
+              "cadence": [
+                18,
+                20
+              ],
+              "note": "Récupération en ramant"
+            }
+          ]
+        },
+        {
+          "temps": 300,
+          "zone": "calme",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Retour au calme"
+        }
       ]
     },
     {
@@ -113,10 +590,38 @@
       "niveau": "Repère",
       "but": "À faire une fois par mois pour mesurer les progrès. Son allure moyenne sert d'allure de référence.",
       "etapes": [
-        {"temps": 300, "zone": "calme", "cadence": [18, 20], "note": "Échauffement complet"},
-        {"temps": 60, "zone": "repos", "note": "Prêt ? Départ au prochain signal"},
-        {"distance": 1000, "zone": "soutenu", "cadence": [24, 28], "note": "1000 m : régulier, finir fort"},
-        {"temps": 300, "zone": "calme", "cadence": [18, 20], "note": "Retour au calme"}
+        {
+          "temps": 300,
+          "zone": "calme",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Échauffement complet"
+        },
+        {
+          "temps": 60,
+          "zone": "repos",
+          "note": "Prêt ? Départ au prochain signal"
+        },
+        {
+          "distance": 1000,
+          "zone": "soutenu",
+          "cadence": [
+            24,
+            28
+          ],
+          "note": "1000 m : régulier, finir fort"
+        },
+        {
+          "temps": 300,
+          "zone": "calme",
+          "cadence": [
+            18,
+            20
+          ],
+          "note": "Retour au calme"
+        }
       ]
     }
   ]
