@@ -97,6 +97,30 @@
   .recomp .cond { color: var(--doux); font-size: 13px; width: 150px; flex: none; }
   .recomp.obtenue .cond { color: var(--ok); font-weight: 600; }
   svg text { fill: var(--doux); font-size: 12px; font-family: inherit; }
+  #exo { position: fixed; inset: 0; background: var(--fond); z-index: 9; display: none; flex-direction: column;
+         padding: 16px 24px; border-top: 10px solid var(--zone, #b38cff); }
+  #exo .haut { display: flex; align-items: center; gap: 12px; color: var(--doux); font-size: 16px; }
+  #exo .milieu { flex: 1; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; align-items: center; min-height: 0; }
+  #x-nom { font-size: clamp(36px, 6vw, 84px); font-weight: 800; color: var(--zone, #b38cff); line-height: 1.05; }
+  #x-chrono { font-size: clamp(90px, 18vw, 260px); font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
+  #x-note { font-size: clamp(18px, 2.4vw, 30px); margin-top: 12px; }
+  #x-dessin svg.figure { width: 100%; max-height: 62vh; }
+  svg.figure polyline, svg.figure line { stroke: var(--texte); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+  svg.figure circle { fill: var(--texte); }
+  svg.figure .sol { stroke: #3a4a56; stroke-width: 3; }
+  svg.figure .meuble { stroke: #5b6b78; stroke-width: 4; }
+  svg.figure .fleche { fill: none; stroke: var(--force); stroke-width: 4; }
+  svg.figure .souffle { fill: rgba(63,182,232,.5); stroke: none; }
+  svg.figure .note { fill: var(--force); font-size: 22px; font-weight: 700; }
+  svg.figure .pose-a { animation: poseA 2.4s infinite steps(1); }
+  svg.figure .pose-b { animation: poseB 2.4s infinite steps(1); }
+  @keyframes poseA { 0% { opacity: 1; } 50% { opacity: 0; } }
+  @keyframes poseB { 0% { opacity: 0; } 50% { opacity: 1; } }
+  #exo .bas { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 18px; }
+  #exo .bas .barre { flex-basis: 100%; height: 12px; }
+  #exo button { font-size: 18px; padding: 10px 18px; }
+  #bandeau { display: none; background: #5a3a12; color: #ffe2b0; padding: 10px 16px; font-size: 15px; }
+  @media (max-width: 760px) { #exo .milieu { grid-template-columns: 1fr; } #x-dessin svg.figure { max-height: 30vh; } }
   .modale { position: fixed; inset: 0; background: rgba(5,8,10,.82); display: none; place-items: center; z-index: 10; }
   .modale .boite { background: var(--carte); border-radius: 16px; padding: 24px 28px; width: calc(100% - 32px); }
   #f-etapes td { text-align: left; vertical-align: top; }
@@ -118,6 +142,8 @@
 </style>
 </head>
 <body>
+<div id="bandeau">⚠️ L'application qui tourne est une ancienne version : les séances au sol, l'Aventure et les idées repas ne peuvent pas marcher.
+  Dans son terminal, faites <b>Ctrl+C</b>, relancez <b>bash ~/smartrow/rameur.sh</b>, puis rechargez cette page (F5).</div>
 <header>
   <h1>🚣 Rameur</h1>
   <div class="etat"><span class="pastille" id="pastille"></span><span id="connexion">Recherche du SmartRow…</span></div>
@@ -223,6 +249,17 @@
       <button id="f-ok">Enregistrer</button></div>
   </div>
 </main>
+<div id="exo">
+  <div class="haut"><span id="x-etape"></span><span class="espace"></span><span id="x-titre"></span></div>
+  <div class="milieu">
+    <div><div id="x-nom"></div><div id="x-chrono"></div><div id="x-note"></div></div>
+    <div id="x-dessin"></div>
+  </div>
+  <div class="bas"><div class="barre"><div id="x-barre"></div></div>
+    <span id="x-suite" class="sous" style="font-size:18px"></span><span class="espace"></span>
+    <label class="sous"><input type="checkbox" id="x-voix" checked style="width:auto"> voix</label>
+    <button id="x-pause">⏸ Pause</button><button id="x-passer">⏭ Passer</button><button id="x-stop">✖ Arrêter</button></div>
+</div>
 <div id="fiche" class="modale"><div class="boite" style="text-align:left;max-width:640px;max-height:88vh;overflow:auto">
   <h2 id="f-titre" style="margin:0 0 4px"></h2><div class="sous" id="f-info"></div>
   <p id="f-but"></p><table><tbody id="f-etapes"></tbody></table>
@@ -230,6 +267,7 @@
     <button id="f-fermer">Fermer</button><button id="f-go" style="border-color:var(--ok)">▶ Démarrer</button></div></div></div>
 <div id="celebration"><div class="boite"><div id="c-titre" style="font-size:22px;font-weight:700">Séance terminée !</div>
   <div class="gros" id="c-xp">+0 XP</div><ul id="c-liste"></ul><button id="c-ok">Super !</button></div></div>
+<script src="/illustrations.js"></script>
 <script>
 const $ = id => document.getElementById(id);
 const mmss = s => (s == null || s <= 0) ? "–:––" : Math.floor(s / 60) + ":" + String(Math.floor(s % 60)).padStart(2, "0");
@@ -404,13 +442,45 @@ async function demarrerHorsRameur(p) {
   guide = { p, etapes: aplatir(p.etapes), i: 0, debut: null, t0: 0, d0: 0, dernierBip: null, horsRameur: true };
   $("choix").style.display = "none";
   $("guide").style.display = "block";
+  guide.prepFin = performance.now() + 8000;
+  $("x-voix").checked = $("voix").checked;
+  $("exo").style.display = "flex";
   afficherEtape();
-  $("g-reste").textContent = "Prêt";
+  $("x-note").textContent = "Mettez-vous en place : " + (guide.etapes[0].note || "");
   dire(`${p.nom}. Mettez-vous en place. Premier exercice : ${texteEtape(guide.etapes[0])}`);
-  setTimeout(() => { if (guide && guide.p === p) { guide.debut = guide.t0 = performance.now(); bip(1000, 350); afficherEtape(); } }, 6000);
 }
 
+// Écran plein pour les exercices au sol
+function afficherExo() {
+  const e = guide.etapes[guide.i], z = zones[e.zone] || {}, s = guide.etapes[guide.i + 1];
+  const enRepos = !e.exercice;
+  $("exo").style.setProperty("--zone", z.couleur || "#b38cff");
+  $("x-titre").textContent = guide.p.nom;
+  $("x-etape").textContent = guide.debut === null ? "Préparez-vous" : `Étape ${guide.i + 1} / ${guide.etapes.length}`;
+  $("x-nom").textContent = guide.debut === null ? e.exercice || "Prêt ?" : (enRepos ? "Repos" : e.exercice);
+  $("x-note").textContent = enRepos ? (s ? `Respirez. Ensuite : ${s.exercice || "repos"} — ${s.note || ""}` : "Respirez.") : (e.note || "");
+  // pendant le repos, on montre le prochain exercice pour se préparer
+  const dessin = illustration(enRepos && s ? s.exercice : e.exercice);
+  $("x-dessin").innerHTML = dessin || `<div style="font-size:160px;text-align:center">${enRepos ? "😮‍💨" : "💪"}</div>`;
+  $("x-suite").textContent = s ? `Ensuite : ${s.exercice || "Repos"} (${duree(s)})` : "Dernier exercice !";
+  $("x-pause").textContent = guide.pause ? "▶ Reprendre" : "⏸ Pause";
+}
+$("x-voix").onchange = () => { $("voix").checked = $("x-voix").checked; if (!$("voix").checked && window.speechSynthesis) speechSynthesis.cancel(); };
+$("x-pause").onclick = () => {
+  if (!guide || guide.fini) return;
+  if (guide.pause) { const d = performance.now() - guide.pause; guide.t0 += d; if (guide.prepFin) guide.prepFin += d; guide.pause = null; }
+  else guide.pause = performance.now();
+  afficherExo();
+};
+$("x-passer").onclick = () => { if (guide && !guide.fini && guide.debut !== null) etapeSuivante(); };
+$("x-stop").onclick = () => {
+  if (!confirm("Arrêter la séance ?")) return;
+  guide = null; $("exo").style.display = "none"; $("guide").style.display = "none";
+  if (window.speechSynthesis) speechSynthesis.cancel();
+};
+
 function afficherEtape() {
+  if (guide.horsRameur) afficherExo();
   const e = guide.etapes[guide.i], z = zones[e.zone] || {};
   $("guide").style.setProperty("--zone", z.couleur || "");
   $("g-zone").textContent = e.exercice || z.nom || e.zone;
@@ -434,6 +504,11 @@ function etapeSuivante() {
     $("g-zone").textContent = "Terminé 👏";
     $("g-reste").textContent = ""; $("g-barre").style.width = "100%";
     const hors = guide.horsRameur, nomProg = guide.p.nom;
+    if (hors) {
+      $("x-nom").textContent = "Bravo ! 👏"; $("x-chrono").textContent = "✓"; $("x-note").textContent = `${nomProg} terminé.`;
+      $("x-dessin").innerHTML = `<div style="font-size:160px;text-align:center">🏅</div>`; $("x-barre").style.width = "100%";
+      $("x-suite").textContent = ""; $("x-etape").textContent = "";
+    }
     const dureeTot = guide.etapes.reduce((a, e) => a + (e.temps || 0), 0);
     $("g-note").textContent = hors ? `${nomProg} : bravo, c'est fait !` : `${nomProg} : ${Math.round(dernier.distance_m || 0)} m en ${temps(dernier.temps_s)}.`;
     $("g-cibles").textContent = precision.total >= 30 ? `🥁 Cadence tenue ${Math.round(100 * precision.dans / precision.total)} % du temps` : "";
@@ -441,6 +516,7 @@ function etapeSuivante() {
     guide = { fini: true };
     setTimeout(async () => {
       if (hors) {
+        setTimeout(() => { $("exo").style.display = "none"; $("guide").style.display = "none"; }, 2500);
         await fetch(`/exercice?programme=${encodeURIComponent(nomProg)}&duree=${dureeTot}`, { method: "POST" });
         const J = await lireJeu(); celebrer(jeuAvant, J, "Renfo terminé !"); jeuAvant = J;
         return;
@@ -458,8 +534,16 @@ function etapeSuivante() {
 
 setInterval(() => {
   if (!guide || guide.fini) return;
+  if (guide.pause) return;
   if (guide.debut === null) {
-    if (guide.horsRameur) return;
+    if (guide.horsRameur) {
+      const r = Math.ceil((guide.prepFin - performance.now()) / 1000);
+      $("x-chrono").textContent = Math.max(0, r);
+      $("x-barre").style.width = "0%";
+      if (r <= 3 && r >= 1 && guide.dernierBip !== r) { guide.dernierBip = r; bip(660, 120); }
+      if (r <= 0) { guide.debut = guide.t0 = performance.now(); guide.dernierBip = null; bip(1000, 350); afficherEtape(); dire(texteEtape(guide.etapes[0])); }
+      return;
+    }
     if ((dernier.distance_m || 0) > 0 && dernier.arret === false) {   // premier coup
       guide.debut = guide.t0 = performance.now(); guide.d0 = dernier.distance_m || 0;
       bip(1000, 350); afficherEtape();
@@ -478,6 +562,7 @@ setInterval(() => {
     texte = Math.ceil(reste) + " m";
   }
   $("g-reste").textContent = texte;
+  if (guide.horsRameur) { $("x-chrono").textContent = texte; $("x-barre").style.width = Math.min(100, fait / (e.temps || e.distance) * 100) + "%"; }
   $("g-barre").style.width = Math.min(100, fait / (e.temps || e.distance) * 100) + "%";
   if (reste <= 0) etapeSuivante();
 }, 250);
@@ -504,7 +589,11 @@ $("btn-stop").onclick = () => {
 let jeuAvant = null, nomsProgrammes = {};
 const esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 const kgfr = v => (v == null ? "–" : Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 1 }));
-async function lireJeu() { return (await fetch("/jeu")).json(); }
+async function lireJeu() {
+  try { return await (await fetch("/jeu")).json(); }
+  catch (e) { $("bandeau").style.display = "block"; return null; }
+}
+fetch("/version").then(r => r.json()).catch(() => { $("bandeau").style.display = "block"; });
 
 $("btn-aventure").onclick = async () => {
   const av = $("vue-aventure").classList.toggle("vue-cachee") === false;
@@ -655,7 +744,7 @@ $("f-ok").onclick = async () => {
 
 // Célébration : compare l'état du jeu avant et après
 function celebrer(A, B, titre) {
-  if (!A || !B) return;
+  if (!A || !B) return;  // ancienne version du serveur : pas de jeu
   const gains = [];
   if (B.niveau.numero > A.niveau.numero) gains.push(`⭐ Niveau ${B.niveau.numero} : <b>${esc(B.niveau.nom)}</b> !`);
   const avant = new Set(A.badges.filter(b => b.obtenu).map(b => b.id));

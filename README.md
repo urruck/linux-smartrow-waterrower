@@ -89,8 +89,14 @@ vient des jambes, pas du nombre de coups.
 
 ## Hors rameur : ventre et cheville
 
-Ces séances guidées se font au sol, avec un minuteur, la voix et les bips.
-Elles ne comportent **aucun saut**, pour ménager une cheville fragile.
+Ces séances guidées se font au sol. Un **écran plein** affiche, en très
+grand, l'exercice, le chrono, la consigne et un **dessin animé** du
+mouvement. La voix et les bips accompagnent la séance, avec les boutons
+Pause, Passer et Arrêter. Pendant les repos, le dessin montre l'exercice
+suivant. Ces séances ne comportent **aucun saut**, pour ménager une cheville
+fragile.
+
+![Écran d'exercice au sol](captures/exercice-au-sol.png)
 
 | Séance | Contenu |
 |---|---|
@@ -207,6 +213,7 @@ python3 rameur.py --rejouer exemples/seance-260m.log
 | `programmes.json` | les séances guidées |
 | `jeu.py`, `jeu.json` | mode Aventure : XP, niveaux, parcours, badges, quêtes, plan, poids |
 | `recettes.json` | idées de repas protéinés de saison |
+| `illustrations.js` | dessins animés des exercices au sol |
 | `smartrow_ble.py` | connexion au SmartRow et décodage des messages |
 | `ecouter.py` | outil de diagnostic : affiche et enregistre les messages bruts |
 | `exemples/seance-260m.log` | une vraie séance enregistrée, pour les essais |

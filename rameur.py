@@ -189,6 +189,11 @@ async def serveur_web(seance, capteur, hote):
             elif chemin == "/pesee" and ligne[0] == "POST":
                 jeu.ajouter_pesee(float(params["kg"][0].replace(",", ".")))
                 corps, type_ = b"{}", "application/json"
+            elif chemin == "/illustrations.js":
+                with open(os.path.join(ICI, "illustrations.js"), "rb") as f:
+                    corps, type_ = f.read(), "text/javascript; charset=utf-8"
+            elif chemin == "/version":
+                corps, type_ = b'{"version": 3}', "application/json"
             elif chemin == "/recettes":
                 with open(os.path.join(ICI, "recettes.json"), "rb") as f:
                     corps, type_ = f.read(), "application/json"
