@@ -1,0 +1,4 @@
+lib/
+sessions/
+__pycache__/
+*.pyc

@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rameur SmartRow</title>
+<style>
+  :root {
+    --fond: #0f1418; --carte: #182027; --texte: #eef3f6; --doux: #8fa3b1;
+    --eau: #3fb6e8; --force: #f2a33a; --ok: #4cc38a; --alerte: #e5675a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fond); color: var(--texte);
+         font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { display: flex; align-items: center; gap: 12px; padding: 10px 16px; flex-wrap: wrap; }
+  h1 { font-size: 18px; margin: 0; font-weight: 600; }
+  .etat { font-size: 14px; color: var(--doux); display: flex; align-items: center; gap: 6px; }
+  .pastille { width: 10px; height: 10px; border-radius: 50%; background: var(--alerte); }
+  .pastille.ok { background: var(--ok); }
+  .pastille.connexion { background: var(--force); }
+  .espace { flex: 1; }
+  button { background: var(--carte); color: var(--texte); border: 1px solid #2c3944;
+           border-radius: 8px; padding: 8px 14px; font-size: 15px; cursor: pointer; }
+  button:hover { border-color: var(--eau); }
+  main { padding: 0 16px 16px; display: grid; gap: 12px;
+         grid-template-columns: repeat(3, 1fr); }
+  .tuile { background: var(--carte); border-radius: 12px; padding: 12px 16px; min-width: 0; }
+  .nom { font-size: 13px; color: var(--doux); text-transform: uppercase; letter-spacing: .06em; }
+  .val { font-size: clamp(36px, 7vw, 80px); font-weight: 700; font-variant-numeric: tabular-nums;
+         line-height: 1.1; white-space: nowrap; }
+  .val small { font-size: .35em; color: var(--doux); font-weight: 500; margin-left: 4px; }
+  .sous { font-size: 14px; color: var(--doux); }
+  .grande .val { font-size: clamp(48px, 10vw, 120px); }
+  .grande { grid-column: span 3 / span 3; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+            background: none; padding: 0; }
+  .grande > div { background: var(--carte); border-radius: 12px; padding: 12px 16px; }
+  #allure .val { color: var(--eau); }
+  .courbe { grid-column: span 3 / span 3; }
+  canvas { width: 100%; height: 220px; display: block; }
+  #historique { grid-column: span 3 / span 3; display: none; }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid #26313a; }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--doux); font-weight: 500; font-size: 13px; }
+  #guide { grid-column: span 3 / span 3; display: none; border-left: 8px solid var(--zone, var(--eau)); }
+  #guide .ligne { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+  #g-zone { font-size: clamp(28px, 5vw, 56px); font-weight: 800; color: var(--zone, var(--eau)); }
+  #g-reste { font-size: clamp(28px, 5vw, 56px); font-weight: 700; font-variant-numeric: tabular-nums; margin-left: auto; }
+  #g-note { font-size: 18px; margin-top: 4px; }
+  #g-cibles, #g-suite { color: var(--doux); font-size: 15px; margin-top: 4px; }
+  .barre { height: 8px; background: #26313a; border-radius: 4px; margin-top: 10px; overflow: hidden; }
+  .barre div { height: 100%; width: 0; background: var(--zone, var(--eau)); transition: width .25s linear; }
+  .dans-cible { outline: 3px solid var(--ok); }
+  .hors-cible { outline: 3px solid var(--force); }
+  #choix { grid-column: span 3 / span 3; display: none; }
+  .progs { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; margin-top: 10px; }
+  .prog { display: flex; flex-direction: column; justify-content: flex-start; background: #1f2a33; border: 1px solid #2c3944; border-radius: 10px; padding: 12px; cursor: pointer; text-align: left; }
+  .prog:hover { border-color: var(--eau); }
+  .prog b { display: block; font-size: 16px; margin-bottom: 4px; }
+  .prog span { color: var(--doux); font-size: 13px; }
+  .reglage { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 8px; color: var(--doux); font-size: 14px; }
+  input { background: #0f1418; color: var(--texte); border: 1px solid #2c3944; border-radius: 6px; padding: 6px 8px; width: 80px; font-size: 15px; }
+  @media (max-width: 640px) {
+    main { grid-template-columns: 1fr 1fr; }
+    #guide, #choix, .grande, .courbe, #historique { grid-column: span 2 / span 2; }
+    .grande { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>🚣 Rameur</h1>
+  <div class="etat"><span class="pastille" id="pastille"></span><span id="connexion">Recherche du SmartRow…</span></div>
+  <div class="espace"></div>
+  <button id="btn-seances">Séances guidées</button>
+  <button id="btn-histo">Historique</button>
+  <button id="btn-nouvelle">Nouvelle séance</button>
+</header>
+<main>
+  <div class="tuile" id="choix"><div class="nom">Choisir une séance guidée</div>
+    <div class="reglage">Allure de référence /500 m :
+      <input id="ref" placeholder="2:45"> <span id="ref-aide"></span></div>
+    <div class="progs" id="progs"></div></div>
+  <div class="tuile" id="guide">
+    <div class="ligne"><span id="g-zone"></span><span id="g-etape" class="sous"></span>
+      <span id="g-reste"></span></div>
+    <div id="g-note"></div>
+    <div id="g-cibles"></div>
+    <div class="barre"><div id="g-barre"></div></div>
+    <div class="reglage"><span id="g-suite"></span><span class="espace"></span>
+      <label><input type="checkbox" id="voix" checked style="width:auto"> voix</label>
+      <button id="btn-stop">Arrêter la séance guidée</button></div>
+  </div>
+  <section class="grande">
+    <div><div class="nom">Temps</div><div class="val" id="temps">0:00</div></div>
+    <div id="allure"><div class="nom">Allure /500 m</div><div class="val" id="allure-v">–:––</div>
+      <div class="sous">moyenne <span id="allure-moy">–:––</span></div></div>
+  </section>
+  <div class="tuile"><div class="nom">Distance</div><div class="val"><span id="distance">0</span><small>m</small></div></div>
+  <div class="tuile"><div class="nom">Puissance</div><div class="val"><span id="watts">0</span><small>W</small></div>
+    <div class="sous">moyenne <span id="watts-moy">0</span> W</div></div>
+  <div class="tuile" id="t-cadence"><div class="nom">Cadence</div><div class="val"><span id="cadence">0</span><small>c/min</small></div>
+    <div class="sous"><span id="coups">0</span> coups</div></div>
+  <div class="tuile courbe"><div class="nom">Courbe de force du dernier coup</div><canvas id="toile"></canvas></div>
+  <div class="tuile" id="historique"><div class="nom">Séances enregistrées</div>
+    <table><thead><tr><th>Date</th><th>Séance</th><th>Distance</th><th>Temps</th><th>Allure moy.</th><th>Watts moy.</th><th>Coups</th></tr></thead>
+    <tbody id="lignes"></tbody></table></div>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const mmss = s => (s == null || s <= 0) ? "–:––" : Math.floor(s / 60) + ":" + String(Math.floor(s % 60)).padStart(2, "0");
+const temps = s => {
+  if (!s) return "0:00";
+  const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), sec = String(s % 60).padStart(2, "0");
+  return h ? `${h}:${String(m).padStart(2, "0")}:${sec}` : `${m}:${sec}`;
+};
+let courbes = [];   // derniers coups, pour afficher les précédents en transparence
+
+function dessiner() {
+  const c = $("toile"), r = devicePixelRatio || 1;
+  c.width = c.clientWidth * r; c.height = c.clientHeight * r;
+  const g = c.getContext("2d"), W = c.width, H = c.height;
+  g.clearRect(0, 0, W, H);
+  const max = Math.max(20, ...courbes.flat());
+  courbes.forEach((pts, i) => {
+    const dernier = i === courbes.length - 1;
+    g.beginPath();
+    pts.forEach((v, j) => {
+      const x = (j / Math.max(1, pts.length - 1)) * (W - 8 * r) + 4 * r, y = H - 4 * r - v / max * (H - 12 * r);
+      j ? g.lineTo(x, y) : g.moveTo(x, y);
+    });
+    g.strokeStyle = dernier ? getComputedStyle(document.body).getPropertyValue("--force") : "rgba(143,163,177,.25)";
+    g.lineWidth = (dernier ? 4 : 2) * r; g.lineJoin = "round"; g.stroke();
+  });
+}
+addEventListener("resize", dessiner);
+
+const flux = new EventSource("/flux");
+let derniereCourbe = "";
+flux.onmessage = ev => {
+  const e = JSON.parse(ev.data);
+  dernier = e;
+  const libelles = { ok: "SmartRow connecté", connexion: "Connexion…", recherche: "Recherche du SmartRow… (tirez sur la poignée)" };
+  $("connexion").textContent = libelles[e.connexion] || e.connexion;
+  $("pastille").className = "pastille " + (e.connexion || "");
+  $("temps").textContent = temps(e.temps_s);
+  $("distance").textContent = Math.round(e.distance_m || 0);
+  const arret = e.arret !== false;
+  $("allure-v").textContent = arret ? "–:––" : mmss(e.allure_500m_s);
+  $("allure-moy").textContent = mmss(e.allure_moyenne_s);
+  $("watts").textContent = arret ? 0 : (e.watts || 0);
+  $("watts-moy").textContent = Math.round(e.watts_moyens || 0);
+  $("cadence").textContent = arret ? 0 : Math.round(e.cadence || 0);
+  $("coups").textContent = e.coups || 0;
+  ciblesEnDirect(e, arret);
+  const cle = JSON.stringify(e.courbe || []);
+  if (cle !== derniereCourbe) {
+    derniereCourbe = cle;
+    courbes = (e.courbe && e.courbe.length) ? [...courbes.slice(-4), e.courbe] : [];
+    dessiner();
+  }
+};
+
+$("btn-nouvelle").onclick = async () => {
+  if (!confirm("Enregistrer la séance en cours et remettre le compteur à zéro ?")) return;
+  await fetch("/nouvelle", { method: "POST" });
+  courbes = []; dessiner();
+};
+
+$("btn-histo").onclick = async () => {
+  const bloc = $("historique");
+  if (bloc.style.display === "block") { bloc.style.display = "none"; return; }
+  const liste = await (await fetch("/historique")).json();
+  $("lignes").innerHTML = liste.length ? liste.map(s => {
+    const d = new Date(s.debut);
+    return `<tr><td>${d.toLocaleDateString("fr-FR")} ${d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</td>
+      <td style="text-align:left">${s.programme || "libre"}</td><td>${Math.round(s.distance_m || 0)} m</td><td>${temps(s.temps_s)}</td><td>${mmss(s.allure_moyenne_s)}</td>
+      <td>${Math.round(s.watts_moyens || 0)} W</td><td>${s.coups || 0}</td></tr>`;
+  }).join("") : `<tr><td colspan="7">Aucune séance pour l'instant.</td></tr>`;
+  bloc.style.display = "block";
+  bloc.scrollIntoView({ behavior: "smooth" });
+};
+
+// --- Séances guidées ---------------------------------------------------------
+let dernier = {}, programmes = null, zones = {}, guide = null;
+const lireMmss = t => { const m = /^(\d+):(\d{1,2})$/.exec((t || "").trim()); return m ? +m[1] * 60 + +m[2] : null; };
+const stocker = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+const relire = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+
+function aplatir(etapes) {
+  const res = [];
+  for (const e of etapes) {
+    if (e.repeter) {
+      for (let i = 1; i <= e.repeter; i++)
+        aplatir(e.etapes).forEach(x => res.push({ ...x, serie: `${i}/${e.repeter}` }));
+    } else res.push(e);
+  }
+  return res;
+}
+const duree = e => e.temps ? temps(e.temps) : e.distance + " m";
+const alluresVisee = e => {
+  const ref = lireMmss($("ref").value), z = zones[e.zone];
+  return (ref && z && z.ecart_allure_s != null) ? ref + z.ecart_allure_s : null;
+};
+function texteEtape(e) {
+  const z = zones[e.zone] || { nom: e.zone };
+  let t = `${z.nom}, ${e.temps ? (e.temps >= 60 ? Math.round(e.temps / 60 * 10) / 10 + " minutes" : e.temps + " secondes") : e.distance + " mètres"}`;
+  if (e.cadence) t += `, cadence ${e.cadence[0]} à ${e.cadence[1]}`;
+  return t;
+}
+
+// sons et voix
+let audio = null;
+function bip(freq = 880, ms = 150) {
+  try {
+    audio = audio || new AudioContext();
+    const o = audio.createOscillator(), g = audio.createGain();
+    o.frequency.value = freq; o.connect(g); g.connect(audio.destination);
+    g.gain.setValueAtTime(0.3, audio.currentTime);
+    o.start(); o.stop(audio.currentTime + ms / 1000);
+  } catch (e) {}
+}
+function dire(t) {
+  if (!$("voix").checked || !window.speechSynthesis) return;
+  const u = new SpeechSynthesisUtterance(t); u.lang = "fr-FR"; speechSynthesis.cancel(); speechSynthesis.speak(u);
+}
+
+async function chargerProgrammes() {
+  if (programmes) return;
+  const d = await (await fetch("/programmes")).json();
+  programmes = d.programmes; zones = d.zones;
+  $("progs").innerHTML = programmes.map((p, i) => {
+    const et = aplatir(p.etapes), tot = et.filter(e => e.temps).reduce((a, e) => a + e.temps, 0);
+    const dist = et.filter(e => e.distance).reduce((a, e) => a + e.distance, 0);
+    return `<button class="prog" data-i="${i}"><b>${p.nom}</b><span>${p.niveau} · ${Math.round(tot / 60)} min${dist ? " + " + dist + " m" : ""}</span><br><span>${p.but}</span></button>`;
+  }).join("");
+  document.querySelectorAll(".prog").forEach(b => b.onclick = () => demarrer(programmes[b.dataset.i]));
+  // allure de référence : celle choisie, sinon la moyenne de la dernière séance d'au moins 500 m
+  let ref = relire("allure_ref");
+  if (!ref) {
+    const h = await (await fetch("/historique")).json();
+    const s = h.find(x => (x.distance_m || 0) >= 500 && x.allure_moyenne_s);
+    ref = s ? mmss(s.allure_moyenne_s) : "3:00";
+    $("ref-aide").textContent = s ? "(moyenne de votre dernière séance)" : "(valeur par défaut, à ajuster)";
+  }
+  $("ref").value = ref;
+}
+$("ref").onchange = () => stocker("allure_ref", $("ref").value);
+
+$("btn-seances").onclick = async () => {
+  const b = $("choix");
+  if (b.style.display === "block") { b.style.display = "none"; return; }
+  await chargerProgrammes();
+  b.style.display = "block";
+};
+
+async function demarrer(p) {
+  if (!confirm(`Démarrer « ${p.nom} » ? Le compteur sera remis à zéro.`)) return;
+  await fetch("/nouvelle?programme=" + encodeURIComponent(p.nom), { method: "POST" });
+  courbes = []; dessiner();
+  guide = { p, etapes: aplatir(p.etapes), i: 0, debut: null, t0: 0, d0: 0, dernierBip: null };
+  $("choix").style.display = "none";
+  $("guide").style.display = "block";
+  afficherEtape();
+  $("g-reste").textContent = "Prêt";
+  $("g-note").textContent = "Commencez à ramer : la séance démarre au premier coup.";
+  dire(`${p.nom}. Commencez à ramer quand vous êtes prêt. Première étape : ${texteEtape(guide.etapes[0])}`);
+}
+
+function afficherEtape() {
+  const e = guide.etapes[guide.i], z = zones[e.zone] || {};
+  $("guide").style.setProperty("--zone", z.couleur || "");
+  $("g-zone").textContent = z.nom || e.zone;
+  $("g-etape").textContent = `Étape ${guide.i + 1}/${guide.etapes.length}${e.serie ? " · série " + e.serie : ""}`;
+  $("g-note").textContent = e.note || "";
+  const v = alluresVisee(e), c = [];
+  if (e.cadence) c.push(`cadence ${e.cadence[0]}–${e.cadence[1]} c/min`);
+  if (v) c.push(`allure visée ≈ ${mmss(v)} /500 m`);
+  if (e.zone === "repos") c.push("arrêtez de ramer, respirez");
+  $("g-cibles").textContent = c.join(" · ");
+  const s = guide.etapes[guide.i + 1];
+  $("g-suite").textContent = s ? `Ensuite : ${(zones[s.zone] || {}).nom || s.zone} ${duree(s)}` : "Dernière étape";
+}
+
+function etapeSuivante() {
+  guide.i++;
+  guide.t0 = performance.now(); guide.d0 = dernier.distance_m || 0; guide.dernierBip = null;
+  if (guide.i >= guide.etapes.length) {
+    bip(660, 400); setTimeout(() => bip(880, 600), 450);
+    dire("Séance terminée. Bravo !");
+    $("g-zone").textContent = "Terminé 👏";
+    $("g-reste").textContent = ""; $("g-barre").style.width = "100%";
+    $("g-note").textContent = `${guide.p.nom} : ${Math.round(dernier.distance_m || 0)} m en ${temps(dernier.temps_s)}.`;
+    $("g-cibles").textContent = ""; $("g-suite").textContent = "";
+    guide = { fini: true };
+    return;
+  }
+  bip(1000, 350);
+  dire(texteEtape(guide.etapes[guide.i]));
+  afficherEtape();
+}
+
+setInterval(() => {
+  if (!guide || guide.fini) return;
+  if (guide.debut === null) {
+    if ((dernier.distance_m || 0) > 0 && dernier.arret === false) {   // premier coup
+      guide.debut = guide.t0 = performance.now(); guide.d0 = dernier.distance_m || 0;
+      bip(1000, 350); afficherEtape();
+    }
+    return;
+  }
+  const e = guide.etapes[guide.i];
+  let fait, reste, texte;
+  if (e.temps) {
+    fait = (performance.now() - guide.t0) / 1000; reste = Math.max(0, e.temps - fait);
+    texte = temps(Math.ceil(reste));
+    const s = Math.ceil(reste);
+    if (s <= 3 && s >= 1 && guide.dernierBip !== s) { guide.dernierBip = s; bip(660, 120); }
+  } else {
+    fait = (dernier.distance_m || 0) - guide.d0; reste = Math.max(0, e.distance - fait);
+    texte = Math.ceil(reste) + " m";
+  }
+  $("g-reste").textContent = texte;
+  $("g-barre").style.width = Math.min(100, fait / (e.temps || e.distance) * 100) + "%";
+  if (reste <= 0) etapeSuivante();
+}, 250);
+
+function ciblesEnDirect(e, arret) {
+  const tuileC = $("t-cadence"), tuileA = $("allure");
+  tuileC.className = "tuile"; tuileA.className = "";
+  if (!guide || guide.fini || guide.debut === null || arret) return;
+  const et = guide.etapes[guide.i];
+  if (et.cadence && e.cadence) {
+    tuileC.classList.add(e.cadence >= et.cadence[0] - 0.5 && e.cadence <= et.cadence[1] + 0.5 ? "dans-cible" : "hors-cible");
+  }
+  const v = alluresVisee(et);
+  if (v && e.allure_500m_s) tuileA.className = Math.abs(e.allure_500m_s - v) <= 6 ? "dans-cible" : "hors-cible";
+}
+
+$("btn-stop").onclick = () => {
+  if (!confirm("Arrêter la séance guidée ? (la séance reste enregistrée)")) return;
+  guide = null; $("guide").style.display = "none";
+  ciblesEnDirect({}, true);
+};
+dessiner();
+</script>
+</body>
+</html>
