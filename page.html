@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Rameur SmartRow</title>
 <style>
-  :root {
+  :root { color-scheme: dark;
     --fond: #0f1418; --carte: #182027; --texte: #eef3f6; --doux: #8fa3b1;
     --eau: #3fb6e8; --force: #f2a33a; --ok: #4cc38a; --alerte: #e5675a;
   }
@@ -97,6 +97,10 @@
   .recomp .cond { color: var(--doux); font-size: 13px; width: 150px; flex: none; }
   .recomp.obtenue .cond { color: var(--ok); font-weight: 600; }
   svg text { fill: var(--doux); font-size: 12px; font-family: inherit; }
+  .modale { position: fixed; inset: 0; background: rgba(5,8,10,.82); display: none; place-items: center; z-index: 10; }
+  .modale .boite { background: var(--carte); border-radius: 16px; padding: 24px 28px; width: calc(100% - 32px); }
+  #f-etapes td { text-align: left; vertical-align: top; }
+  #f-etapes td:first-child { white-space: nowrap; color: var(--doux); }
   #celebration { position: fixed; inset: 0; background: rgba(5,8,10,.82); display: none; place-items: center; z-index: 10; }
   #celebration .boite { background: var(--carte); border-radius: 16px; padding: 28px 32px; max-width: 520px; width: calc(100% - 32px); text-align: center; }
   #celebration .gros { font-size: 56px; font-weight: 800; color: #ffd166; }
@@ -219,6 +223,11 @@
       <button id="f-ok">Enregistrer</button></div>
   </div>
 </main>
+<div id="fiche" class="modale"><div class="boite" style="text-align:left;max-width:640px;max-height:88vh;overflow:auto">
+  <h2 id="f-titre" style="margin:0 0 4px"></h2><div class="sous" id="f-info"></div>
+  <p id="f-but"></p><table><tbody id="f-etapes"></tbody></table>
+  <div class="reglage" style="margin-top:14px"><span class="espace"></span>
+    <button id="f-fermer">Fermer</button><button id="f-go" style="border-color:var(--ok)">▶ Démarrer</button></div></div></div>
 <div id="celebration"><div class="boite"><div id="c-titre" style="font-size:22px;font-weight:700">Séance terminée !</div>
   <div class="gros" id="c-xp">+0 XP</div><ul id="c-liste"></ul><button id="c-ok">Super !</button></div></div>
 <script>
@@ -353,7 +362,7 @@ async function chargerProgrammes() {
     const dist = et.filter(e => e.distance).reduce((a, e) => a + e.distance, 0);
     return `<button class="prog" data-i="${i}"><b>${p.nom}</b><span>${p.niveau} · ${Math.round(tot / 60)} min${dist ? " + " + dist + " m" : ""}</span><br><span>${p.but}</span></button>`;
   }).join("");
-  document.querySelectorAll(".prog").forEach(b => b.onclick = () => demarrer(programmes[b.dataset.i]));
+  document.querySelectorAll(".prog").forEach(b => b.onclick = () => fiche(programmes[b.dataset.i]));
   // allure de référence : celle choisie, sinon la moyenne de la dernière séance d'au moins 500 m
   let ref = relire("allure_ref");
   if (!ref) {
@@ -376,7 +385,7 @@ $("btn-seances").onclick = async () => {
 
 async function demarrer(p) {
   if (p.sans_rameur) return demarrerHorsRameur(p);
-  if (!confirm(`Démarrer « ${p.nom} » ? Le compteur sera remis à zéro.`)) return;
+  if ((dernier.distance_m || 0) > 50 && !confirm(`Démarrer « ${p.nom} » ? La séance en cours sera enregistrée et le compteur remis à zéro.`)) return;
   await fetch("/nouvelle?programme=" + encodeURIComponent(p.nom), { method: "POST" });
   jeuAvant = await lireJeu();
   precision = { dans: 0, total: 0 };
@@ -536,7 +545,7 @@ async function afficherAventure(J) {
       : (S.plan.length ? "<div style='color:var(--ok)'>✔ Toutes les séances de rame du plan sont faites cette semaine !</div>" : "")) +
     (S.renfo_a_faire.length ? "<div class='sous' style='margin-top:6px'>🧱 Hors rameur, les autres jours :</div>" + S.renfo_a_faire.map(bouton).join("") : "");
   document.querySelectorAll(".lancer").forEach(b => b.onclick = () => {
-    $("btn-aventure").click(); demarrer(nomsProgrammes[b.dataset.id]);
+    fiche(nomsProgrammes[b.dataset.id], true);
   });
   $("a-quetes").innerHTML = (J.quetes.length ? "<div class='sous'>Quêtes de la semaine (+150 XP chacune) :</div>" : "") + J.quetes.map(q => `
     <div class="quete ${q.ok ? "ok" : ""}"><div class="coche">${q.ok ? "✓" : ""}</div>
@@ -694,6 +703,31 @@ $("repas-tout").onclick = () => {
   l.innerHTML = "<hr style='border-color:#26313a'>" + recettes.conseils.map(c => `<div class="sous">• ${esc(c)}</div>`).join("") +
     recettes.recettes.map(ficheRecette).join("");
   l.style.display = "block";
+};
+
+// --- Fiche détaillée d'une séance (avant de la lancer) ----------------------------
+let ficheProg = null, ficheDepuisAventure = false;
+function fiche(p, depuisAventure = false) {
+  ficheProg = p; ficheDepuisAventure = depuisAventure;
+  const et = aplatir(p.etapes), tot = et.reduce((a, e) => a + (e.temps || 0), 0);
+  const dist = et.reduce((a, e) => a + (e.distance || 0), 0);
+  $("f-titre").textContent = p.nom;
+  $("f-info").textContent = `${p.niveau} · ${temps(tot)}${dist ? " + " + dist + " m" : ""} · ${et.length} étapes` + (p.sans_rameur ? " · au sol, sans rameur" : "");
+  $("f-but").textContent = p.but || "";
+  $("f-etapes").innerHTML = et.map(e => {
+    const z = zones[e.zone] || { nom: e.zone };
+    const titre = e.exercice || z.nom;
+    const cib = [e.cadence ? `cadence ${e.cadence[0]}–${e.cadence[1]}` : "", e.serie ? "série " + e.serie : ""].filter(Boolean).join(" · ");
+    return `<tr><td>${e.temps ? temps(e.temps) : e.distance + " m"}</td>
+      <td><b style="color:${z.couleur || "inherit"}">${esc(titre)}</b>${cib ? ` <span class="sous">${cib}</span>` : ""}<br><span class="sous">${esc(e.note || "")}</span></td></tr>`;
+  }).join("");
+  $("fiche").style.display = "grid";
+}
+$("f-fermer").onclick = () => $("fiche").style.display = "none";
+$("f-go").onclick = () => {
+  $("fiche").style.display = "none";
+  if (ficheDepuisAventure && !$("vue-aventure").classList.contains("vue-cachee")) $("btn-aventure").click();
+  demarrer(ficheProg);
 };
 
 $("c-ok").onclick = () => $("celebration").style.display = "none";

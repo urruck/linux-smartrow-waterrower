@@ -631,7 +631,7 @@
     },
     {
       "id": "cheville",
-      "nom": "Mobilité cheville 6 min",
+      "nom": "Mobilité cheville 5 min",
       "niveau": "Hors rameur",
       "sans_rameur": true,
       "but": "Avant la séance de rame ou chaque jour. Aucun exercice ne doit faire mal. Demandez l'avis d'un kiné si la cheville reste gonflée.",
@@ -766,6 +766,40 @@
           "note": "Mains vers les genoux, on souffle en montant, sans tirer sur la nuque"
         },
         {
+          "temps": 20,
+          "zone": "repos",
+          "note": "Repos, respirez"
+        },
+        {
+          "temps": 30,
+          "zone": "exercice",
+          "exercice": "Planche latérale gauche",
+          "note": "Deuxième tour, bassin haut"
+        },
+        {
+          "temps": 30,
+          "zone": "exercice",
+          "exercice": "Planche latérale droite",
+          "note": "Deuxième tour, de l'autre côté"
+        },
+        {
+          "temps": 20,
+          "zone": "repos",
+          "note": "Repos, respirez"
+        },
+        {
+          "temps": 45,
+          "zone": "exercice",
+          "exercice": "Pont fessier",
+          "note": "Deuxième tour : tenez 2 s en haut"
+        },
+        {
+          "temps": 40,
+          "zone": "exercice",
+          "exercice": "Dead bug",
+          "note": "Deuxième tour, toujours lent"
+        },
+        {
           "temps": 60,
           "zone": "exercice",
           "exercice": "Respiration abdominale",
@@ -875,6 +909,57 @@
           "zone": "exercice",
           "exercice": "Superman",
           "note": "Sur le ventre : décollez bras et jambes, 2 s, relâchez"
+        },
+        {
+          "temps": 20,
+          "zone": "repos",
+          "note": "Repos, respirez"
+        },
+        {
+          "temps": 40,
+          "zone": "exercice",
+          "exercice": "Planche",
+          "note": "Deuxième tour : on tient, nombril rentré"
+        },
+        {
+          "temps": 20,
+          "zone": "repos",
+          "note": "Repos, respirez"
+        },
+        {
+          "temps": 45,
+          "zone": "exercice",
+          "exercice": "Bird dog",
+          "note": "Deuxième tour, lent et stable"
+        },
+        {
+          "temps": 45,
+          "zone": "exercice",
+          "exercice": "Dead bug",
+          "note": "Deuxième tour"
+        },
+        {
+          "temps": 30,
+          "zone": "exercice",
+          "exercice": "Planche latérale gauche",
+          "note": "Deuxième tour"
+        },
+        {
+          "temps": 30,
+          "zone": "exercice",
+          "exercice": "Planche latérale droite",
+          "note": "Deuxième tour"
+        },
+        {
+          "temps": 20,
+          "zone": "repos",
+          "note": "Repos, respirez"
+        },
+        {
+          "temps": 45,
+          "zone": "exercice",
+          "exercice": "Pont fessier",
+          "note": "Dernier effort : tenez 2 s en haut"
         },
         {
           "temps": 60,
