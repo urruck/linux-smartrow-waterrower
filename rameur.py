@@ -123,6 +123,8 @@ def historique():
                 try:
                     with open(os.path.join(DOSSIER, nom), encoding="utf-8") as f:
                         d = json.load(f)
+                    if d.get("type") == "renfo":
+                        continue
                     res.append({"fichier": nom, "debut": d["debut"], "programme": d.get("programme"), **d["resume"]})
                 except (OSError, ValueError, KeyError):
                     pass
@@ -169,6 +171,16 @@ async def serveur_web(seance, capteur, hote):
                 seance._modifiee = True
                 seance.sauver()
                 corps, type_ = b"{}", "application/json"
+            elif chemin == "/exercice" and ligne[0] == "POST":  # séance hors rameur terminée
+                maintenant = datetime.datetime.now()
+                duree = int(params.get("duree", ["0"])[0])
+                os.makedirs(DOSSIER, exist_ok=True)
+                with open(os.path.join(DOSSIER, maintenant.strftime("%Y-%m-%d_%H%M%S") + "_renfo.json"), "w",
+                          encoding="utf-8") as f:
+                    json.dump({"debut": (maintenant - datetime.timedelta(seconds=duree)).isoformat(timespec="seconds"),
+                               "type": "renfo", "programme": params.get("programme", [""])[0], "termine": True,
+                               "resume": {"distance_m": 0, "temps_s": duree}, "points": [], "coups": []}, f)
+                corps, type_ = b"{}", "application/json"
             elif chemin == "/jeu":
                 corps, type_ = json.dumps(jeu.etat(), ensure_ascii=False, default=str).encode(), "application/json"
             elif chemin == "/profil" and ligne[0] == "POST":
@@ -177,6 +189,9 @@ async def serveur_web(seance, capteur, hote):
             elif chemin == "/pesee" and ligne[0] == "POST":
                 jeu.ajouter_pesee(float(params["kg"][0].replace(",", ".")))
                 corps, type_ = b"{}", "application/json"
+            elif chemin == "/recettes":
+                with open(os.path.join(ICI, "recettes.json"), "rb") as f:
+                    corps, type_ = f.read(), "application/json"
             elif chemin == "/programmes":
                 with open(os.path.join(ICI, "programmes.json"), "rb") as f:
                     corps, type_ = f.read(), "application/json"

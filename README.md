@@ -8,7 +8,9 @@ le navigateur. On peut l'utiliser sur le PC, ou sur une tablette ou un
 téléphone posé devant le rameur. Elle propose aussi des **séances guidées**,
 avec consignes vocales, bips et **métronome de cadence**, ainsi qu'un **mode
 Aventure** pour rester motivé : niveaux, descente de la Loire, badges,
-quêtes, suivi du poids et récompenses personnelles. Tout est enregistré sur l'ordinateur : aucun
+quêtes, suivi du poids et récompenses personnelles. Elle propose aussi des
+séances **hors rameur** (gainage du ventre, mobilité de cheville) et des
+**idées de repas** riches en protéines. Tout est enregistré sur l'ordinateur : aucun
 compte ni service en ligne n'est nécessaire.
 
 Projet non officiel, sans lien avec WaterRower ni SmartRow.
@@ -32,7 +34,7 @@ Projet non officiel, sans lien avec WaterRower ni SmartRow.
 
 | Séance | Niveau | Contenu |
 |---|---|---|
-| Reprise douce 15 min | Reprise | 4 min calme, 8 min facile, 3 min calme, cadence 16–20 |
+| Reprise douce 15 min | Reprise | 4 min calme, 8 min facile, 3 min calme, cadence 16–20, conseils pour la cheville |
 | Reprise 20 min | Reprise | 2 × 5 min faciles, avec une pause en ramant |
 | Découverte 12 min | Débutant | 3 min calme, 6 min facile, 3 min calme |
 | Technique : changer de cadence | Débutant | Alternance 18–20 / 22–26 c/min avec la même force : on regarde la courbe |
@@ -85,6 +87,38 @@ Repères de cadence :
 Le mieux est de ramer **long et puissant** plutôt que vite : la puissance
 vient des jambes, pas du nombre de coups.
 
+## Hors rameur : ventre et cheville
+
+Ces séances guidées se font au sol, avec un minuteur, la voix et les bips.
+Elles ne comportent **aucun saut**, pour ménager une cheville fragile.
+
+| Séance | Contenu |
+|---|---|
+| Mobilité cheville 6 min | cercles, alphabet avec le pied, montées sur pointes, équilibre, étirement des mollets |
+| Renfo ventre 10 min | bascule du bassin, planche sur les genoux, dead bug, planche latérale, pont fessier, relevés de buste, respiration abdominale |
+| Renfo ventre 15 min | niveau 2 : planche, bird dog, ciseaux, superman… (à partir de la semaine 5) |
+
+Elles rapportent de l'XP, les badges *Gainé*, *Sangle d'acier* et
+*Cheville solide*, et comptent pour une quête de la semaine. Le gainage
+renforce la sangle abdominale. Le ventre, lui, s'affine avec la perte de
+poids globale : rame et alimentation.
+
+## Idées de repas
+
+Le mode Aventure propose chaque jour une **recette riche en protéines, de
+saison, simple et sans poisson ni fruits de mer**, avec un bouton pour en
+voir une autre ou la liste complète. On y trouve par exemple :
+- un curry de lentilles ;
+- un chili ;
+- de la dinde avec de la butternut ;
+- un velouté de potimarron aux œufs ;
+- un gratin de chou-fleur au jambon ;
+- du tofu au brocoli ;
+- un bol de fromage blanc à la poire…
+
+La liste est dans [`recettes.json`](recettes.json) et se complète
+facilement.
+
 ## Mode Aventure
 
 ![Mode Aventure (données d'exemple)](captures/aventure.png)
@@ -98,7 +132,8 @@ vient des jambes, pas du nombre de coups.
   de Saumur à Saint-Nazaire, en 190 km et 16 escales (distances
   approximatives).
 - **Plan « Retour en forme » sur 12 semaines** :
-  - 3 séances par semaine ;
+  - 3 séances de rame par semaine, plus 2 séances hors rameur les autres
+    jours ;
   - **2 semaines de reprise douce** au début, prévues pour un retour de
     blessure ;
   - puis de l'endurance de plus en plus longue, la plus efficace pour
@@ -171,6 +206,7 @@ python3 rameur.py --rejouer exemples/seance-260m.log
 | `page.html` | l'affichage dans le navigateur, avec les séances guidées |
 | `programmes.json` | les séances guidées |
 | `jeu.py`, `jeu.json` | mode Aventure : XP, niveaux, parcours, badges, quêtes, plan, poids |
+| `recettes.json` | idées de repas protéinés de saison |
 | `smartrow_ble.py` | connexion au SmartRow et décodage des messages |
 | `ecouter.py` | outil de diagnostic : affiche et enregistre les messages bruts |
 | `exemples/seance-260m.log` | une vraie séance enregistrée, pour les essais |

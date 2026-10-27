@@ -7,7 +7,8 @@
     "seance_du_plan": 50,
     "quete": 150,
     "badge": 100,
-    "precision_cadence_max": 100
+    "precision_cadence_max": 100,
+    "seance_renfo": 80
   },
   "niveaux": [
     "Moussaillon",
@@ -201,6 +202,24 @@
       "texte": "5 séances à 80 % de cadence tenue"
     },
     {
+      "id": "gaine",
+      "icone": "🧱",
+      "nom": "Gainé",
+      "texte": "5 séances de renfo ventre"
+    },
+    {
+      "id": "gaine20",
+      "icone": "🛡️",
+      "nom": "Sangle d'acier",
+      "texte": "20 séances de renfo ventre"
+    },
+    {
+      "id": "cheville6",
+      "icone": "🦶",
+      "nom": "Cheville solide",
+      "texte": "6 séances de mobilité cheville"
+    },
+    {
       "id": "record1000",
       "icone": "🏆",
       "nom": "Record battu",
@@ -257,7 +276,7 @@
   ],
   "plan": {
     "nom": "Retour en forme : 12 semaines",
-    "_note": "3 séances par semaine, avec un jour de repos entre deux. Semaines 1-2 : reprise douce après blessure.",
+    "_note": "3 séances de rame par semaine (un jour de repos entre deux) + 2 séances hors rameur (renfo, cheville) les autres jours. Semaines 1-2 : reprise douce après l'entorse de cheville.",
     "semaines": [
       {
         "theme": "Reprise douce",
@@ -265,6 +284,10 @@
           "reprise15",
           "reprise15",
           "reprise15"
+        ],
+        "renfo": [
+          "cheville",
+          "ventre1"
         ]
       },
       {
@@ -273,6 +296,10 @@
           "reprise20",
           "reprise20",
           "reprise20"
+        ],
+        "renfo": [
+          "cheville",
+          "ventre1"
         ]
       },
       {
@@ -281,6 +308,10 @@
           "endurance20",
           "technique",
           "endurance20"
+        ],
+        "renfo": [
+          "ventre1",
+          "ventre1"
         ]
       },
       {
@@ -289,6 +320,10 @@
           "endurance20",
           "technique",
           "endurance30"
+        ],
+        "renfo": [
+          "ventre1",
+          "ventre1"
         ]
       },
       {
@@ -297,6 +332,10 @@
           "endurance30",
           "technique",
           "endurance30"
+        ],
+        "renfo": [
+          "ventre2",
+          "ventre2"
         ]
       },
       {
@@ -305,6 +344,10 @@
           "endurance30",
           "fractionne3030",
           "endurance30"
+        ],
+        "renfo": [
+          "ventre2",
+          "ventre2"
         ]
       },
       {
@@ -313,6 +356,10 @@
           "test1000",
           "endurance30",
           "endurance40"
+        ],
+        "renfo": [
+          "ventre2",
+          "ventre2"
         ]
       },
       {
@@ -321,6 +368,10 @@
           "endurance40",
           "pyramide",
           "endurance30"
+        ],
+        "renfo": [
+          "ventre2",
+          "ventre2"
         ]
       },
       {
@@ -329,6 +380,10 @@
           "endurance40",
           "4x500",
           "endurance30"
+        ],
+        "renfo": [
+          "ventre2",
+          "ventre2"
         ]
       },
       {
@@ -337,6 +392,10 @@
           "endurance40",
           "seuil",
           "endurance40"
+        ],
+        "renfo": [
+          "ventre2",
+          "ventre2"
         ]
       },
       {
@@ -345,6 +404,10 @@
           "endurance40",
           "pyramide",
           "endurance40"
+        ],
+        "renfo": [
+          "ventre2",
+          "ventre2"
         ]
       },
       {
@@ -353,6 +416,10 @@
           "test1000",
           "endurance40",
           "seuil"
+        ],
+        "renfo": [
+          "ventre2",
+          "ventre2"
         ]
       }
     ]
@@ -361,6 +428,10 @@
     {
       "id": "plan",
       "texte": "Faire les 3 séances du plan de la semaine"
+    },
+    {
+      "id": "renfo",
+      "texte": "Faire 2 séances hors rameur (renfo, cheville)"
     },
     {
       "id": "km",

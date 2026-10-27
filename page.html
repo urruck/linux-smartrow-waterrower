@@ -166,7 +166,7 @@
       <div style="flex:1;min-width:220px"><h2 id="a-nom">Moussaillon</h2>
         <div class="sous" id="a-xp"></div><div class="xpbarre"><div id="a-xpbarre"></div></div></div></div>
     <div class="chiffres">
-      <div><b id="a-km">0</b><span>km ramés</span></div><div><b id="a-seances">0</b><span>séances</span></div>
+      <div><b id="a-km">0</b><span>km ramés</span></div><div><b id="a-seances">0</b><span>séances de rame</span></div><div><b id="a-renfo">0</b><span>séances de renfo</span></div>
       <div><b id="a-kcal">0</b><span>kcal dépensées (estimation)</span></div><div><b id="a-temps">0</b><span>de rame</span></div>
     </div>
   </div>
@@ -200,6 +200,13 @@
   <div class="tuile">
     <div class="nom">Dernières séances</div>
     <table><tbody id="a-journal"></tbody></table>
+  </div>
+  <div class="tuile large" id="repas">
+    <div class="reglage" style="margin-top:0"><span class="nom">🍲 Idée repas protéiné de saison</span><span class="espace"></span>
+      <button id="repas-autre">Une autre idée</button><button id="repas-tout">Toutes les recettes</button></div>
+    <div id="repas-jour"></div>
+    <div id="repas-liste" style="display:none"></div>
+    <div class="sous" id="repas-conseil" style="margin-top:8px"></div>
   </div>
   <div class="tuile large"><div class="nom" id="b-titre">Badges</div><div class="badges" id="badges"></div></div>
   <div class="tuile large">
@@ -314,6 +321,7 @@ const alluresVisee = e => {
   return (ref && z && z.ecart_allure_s != null) ? ref + z.ecart_allure_s : null;
 };
 function texteEtape(e) {
+  if (e.exercice) return `${e.exercice}, ${e.temps} secondes. ${e.note || ""}`;
   const z = zones[e.zone] || { nom: e.zone };
   let t = `${z.nom}, ${e.temps ? (e.temps >= 60 ? Math.round(e.temps / 60 * 10) / 10 + " minutes" : e.temps + " secondes") : e.distance + " mètres"}`;
   if (e.cadence) t += `, cadence ${e.cadence[0]} à ${e.cadence[1]}`;
@@ -367,6 +375,7 @@ $("btn-seances").onclick = async () => {
 };
 
 async function demarrer(p) {
+  if (p.sans_rameur) return demarrerHorsRameur(p);
   if (!confirm(`Démarrer « ${p.nom} » ? Le compteur sera remis à zéro.`)) return;
   await fetch("/nouvelle?programme=" + encodeURIComponent(p.nom), { method: "POST" });
   jeuAvant = await lireJeu();
@@ -381,10 +390,21 @@ async function demarrer(p) {
   dire(`${p.nom}. Commencez à ramer quand vous êtes prêt. Première étape : ${texteEtape(guide.etapes[0])}`);
 }
 
+async function demarrerHorsRameur(p) {
+  jeuAvant = await lireJeu();
+  guide = { p, etapes: aplatir(p.etapes), i: 0, debut: null, t0: 0, d0: 0, dernierBip: null, horsRameur: true };
+  $("choix").style.display = "none";
+  $("guide").style.display = "block";
+  afficherEtape();
+  $("g-reste").textContent = "Prêt";
+  dire(`${p.nom}. Mettez-vous en place. Premier exercice : ${texteEtape(guide.etapes[0])}`);
+  setTimeout(() => { if (guide && guide.p === p) { guide.debut = guide.t0 = performance.now(); bip(1000, 350); afficherEtape(); } }, 6000);
+}
+
 function afficherEtape() {
   const e = guide.etapes[guide.i], z = zones[e.zone] || {};
   $("guide").style.setProperty("--zone", z.couleur || "");
-  $("g-zone").textContent = z.nom || e.zone;
+  $("g-zone").textContent = e.exercice || z.nom || e.zone;
   $("g-etape").textContent = `Étape ${guide.i + 1}/${guide.etapes.length}${e.serie ? " · série " + e.serie : ""}`;
   $("g-note").textContent = e.note || "";
   const v = alluresVisee(e), c = [];
@@ -393,7 +413,7 @@ function afficherEtape() {
   if (e.zone === "repos") c.push("arrêtez de ramer, respirez");
   $("g-cibles").textContent = c.join(" · ");
   const s = guide.etapes[guide.i + 1];
-  $("g-suite").textContent = s ? `Ensuite : ${(zones[s.zone] || {}).nom || s.zone} ${duree(s)}` : "Dernière étape";
+  $("g-suite").textContent = s ? `Ensuite : ${s.exercice || (zones[s.zone] || {}).nom || s.zone} ${duree(s)}` : "Dernière étape";
 }
 
 function etapeSuivante() {
@@ -404,11 +424,18 @@ function etapeSuivante() {
     dire("Séance terminée. Bravo !");
     $("g-zone").textContent = "Terminé 👏";
     $("g-reste").textContent = ""; $("g-barre").style.width = "100%";
-    $("g-note").textContent = `${guide.p.nom} : ${Math.round(dernier.distance_m || 0)} m en ${temps(dernier.temps_s)}.`;
+    const hors = guide.horsRameur, nomProg = guide.p.nom;
+    const dureeTot = guide.etapes.reduce((a, e) => a + (e.temps || 0), 0);
+    $("g-note").textContent = hors ? `${nomProg} : bravo, c'est fait !` : `${nomProg} : ${Math.round(dernier.distance_m || 0)} m en ${temps(dernier.temps_s)}.`;
     $("g-cibles").textContent = precision.total >= 30 ? `🥁 Cadence tenue ${Math.round(100 * precision.dans / precision.total)} % du temps` : "";
     $("g-suite").textContent = "";
     guide = { fini: true };
     setTimeout(async () => {
+      if (hors) {
+        await fetch(`/exercice?programme=${encodeURIComponent(nomProg)}&duree=${dureeTot}`, { method: "POST" });
+        const J = await lireJeu(); celebrer(jeuAvant, J, "Renfo terminé !"); jeuAvant = J;
+        return;
+      }
       const pc = precision.total >= 30 ? Math.round(100 * precision.dans / precision.total) : "";
       await fetch("/fin?precision=" + pc, { method: "POST" });
       const J = await lireJeu(); celebrer(jeuAvant, J, "Séance terminée !"); jeuAvant = J;
@@ -423,6 +450,7 @@ function etapeSuivante() {
 setInterval(() => {
   if (!guide || guide.fini) return;
   if (guide.debut === null) {
+    if (guide.horsRameur) return;
     if ((dernier.distance_m || 0) > 0 && dernier.arret === false) {   // premier coup
       guide.debut = guide.t0 = performance.now(); guide.d0 = dernier.distance_m || 0;
       bip(1000, 350); afficherEtape();
@@ -493,21 +521,24 @@ async function afficherAventure(J) {
   $("a-nom").textContent = (J.profil.prenom ? J.profil.prenom + ", " : "") + N.nom;
   $("a-xp").textContent = `${N.xp} XP · encore ${N.xp_suivant - N.xp} XP pour le niveau ${N.numero + 1}`;
   $("a-xpbarre").style.width = (100 * (N.xp - N.xp_debut) / (N.xp_suivant - N.xp_debut)) + "%";
-  $("a-km").textContent = kgfr(T.km); $("a-seances").textContent = T.seances;
+  $("a-km").textContent = kgfr(T.km); $("a-seances").textContent = T.seances; $("a-renfo").textContent = T.renfo;
   $("a-kcal").textContent = T.kcal; $("a-temps").textContent = temps(T.temps_s);
 
   // semaine
   const S = J.semaine;
-  $("a-semaine").textContent = S.numero <= S.nb_semaines ? `Semaine ${S.numero} / ${S.nb_semaines} du plan` : "Plan terminé";
+  const jourDebut = new Date(S.debut + "T00:00").toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+  $("a-semaine").textContent = S.avant_debut ? `Le plan commence ${jourDebut}` : S.numero <= S.nb_semaines ? `Semaine ${S.numero} / ${S.nb_semaines} du plan` : "Plan terminé";
   $("a-theme").textContent = S.theme;
-  $("a-afaire").innerHTML = S.a_faire.length
-    ? "<div class='sous'>Séances du plan à faire (un jour de repos entre deux) :</div>" +
-      S.a_faire.map(id => `<button class="lancer" data-id="${id}">▶ ${esc(nomsProgrammes[id]?.nom || id)}</button>`).join("")
-    : (S.plan.length ? "<div style='color:var(--ok)'>✔ Toutes les séances du plan sont faites cette semaine. Repos ou séance bonus !</div>" : "");
+  const bouton = id => `<button class="lancer" data-id="${id}">▶ ${esc(nomsProgrammes[id]?.nom || id)}</button>`;
+  $("a-afaire").innerHTML = (S.avant_debut ? "<div class='sous'>En attendant : la mobilité de cheville peut se faire dès maintenant. Programme de la 1re semaine :</div>" : "") +
+    (S.a_faire.length
+      ? "<div class='sous'>🚣 Rame (un jour de repos entre deux) :</div>" + S.a_faire.map(bouton).join("")
+      : (S.plan.length ? "<div style='color:var(--ok)'>✔ Toutes les séances de rame du plan sont faites cette semaine !</div>" : "")) +
+    (S.renfo_a_faire.length ? "<div class='sous' style='margin-top:6px'>🧱 Hors rameur, les autres jours :</div>" + S.renfo_a_faire.map(bouton).join("") : "");
   document.querySelectorAll(".lancer").forEach(b => b.onclick = () => {
     $("btn-aventure").click(); demarrer(nomsProgrammes[b.dataset.id]);
   });
-  $("a-quetes").innerHTML = "<div class='sous'>Quêtes de la semaine (+150 XP chacune) :</div>" + J.quetes.map(q => `
+  $("a-quetes").innerHTML = (J.quetes.length ? "<div class='sous'>Quêtes de la semaine (+150 XP chacune) :</div>" : "") + J.quetes.map(q => `
     <div class="quete ${q.ok ? "ok" : ""}"><div class="coche">${q.ok ? "✓" : ""}</div>
       <div class="mini">${esc(q.texte)}<div class="xpbarre"><div style="width:${Math.min(100, 100 * q.fait / q.but)}%"></div></div></div>
       <span class="sous">${kgfr(q.fait)} / ${kgfr(q.but)}</span></div>`).join("");
@@ -534,7 +565,7 @@ async function afficherAventure(J) {
 
   // journal
   $("a-journal").innerHTML = J.journal.map(j => `<tr><td>${new Date(j.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}</td>
-    <td style="text-align:left">${esc(j.programme)}</td><td>${kgfr(j.distance_m / 1000)} km</td><td>${j.kcal} kcal</td>
+    <td style="text-align:left">${j.renfo ? "🧱 " : ""}${esc(j.programme)}</td><td>${j.renfo ? temps(j.temps_s) : kgfr(j.distance_m / 1000) + " km"}</td><td>${j.renfo ? "" : j.kcal + " kcal"}</td>
     <td>${j.precision != null ? "🥁 " + j.precision + " %" : ""}</td><td style="color:#ffd166">+${j.xp} XP</td></tr>`).join("") || "<tr><td>Aucune séance pour l'instant.</td></tr>";
 
   // badges
@@ -548,6 +579,7 @@ async function afficherAventure(J) {
   $("f-prenom").value = Pr.prenom || ""; $("f-taille").value = Pr.taille_cm;
   $("f-depart").value = Pr.poids_depart_kg; $("f-objectif").value = Pr.poids_objectif_kg; $("f-debut").value = Pr.debut;
   jeuAvant = J;
+  afficherRepas();
 }
 
 function carte(R) {
@@ -639,6 +671,31 @@ function celebrer(A, B, titre) {
   }
   if (gains.length) dire(gains.length > 1 ? `Bravo ! ${xp} points d'expérience et ${gains.length} nouveautés.` : `Bravo ! ${xp} points d'expérience.`);
 }
+// --- Idées repas -------------------------------------------------------------------
+let recettes = null, recetteIdx = 0;
+const ficheRecette = r => `<h3 style="margin:8px 0 4px">${esc(r.nom)}</h3>
+  <div class="sous">${esc(r.type)} · ${r.temps_min} min · ≈ ${r.proteines_g} g de protéines</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:6px">
+    <ul style="margin:0;padding-left:18px">${r.ingredients.map(i => `<li>${esc(i)}</li>`).join("")}</ul>
+    <ol style="margin:0;padding-left:18px">${r.etapes.map(e => `<li>${esc(e)}</li>`).join("")}</ol></div>`;
+async function afficherRepas() {
+  if (!recettes) {
+    recettes = await (await fetch("/recettes")).json();
+    const j = Math.floor(Date.now() / 864e5);
+    recetteIdx = j % recettes.recettes.length;
+    $("repas-conseil").textContent = "💡 " + recettes.conseils[j % recettes.conseils.length];
+  }
+  $("repas-jour").innerHTML = ficheRecette(recettes.recettes[recetteIdx]);
+}
+$("repas-autre").onclick = () => { recetteIdx = (recetteIdx + 1) % recettes.recettes.length; afficherRepas(); };
+$("repas-tout").onclick = () => {
+  const l = $("repas-liste");
+  if (l.style.display === "block") { l.style.display = "none"; return; }
+  l.innerHTML = "<hr style='border-color:#26313a'>" + recettes.conseils.map(c => `<div class="sous">• ${esc(c)}</div>`).join("") +
+    recettes.recettes.map(ficheRecette).join("");
+  l.style.display = "block";
+};
+
 $("c-ok").onclick = () => $("celebration").style.display = "none";
 
 // --- Cadence : cible, jauge, métronome, précision ---------------------------------

@@ -30,6 +30,11 @@
       "nom": "Repos",
       "ecart_allure_s": null,
       "couleur": "#5b6b78"
+    },
+    "exercice": {
+      "nom": "Exercice",
+      "ecart_allure_s": null,
+      "couleur": "#b38cff"
     }
   },
   "programmes": [
@@ -37,7 +42,7 @@
       "id": "reprise15",
       "nom": "Reprise douce 15 min",
       "niveau": "Reprise",
-      "but": "Remettre le corps en route sans forcer. Douleur à l'entorse = on arrête.",
+      "but": "Remettre le corps en route sans forcer. Cheville : sangle sur la partie large du pied, pas trop serrée ; ne pas avancer jusqu'au bout. Douleur = on arrête.",
       "etapes": [
         {
           "temps": 240,
@@ -46,7 +51,7 @@
             16,
             18
           ],
-          "note": "Mouvement lent, sans forcer à l'attaque"
+          "note": "Mouvement lent. Cheville : n'avancez pas jusqu'au bout, le talon peut se décoller"
         },
         {
           "temps": 480,
@@ -55,7 +60,7 @@
             18,
             20
           ],
-          "note": "Facile : vous devez pouvoir parler. Écoutez votre articulation."
+          "note": "Facile, poussez avec tout le pied (pas sur la pointe). Douleur à la cheville = stop"
         },
         {
           "temps": 180,
@@ -72,7 +77,7 @@
       "id": "reprise20",
       "nom": "Reprise 20 min",
       "niveau": "Reprise",
-      "but": "Un peu plus long, toujours facile. Arrêt immédiat en cas de douleur.",
+      "but": "Un peu plus long, toujours facile. Cheville : amplitude un peu réduite, poussée avec tout le pied. Douleur = stop.",
       "etapes": [
         {
           "temps": 240,
@@ -81,7 +86,7 @@
             16,
             18
           ],
-          "note": "Échauffement lent"
+          "note": "Échauffement lent, amplitude réduite pour la cheville"
         },
         {
           "temps": 300,
@@ -621,6 +626,261 @@
             20
           ],
           "note": "Retour au calme"
+        }
+      ]
+    },
+    {
+      "id": "cheville",
+      "nom": "Mobilité cheville 6 min",
+      "niveau": "Hors rameur",
+      "sans_rameur": true,
+      "but": "Avant la séance de rame ou chaque jour. Aucun exercice ne doit faire mal. Demandez l'avis d'un kiné si la cheville reste gonflée.",
+      "etapes": [
+        {
+          "temps": 45,
+          "zone": "exercice",
+          "exercice": "Cercles de cheville",
+          "note": "Assis, pied en l'air : grands cercles lents, puis dans l'autre sens"
+        },
+        {
+          "temps": 60,
+          "zone": "exercice",
+          "exercice": "Alphabet avec le pied",
+          "note": "Écrivez l'alphabet en majuscules avec le gros orteil"
+        },
+        {
+          "temps": 45,
+          "zone": "exercice",
+          "exercice": "Flexion / extension",
+          "note": "Pied vers vous, puis pointe tendue, lentement"
+        },
+        {
+          "temps": 15,
+          "zone": "repos",
+          "note": "Repos, respirez"
+        },
+        {
+          "temps": 45,
+          "zone": "exercice",
+          "exercice": "Montées sur pointes",
+          "note": "Debout, mains sur un mur, sur les deux pieds : monter et descendre lentement"
+        },
+        {
+          "temps": 45,
+          "zone": "exercice",
+          "exercice": "Équilibre pied gauche",
+          "note": "Sur un pied, une main près d'un appui. Regard droit devant"
+        },
+        {
+          "temps": 45,
+          "zone": "exercice",
+          "exercice": "Équilibre pied droit",
+          "note": "Sur l'autre pied, sans forcer"
+        },
+        {
+          "temps": 30,
+          "zone": "exercice",
+          "exercice": "Étirement mollets",
+          "note": "Pied en arrière, talon au sol, contre un mur, chaque jambe 15 s"
+        }
+      ]
+    },
+    {
+      "id": "ventre1",
+      "nom": "Renfo ventre 10 min",
+      "niveau": "Hors rameur",
+      "sans_rameur": true,
+      "but": "Gainage au sol, sans saut : ménage la cheville. À faire les jours sans rame.",
+      "etapes": [
+        {
+          "temps": 45,
+          "zone": "exercice",
+          "exercice": "Bascule du bassin",
+          "note": "Sur le dos, genoux pliés : plaquez le bas du dos au sol en soufflant"
+        },
+        {
+          "temps": 30,
+          "zone": "exercice",
+          "exercice": "Planche sur les genoux",
+          "note": "Avant-bras au sol, corps aligné des genoux à la tête, nombril rentré"
+        },
+        {
+          "temps": 20,
+          "zone": "repos",
+          "note": "Repos, respirez"
+        },
+        {
+          "temps": 40,
+          "zone": "exercice",
+          "exercice": "Dead bug",
+          "note": "Sur le dos, bras et jambes en l'air : allongez bras et jambe opposés, lentement"
+        },
+        {
+          "temps": 20,
+          "zone": "repos",
+          "note": "Repos, respirez"
+        },
+        {
+          "temps": 25,
+          "zone": "exercice",
+          "exercice": "Planche latérale gauche",
+          "note": "Sur l'avant-bras et le genou, bassin haut"
+        },
+        {
+          "temps": 25,
+          "zone": "exercice",
+          "exercice": "Planche latérale droite",
+          "note": "Même chose de l'autre côté"
+        },
+        {
+          "temps": 20,
+          "zone": "repos",
+          "note": "Repos, respirez"
+        },
+        {
+          "temps": 40,
+          "zone": "exercice",
+          "exercice": "Pont fessier",
+          "note": "Sur le dos, pieds à plat : montez le bassin, serrez les fessiers, redescendez"
+        },
+        {
+          "temps": 20,
+          "zone": "repos",
+          "note": "Repos, respirez"
+        },
+        {
+          "temps": 30,
+          "zone": "exercice",
+          "exercice": "Planche sur les genoux",
+          "note": "Encore une ! Respirez normalement"
+        },
+        {
+          "temps": 20,
+          "zone": "repos",
+          "note": "Repos, respirez"
+        },
+        {
+          "temps": 40,
+          "zone": "exercice",
+          "exercice": "Relevés de buste lents",
+          "note": "Mains vers les genoux, on souffle en montant, sans tirer sur la nuque"
+        },
+        {
+          "temps": 60,
+          "zone": "exercice",
+          "exercice": "Respiration abdominale",
+          "note": "Allongé : inspirez par le nez en gonflant le ventre, soufflez longuement en rentrant le nombril"
+        }
+      ]
+    },
+    {
+      "id": "ventre2",
+      "nom": "Renfo ventre 15 min",
+      "niveau": "Hors rameur",
+      "sans_rameur": true,
+      "but": "Niveau 2, à partir de la semaine 5 si la cheville va bien. Toujours sans saut.",
+      "etapes": [
+        {
+          "temps": 45,
+          "zone": "exercice",
+          "exercice": "Bascule du bassin",
+          "note": "Échauffement : bas du dos plaqué au sol"
+        },
+        {
+          "temps": 40,
+          "zone": "exercice",
+          "exercice": "Planche",
+          "note": "Sur les avant-bras et les pointes de pieds (sur les genoux si la cheville tire)"
+        },
+        {
+          "temps": 20,
+          "zone": "repos",
+          "note": "Repos, respirez"
+        },
+        {
+          "temps": 45,
+          "zone": "exercice",
+          "exercice": "Dead bug",
+          "note": "Lent et contrôlé, bas du dos collé au sol"
+        },
+        {
+          "temps": 15,
+          "zone": "repos",
+          "note": "Repos, respirez"
+        },
+        {
+          "temps": 30,
+          "zone": "exercice",
+          "exercice": "Planche latérale gauche",
+          "note": "Sur l'avant-bras, jambes tendues ou genou au sol"
+        },
+        {
+          "temps": 30,
+          "zone": "exercice",
+          "exercice": "Planche latérale droite",
+          "note": "De l'autre côté"
+        },
+        {
+          "temps": 20,
+          "zone": "repos",
+          "note": "Repos, respirez"
+        },
+        {
+          "temps": 45,
+          "zone": "exercice",
+          "exercice": "Bird dog",
+          "note": "À quatre pattes : tendez bras et jambe opposés, 2 s, alternez"
+        },
+        {
+          "temps": 45,
+          "zone": "exercice",
+          "exercice": "Pont fessier",
+          "note": "Montez, tenez 2 s en haut, redescendez lentement"
+        },
+        {
+          "temps": 20,
+          "zone": "repos",
+          "note": "Repos, respirez"
+        },
+        {
+          "temps": 40,
+          "zone": "exercice",
+          "exercice": "Planche",
+          "note": "Dernière planche : nombril rentré, fessiers serrés"
+        },
+        {
+          "temps": 20,
+          "zone": "repos",
+          "note": "Repos, respirez"
+        },
+        {
+          "temps": 45,
+          "zone": "exercice",
+          "exercice": "Relevés de buste lents",
+          "note": "Soufflez en montant"
+        },
+        {
+          "temps": 40,
+          "zone": "exercice",
+          "exercice": "Ciseaux bas",
+          "note": "Sur le dos, mains sous les fesses : battements de jambes lents"
+        },
+        {
+          "temps": 20,
+          "zone": "repos",
+          "note": "Repos, respirez"
+        },
+        {
+          "temps": 40,
+          "zone": "exercice",
+          "exercice": "Superman",
+          "note": "Sur le ventre : décollez bras et jambes, 2 s, relâchez"
+        },
+        {
+          "temps": 60,
+          "zone": "exercice",
+          "exercice": "Respiration abdominale",
+          "note": "Inspirez en gonflant le ventre, soufflez longuement en rentrant le nombril"
         }
       ]
     }

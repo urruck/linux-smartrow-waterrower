@@ -99,7 +99,7 @@ def seances(poids_kg):
         res.append({
             "fichier": nom, "debut": debut, "programme": d.get("programme"),
             "programme_id": noms.get(d.get("programme")), "termine": bool(d.get("termine")),
-            "precision": d.get("precision_cadence"),
+            "precision": d.get("precision_cadence"), "renfo": d.get("type") == "renfo",
             "distance_m": r.get("distance_m") or 0, "temps_s": r.get("temps_s") or 0,
             "allure_moyenne_s": r.get("allure_moyenne_s"), "kcal": kcal(d.get("points", []), poids_kg),
         })
@@ -132,11 +132,19 @@ def etat():
         n = semaine_de(s["debut"])
         s["semaine"] = n
         par_semaine.setdefault(n, []).append(s)
-    plan_fait = {}
+    plan_fait, renfo_faits = {}, {}
     for n, ss in par_semaine.items():
         attendues = list(plan[n - 1]["seances"]) if 0 < n <= len(plan) else []
-        faites = []
+        renfo_att = list(plan[n - 1].get("renfo", [])) if 0 < n <= len(plan) else []
+        faites, renfo_faits[n] = [], []
         for s in ss:
+            if s["renfo"]:
+                s["xp"] = xp_r.get("seance_renfo", 80) if s["termine"] else 0
+                if s["programme_id"] in renfo_att:
+                    renfo_att.remove(s["programme_id"])
+                    renfo_faits[n].append(s["programme_id"])
+                xp += s["xp"]
+                continue
             gain = int(s["distance_m"] / 100 * xp_r.get("par_100m", 10))
             if s["temps_s"] >= 600:
                 gain += xp_r.get("seance_10min", 50)
@@ -153,9 +161,15 @@ def etat():
         plan_fait[n] = faites
     journal = [{"date": s["debut"].isoformat(timespec="minutes"), "programme": s["programme"] or "Séance libre",
                 "distance_m": s["distance_m"], "temps_s": s["temps_s"], "kcal": round(s["kcal"]),
-                "precision": s["precision"],
+                "precision": s["precision"], "renfo": s["renfo"],
                 "xp": s["xp"]} for s in reversed(liste[-15:])]
 
+    renfos = [s for s in liste if s["renfo"] and s["termine"]]
+    liste = [s for s in liste if not s["renfo"]]   # la suite ne concerne que la rame
+    par_semaine = {n: [s for s in ss if not s["renfo"]] for n, ss in par_semaine.items()}
+    renfo_semaine = {}
+    for s in renfos:
+        renfo_semaine.setdefault(s["semaine"], []).append(s)
     total_m = sum(s["distance_m"] for s in liste)
     total_kcal = sum(s["kcal"] for s in liste)
     perdu = round(P["poids_depart_kg"] - poids_actuel, 1)
@@ -172,7 +186,7 @@ def etat():
         return len(par_semaine.get(n, [])) >= 3
     serie = 0
     meilleure_serie = 0
-    for n in range(1, max(par_semaine or [0]) + 1):
+    for n in range(1, max(par_semaine or [0], default=0) + 1):
         serie = serie + 1 if complete(n) else 0
         meilleure_serie = max(meilleure_serie, serie)
 
@@ -190,6 +204,9 @@ def etat():
         "fractionne": any(s["termine"] and s["programme_id"] in ("fractionne3030", "pyramide") for s in liste),
         "metronome": any((s["precision"] or 0) >= 80 for s in liste),
         "horloger": sum(1 for s in liste if (s["precision"] or 0) >= 80) >= 5,
+        "gaine": sum(1 for s in renfos if s["programme_id"] in ("ventre1", "ventre2")) >= 5,
+        "gaine20": sum(1 for s in renfos if s["programme_id"] in ("ventre1", "ventre2")) >= 20,
+        "cheville6": sum(1 for s in renfos if s["programme_id"] == "cheville") >= 6,
         "record1000": record, "kcal1000": total_kcal >= 1000, "kcal5000": total_kcal >= 5000,
         "poids1": perdu >= 1, "poids3": perdu >= 3, "poids_obj": pes != [] and poids_actuel <= P["poids_objectif_kg"],
         "chalonnes": km >= 68, "nantes": km >= 135, "ocean": km >= 190,
@@ -203,13 +220,16 @@ def etat():
     km_semaine = sum(s["distance_m"] for s in ss) / 1000
     lundi = lundi0 + datetime.timedelta(weeks=semaine - 1)
     pesee_semaine = any(lundi.isoformat() <= p["date"] < (lundi + datetime.timedelta(days=7)).isoformat() for p in pes)
-    plan_semaine = plan[semaine - 1] if 0 < semaine <= len(plan) else None
+    avant_debut = semaine < 1
+    plan_semaine = plan[0] if avant_debut and plan else (plan[semaine - 1] if 0 < semaine <= len(plan) else None)
     quetes = []
     for q in R.get("quetes", []):
         if q["id"] == "plan" and plan_semaine:
             fait, but = len(plan_fait.get(semaine, [])), len(plan_semaine["seances"])
         elif q["id"] == "km":
             fait, but = round(km_semaine, 1), km_cible
+        elif q["id"] == "renfo":
+            fait, but = len(renfo_semaine.get(semaine, [])), 2
         elif q["id"] == "cadence":
             fait, but = sum(1 for s in ss if (s["precision"] or 0) >= 75), 2
         elif q["id"] == "pesee":
@@ -224,6 +244,8 @@ def etat():
             xp += xp_r.get("quete", 150)
         if 0 < n <= len(plan) and len(plan_fait.get(n, [])) >= len(plan[n - 1]["seances"]):
             xp += xp_r.get("quete", 150)
+    if avant_debut:
+        quetes = []
     xp += sum(xp_r.get("quete", 150) for q in quetes if q["ok"] and "pesee" not in q["texte"])
 
     # --- Niveau
@@ -249,16 +271,19 @@ def etat():
     recompenses = [{**r, "obtenue": debloquee(r["condition"])} for r in P.get("recompenses", [])]
 
     # --- Séances du plan restant à faire cette semaine
-    a_faire = []
+    a_faire, renfo_a_faire = [], []
     if plan_semaine:
-        restantes = list(plan_semaine["seances"])
-        for f in plan_fait.get(semaine, []):
-            restantes.remove(f)
-        a_faire = restantes
+        a_faire = list(plan_semaine["seances"])
+        renfo_a_faire = list(plan_semaine.get("renfo", []))
+        if not avant_debut:
+            for f in plan_fait.get(semaine, []):
+                a_faire.remove(f)
+            for f in renfo_faits.get(semaine, []):
+                renfo_a_faire.remove(f)
 
     return {
         "profil": P, "niveau": niveau, "xp_total": xp,
-        "totaux": {"km": round(km, 2), "seances": len(liste), "kcal": round(total_kcal),
+        "totaux": {"km": round(km, 2), "seances": len(liste), "renfo": len(renfos), "kcal": round(total_kcal),
                    "temps_s": sum(s["temps_s"] for s in liste)},
         "poids": {"depart": P["poids_depart_kg"], "objectif": P["poids_objectif_kg"], "actuel": poids_actuel,
                   "perdu": perdu, "a_perdre": a_perdre, "pesees": pes},
@@ -266,7 +291,8 @@ def etat():
                      "derniere": atteintes[-1] if atteintes else None, "prochaine": prochaine,
                      "total_km": esc[-1]["km"] if esc else 0},
         "badges": badges,
-        "semaine": {"numero": semaine, "theme": plan_semaine["theme"] if plan_semaine else "Plan terminé : continuez à votre rythme",
+        "semaine": {"numero": semaine, "avant_debut": avant_debut, "debut": P["debut"], "renfo_a_faire": renfo_a_faire,
+                    "theme": plan_semaine["theme"] if plan_semaine else "Plan terminé : continuez à votre rythme",
                     "nb_semaines": len(plan), "plan": plan_semaine["seances"] if plan_semaine else [],
                     "a_faire": a_faire, "km": round(km_semaine, 1), "nb_seances": len(ss)},
         "quetes": quetes, "recompenses": recompenses, "journal": journal,
