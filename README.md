@@ -94,7 +94,7 @@ Elles ne comportent **aucun saut**, pour ménager une cheville fragile.
 
 | Séance | Contenu |
 |---|---|
-| Mobilité cheville 6 min | cercles, alphabet avec le pied, montées sur pointes, équilibre, étirement des mollets |
+| Mobilité cheville 5 min | cercles, alphabet avec le pied, montées sur pointes, équilibre, étirement des mollets |
 | Renfo ventre 10 min | bascule du bassin, planche sur les genoux, dead bug, planche latérale, pont fessier, relevés de buste, respiration abdominale |
 | Renfo ventre 15 min | niveau 2 : planche, bird dog, ciseaux, superman… (à partir de la semaine 5) |
 
