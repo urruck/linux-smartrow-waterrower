@@ -10,8 +10,7 @@ import json
 import os
 
 ICI = os.path.dirname(os.path.abspath(__file__))
-SESSIONS = os.path.join(ICI, "sessions")
-DONNEES = os.path.join(ICI, "donnees")
+from chemins import SESSIONS, DONNEES  # noqa: E402  (données dans ~/.local/share)
 
 PROFIL_DEFAUT = {
     "prenom": "",

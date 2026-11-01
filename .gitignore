@@ -3,3 +3,4 @@ sessions/
 donnees/
 __pycache__/
 *.pyc
+dist/

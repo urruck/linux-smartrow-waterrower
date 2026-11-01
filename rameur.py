@@ -3,7 +3,8 @@
 
 Lit le SmartRow en Bluetooth et affiche la séance en direct dans le
 navigateur : temps, distance, allure, watts, cadence, courbe de force.
-Chaque séance est enregistrée dans sessions/ (format JSON).
+Chaque séance est enregistrée dans ~/.local/share/rameur-smartrow/sessions/
+(format JSON).
 
   python3 rameur.py              puis ouvrir http://localhost:8765
   python3 rameur.py --reseau     page visible aussi depuis une tablette ou un
@@ -22,7 +23,9 @@ import time
 import urllib.parse
 
 ICI = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(ICI, "lib"))
+# bleak : paquet système python3-bleak, ou copie locale dans lib/ (installer.sh)
+if os.path.isdir(os.path.join(ICI, "lib")):
+    sys.path.insert(0, os.path.join(ICI, "lib"))
 sys.path.insert(0, ICI)
 
 from bleak.exc import BleakError  # noqa: E402
@@ -30,7 +33,7 @@ import jeu  # noqa: E402
 import smartrow_ble as sr  # noqa: E402
 
 PORT = 8765
-DOSSIER = os.path.join(ICI, "sessions")
+from chemins import SESSIONS as DOSSIER  # noqa: E402  (séances dans ~/.local/share)
 CHAMPS = ("distance_m", "temps_s", "watts", "watts_moyens", "cadence", "coups",
           "allure_500m_s", "allure_moyenne_s", "travail_j", "longueur_coup", "arret")
 
@@ -131,6 +134,25 @@ def historique():
     return res
 
 
+# --- Voix de secours : speech-dispatcher (spd-say) -------------------------------
+
+_voix = None
+
+
+def parler(texte):
+    """Annonce vocale par speech-dispatcher, en coupant l'annonce précédente."""
+    global _voix
+    import shutil
+    import subprocess
+    if not texte.strip() or not shutil.which("spd-say"):
+        return
+    if _voix and _voix.poll() is None:
+        _voix.terminate()
+    subprocess.run(["spd-say", "-C"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
+    _voix = subprocess.Popen(["spd-say", "-l", "fr", "-w", texte],
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
 # --- Serveur web (bibliothèque standard, sans dépendance) ----------------------
 
 async def serveur_web(seance, capteur, hote):
@@ -180,6 +202,9 @@ async def serveur_web(seance, capteur, hote):
                     json.dump({"debut": (maintenant - datetime.timedelta(seconds=duree)).isoformat(timespec="seconds"),
                                "type": "renfo", "programme": params.get("programme", [""])[0], "termine": True,
                                "resume": {"distance_m": 0, "temps_s": duree}, "points": [], "coups": []}, f)
+                corps, type_ = b"{}", "application/json"
+            elif chemin == "/parler" and ligne[0] == "POST":  # voix de Linux (fenêtre sans voix)
+                parler(donnees.decode("utf-8", "replace")[:300])
                 corps, type_ = b"{}", "application/json"
             elif chemin == "/jeu":
                 corps, type_ = json.dumps(jeu.etat(), ensure_ascii=False, default=str).encode(), "application/json"

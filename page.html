@@ -143,7 +143,7 @@
 </head>
 <body>
 <div id="bandeau">⚠️ L'application qui tourne est une ancienne version : les séances au sol, l'Aventure et les idées repas ne peuvent pas marcher.
-  Dans son terminal, faites <b>Ctrl+C</b>, relancez <b>bash ~/smartrow/rameur.sh</b>, puis rechargez cette page (F5).</div>
+  Dans son terminal, faites <b>Ctrl+C</b>, relancez <b>bash ~/Documents/claude/smartrow/rameur.sh</b>, puis rechargez cette page (F5).</div>
 <header>
   <h1>🚣 Rameur</h1>
   <div class="etat"><span class="pastille" id="pastille"></span><span id="connexion">Recherche du SmartRow…</span></div>
@@ -386,9 +386,18 @@ function bip(freq = 880, ms = 150) {
     o.start(); o.stop(audio.currentTime + ms / 1000);
   } catch (e) {}
 }
+function voixFrancaise() {
+  try { return window.speechSynthesis && speechSynthesis.getVoices().some(v => v.lang && v.lang.startsWith("fr")); }
+  catch (e) { return false; }
+}
 function dire(t) {
-  if (!$("voix").checked || !window.speechSynthesis) return;
-  const u = new SpeechSynthesisUtterance(t); u.lang = "fr-FR"; speechSynthesis.cancel(); speechSynthesis.speak(u);
+  if (!$("voix").checked) return;
+  if (voixFrancaise()) {
+    const u = new SpeechSynthesisUtterance(t); u.lang = "fr-FR"; speechSynthesis.cancel(); speechSynthesis.speak(u);
+  } else {
+    // fenêtre de l'application (WebKit) sans voix : synthèse vocale de Linux
+    fetch("/parler", { method: "POST", body: t }).catch(() => {});
+  }
 }
 
 async function chargerProgrammes() {

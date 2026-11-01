@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="fond" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2f7fc1"/>
+      <stop offset="1" stop-color="#1b4f8a"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="120" height="120" rx="26" fill="url(#fond)"/>
+  <!-- eau -->
+  <path d="M14 98 q10 -7 20 0 t20 0 t20 0 t20 0 t20 0" fill="none" stroke="#9fd3ff" stroke-width="5" stroke-linecap="round"/>
+  <!-- rail du rameur -->
+  <rect x="18" y="80" width="92" height="7" rx="3.5" fill="#d9e9f7"/>
+  <!-- roue à eau -->
+  <circle cx="98" cy="70" r="15" fill="#d9e9f7"/>
+  <circle cx="98" cy="70" r="7" fill="#1b4f8a"/>
+  <!-- rameur : tête, dos, bras, jambes -->
+  <circle cx="44" cy="34" r="8" fill="#ffffff"/>
+  <path d="M46 43 L38 70" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
+  <path d="M44 50 L72 56 L90 64" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M38 70 L62 62 L74 78" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="30" y="70" width="18" height="7" rx="3" fill="#f9a825"/>
+</svg>

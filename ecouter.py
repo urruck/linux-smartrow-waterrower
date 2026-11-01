@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Étape 1 : écoute le SmartRow, affiche les valeurs décodées et enregistre
-tous les messages bruts dans sessions/ pour vérifier le décodage.
+tous les messages bruts dans ~/.local/share/rameur-smartrow/sessions/ pour vérifier le décodage.
 
   python3 ecouter.py              cherche le SmartRow puis écoute (Ctrl+C pour arrêter)
   python3 ecouter.py --scan       liste seulement les appareils Bluetooth proches
@@ -12,8 +12,10 @@ import signal
 import sys
 
 ICI = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(ICI, "lib"))
+if os.path.isdir(os.path.join(ICI, "lib")):
+    sys.path.insert(0, os.path.join(ICI, "lib"))
 sys.path.insert(0, ICI)
+from chemins import SESSIONS  # noqa: E402
 
 from bleak import BleakScanner  # noqa: E402
 from bleak.exc import BleakError  # noqa: E402
@@ -37,8 +39,8 @@ async def ecouter():
         print("SmartRow introuvable. Il est peut-être en veille, trop loin, ou connecté au téléphone.")
         return 1
     print(f"Trouvé : {appareil.name} ({appareil.address}). Connexion...")
-    os.makedirs(os.path.join(ICI, "sessions"), exist_ok=True)
-    chemin = os.path.join(ICI, "sessions", datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S") + ".log")
+    os.makedirs(SESSIONS, exist_ok=True)
+    chemin = os.path.join(SESSIONS, datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S") + ".log")
     journal = open(chemin, "w", encoding="utf-8")
     etat = {}
 

@@ -157,8 +157,8 @@ facilement.
   l'escale de Chalonnes, au niveau 5… Elles se débloquent toutes seules,
   avec des confettis.
 
-Le profil et les pesées restent sur l'ordinateur, dans `donnees/`, qui n'est
-pas publié. Les règles du jeu sont dans [`jeu.json`](jeu.json) et faciles à
+Le profil et les pesées restent sur l'ordinateur, dans
+`~/.local/share/rameur-smartrow/donnees/`, qui n'est pas publié. Les règles du jeu sont dans [`jeu.json`](jeu.json) et faciles à
 modifier.
 
 > Le rameur aide, mais la perte de poids se joue surtout dans l'assiette et
@@ -174,15 +174,35 @@ médecin avant les séances intenses.
 
 ## Installation
 
-Il faut Linux avec Bluetooth (BlueZ), Python 3.9 ou plus récent, et un
-navigateur.
+Il faut Linux avec Bluetooth (BlueZ). Testé sur Zorin OS 18 / Ubuntu 24.04.
+
+### Paquet .deb (recommandé)
+
+Télécharger `rameur-smartrow_*_all.deb` dans les
+[versions publiées](https://github.com/urruck/linux-smartrow-watterrower/releases),
+ou le construire, puis l'installer :
+
+```
+bash construire_deb.sh                                  # crée dist/rameur-smartrow_0.1.0_all.deb
+sudo apt install ./dist/rameur-smartrow_0.1.0_all.deb
+```
+
+L'application **Rameur** apparaît dans le menu (commande : `rameur`). Elle
+s'ouvre dans sa propre fenêtre ; la fermer enregistre la séance en cours.
+Le paquet installe aussi ce qu'il faut (`python3-bleak`, GTK 4, WebKit,
+synthèse vocale).
+
+### Depuis les sources, sans sudo
 
 ```
 git clone https://github.com/urruck/linux-smartrow-watterrower.git
 cd linux-smartrow-watterrower
-bash installer.sh      # installe la bibliothèque Bluetooth « bleak » dans lib/
-bash rameur.sh         # lance l'appli et ouvre http://localhost:8765
+bash installer.sh      # bleak dans lib/ si besoin, commande « rameur » et raccourci du menu
+python3 rameur_app.py  # la fenêtre de l'application
+bash rameur.sh         # ou : dans le navigateur, http://localhost:8765
 ```
+
+### Utilisation
 
 - **Fermez l'appli SmartRow du téléphone** : le capteur n'accepte qu'une
   connexion à la fois.
@@ -191,12 +211,16 @@ bash rameur.sh         # lance l'appli et ouvre http://localhost:8765
 - **Ne l'appairez pas** dans les réglages Bluetooth. Sous Linux, un
   appairage gardé en mémoire fait échouer la connexion. Pour le retirer :
   `bluetoothctl remove <adresse>`.
-- `bash rameur.sh --reseau` rend la page visible depuis une tablette ou un
+- `rameur --reseau` (ou `bash rameur.sh --reseau`) rend la page visible depuis une tablette ou un
   téléphone du même Wi-Fi, à l'adresse `http://<ip-du-pc>:8765`.
 - **Nouvelle séance** enregistre la séance en cours et remet le compteur à
   zéro.
-- Les séances sont enregistrées dans `sessions/`, au format JSON, avec un
-  relevé par seconde et la courbe de chaque coup.
+- Les séances sont enregistrées dans `~/.local/share/rameur-smartrow/sessions/`,
+  au format JSON, avec un relevé par seconde et la courbe de chaque coup.
+  Au premier lancement, les séances et le profil d'une ancienne version
+  (dossiers `sessions/` et `donnees/` à côté du programme) y sont copiés.
+- Sans voix française dans la fenêtre, les annonces passent par la
+  synthèse vocale de Linux (`spd-say`).
 
 Pour essayer sans rameur, on peut rejouer une vraie séance enregistrée :
 
@@ -208,7 +232,10 @@ python3 rameur.py --rejouer exemples/seance-260m.log
 
 | Fichier | Rôle |
 |---|---|
-| `rameur.py` | application : Bluetooth, petit serveur web, enregistrement |
+| `rameur_app.py` | application de bureau : fenêtre GTK 4 + WebKit qui lance `rameur.py` |
+| `rameur.py` | serveur : Bluetooth, petit serveur web, enregistrement |
+| `chemins.py` | emplacement des données (`~/.local/share/rameur-smartrow`) |
+| `construire_deb.sh` | construit le paquet `.deb` |
 | `page.html` | l'affichage dans le navigateur, avec les séances guidées |
 | `programmes.json` | les séances guidées |
 | `jeu.py`, `jeu.json` | mode Aventure : XP, niveaux, parcours, badges, quêtes, plan, poids |
