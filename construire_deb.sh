@@ -48,7 +48,7 @@ install -m 644 "$ICI/README.md" "$D/"
 cat > "$D/copyright" <<'EOF'
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: rameur-smartrow
-Source: https://github.com/urruck/linux-smartrow-watterrower
+Source: https://github.com/urruck/linux-smartrow-waterrower
 
 Files: *
 Copyright: Yvan Godreau
@@ -70,7 +70,7 @@ Depends: python3 (>= 3.10), python3-bleak, bluez, python3-gi, gir1.2-gtk-4.0, gi
 Recommends: speech-dispatcher
 Installed-Size: $(du -sk "$P/usr" | cut -f1)
 Maintainer: Yvan Godreau <yvan.godreau@centresocial-chemille.asso.fr>
-Homepage: https://github.com/urruck/linux-smartrow-watterrower
+Homepage: https://github.com/urruck/linux-smartrow-waterrower
 Description: application de rameur pour WaterRower équipé d'un SmartRow
  Lit le capteur SmartRow en Bluetooth et affiche la séance en direct :
  temps, distance, allure, puissance, cadence et courbe de force.

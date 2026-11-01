@@ -179,7 +179,7 @@ Il faut Linux avec Bluetooth (BlueZ). Testé sur Zorin OS 18 / Ubuntu 24.04.
 ### Paquet .deb (recommandé)
 
 Télécharger `rameur-smartrow_*_all.deb` dans les
-[versions publiées](https://github.com/urruck/linux-smartrow-watterrower/releases),
+[versions publiées](https://github.com/urruck/linux-smartrow-waterrower/releases),
 ou le construire, puis l'installer :
 
 ```
@@ -195,8 +195,8 @@ synthèse vocale).
 ### Depuis les sources, sans sudo
 
 ```
-git clone https://github.com/urruck/linux-smartrow-watterrower.git
-cd linux-smartrow-watterrower
+git clone https://github.com/urruck/linux-smartrow-waterrower.git
+cd linux-smartrow-waterrower
 bash installer.sh      # bleak dans lib/ si besoin, commande « rameur » et raccourci du menu
 python3 rameur_app.py  # la fenêtre de l'application
 bash rameur.sh         # ou : dans le navigateur, http://localhost:8765
