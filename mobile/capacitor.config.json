@@ -1,0 +1,18 @@
+{
+  "appId": "io.github.urruck.rameur",
+  "appName": "Rameur",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false
+  },
+  "plugins": {
+    "BluetoothLe": {
+      "displayStrings": {
+        "scanning": "Recherche…",
+        "cancel": "Annuler",
+        "availableDevices": "Appareils disponibles",
+        "noDeviceFound": "Aucun appareil trouvé"
+      }
+    }
+  }
+}

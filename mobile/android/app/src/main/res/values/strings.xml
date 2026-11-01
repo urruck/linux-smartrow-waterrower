@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Rameur</string>
+    <string name="title_activity_main">Rameur</string>
+    <string name="package_name">io.github.urruck.rameur</string>
+    <string name="custom_url_scheme">io.github.urruck.rameur</string>
+</resources>

@@ -1,0 +1,23 @@
+{
+  "name": "rameur-smartrow-android",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Application Android du rameur WaterRower + SmartRow (Capacitor)",
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "construire": "node construire_www.mjs"
+  },
+  "dependencies": {
+    "@capacitor-community/bluetooth-le": "^8.3.0",
+    "@capacitor-community/keep-awake": "^8.0.1",
+    "@capacitor-community/text-to-speech": "^8.0.2",
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/filesystem": "^8.1.5"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.6.0",
+    "esbuild": "^0.28.2"
+  }
+}

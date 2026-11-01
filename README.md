@@ -1,7 +1,7 @@
 # linux-smartrow-waterrower
 
-**Une application de rameur pour Linux, avec un WaterRower équipé du capteur
-SmartRow.**
+**Une application de rameur pour Linux et Android, avec un WaterRower équipé
+du capteur SmartRow.**
 
 L'application lit le SmartRow en Bluetooth et affiche la séance en direct dans
 le navigateur. On peut l'utiliser sur le PC, ou sur une tablette ou un
@@ -192,6 +192,30 @@ s'ouvre dans sa propre fenêtre ; la fermer enregistre la séance en cours.
 Le paquet installe aussi ce qu'il faut (`python3-bleak`, GTK 4, WebKit,
 synthèse vocale).
 
+### Téléphone ou tablette Android
+
+Télécharger `rameur-smartrow_*.apk` dans les
+[versions publiées](https://github.com/urruck/linux-smartrow-waterrower/releases)
+depuis le téléphone, l'ouvrir et accepter l'installation (Android demande
+d'autoriser le navigateur à installer des applications). Android 7 ou plus,
+avec Bluetooth.
+
+Au premier lancement, autoriser **« Appareils à proximité »** : c'est le
+Bluetooth qui sert à trouver le SmartRow. L'application fait tout dans le
+téléphone, sans PC ni Internet : mêmes écrans, séances guidées, voix
+d'Android, aventure. L'écran reste allumé pendant qu'elle est ouverte. Les
+séances sont gardées dans le téléphone, au même format que sur Linux.
+Désinstaller l'application les efface.
+
+Pour reconstruire l'APK (Node.js, kit Android et Java 21, sans sudo) :
+`bash mobile/construire_apk.sh`. Le dossier `mobile/` contient
+`src/serveur.js`, une traduction en JavaScript de `rameur.py`, `jeu.py` et
+`smartrow_ble.py`. La page `page.html` est reprise telle quelle.
+`mobile/essais/comparer.sh` vérifie que les deux versions donnent les mêmes
+résultats. Pour essayer la version téléphone dans un navigateur sans rameur :
+`cd mobile/www && python3 -m http.server`, puis ouvrir
+`http://localhost:8000/?demo=4`.
+
 ### Depuis les sources, sans sudo
 
 ```
@@ -244,6 +268,7 @@ python3 rameur.py --rejouer exemples/seance-260m.log
 | `smartrow_ble.py` | connexion au SmartRow et décodage des messages |
 | `ecouter.py` | outil de diagnostic : affiche et enregistre les messages bruts |
 | `exemples/seance-260m.log` | une vraie séance enregistrée, pour les essais |
+| `mobile/` | application Android (Capacitor) : `construire_apk.sh`, `src/` |
 
 ## Protocole SmartRow (V2, vérifié le 27/10/2026 sur une vraie séance)
 
