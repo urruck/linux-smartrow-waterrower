@@ -2,7 +2,7 @@
 # Construit le paquet Debian/Ubuntu du rameur : dist/rameur-smartrow_VERSION_all.deb
 # Installation ensuite : sudo apt install ./dist/rameur-smartrow_VERSION_all.deb
 set -euo pipefail
-VERSION="${1:-0.1.0}"
+VERSION="${1:-0.2.0}"
 ICI="$(cd "$(dirname "$0")" && pwd)"
 SORTIE="$ICI/dist"
 TRAVAIL="$(mktemp -d)"
@@ -13,7 +13,7 @@ A="$P/usr/share/rameur-smartrow"
 # Programme (les données personnelles vont dans ~/.local/share/rameur-smartrow)
 install -d "$A/exemples"
 install -m 755 "$ICI"/{rameur_app.py,rameur.py,ecouter.py} "$A/"
-install -m 644 "$ICI"/{chemins.py,jeu.py,smartrow_ble.py,page.html,illustrations.js} "$A/"
+install -m 644 "$ICI"/{chemins.py,jeu.py,sauvegarde.py,smartrow_ble.py,page.html,illustrations.js} "$A/"
 install -m 644 "$ICI"/{jeu.json,programmes.json,recettes.json} "$A/"
 install -m 644 "$ICI"/exemples/* "$A/exemples/"
 

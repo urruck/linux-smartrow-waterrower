@@ -10,6 +10,7 @@ import { KeepAwake } from "@capacitor-community/keep-awake";
 import { TextToSpeech } from "@capacitor-community/text-to-speech";
 import * as sr from "./smartrow.js";
 import * as jeu from "./jeu.js";
+import * as sauvegarde from "./sauvegarde.js";
 import { stock } from "./stockage.js";
 
 const CHAMPS = ["distance_m", "temps_s", "watts", "watts_moyens", "cadence", "coups",
@@ -311,13 +312,19 @@ async function repondre(chemin, methode, p, corps) {
   if (chemin === "/jeu") return json(await jeu.etat());
   if (chemin === "/profil" && post) { await jeu.enregistrerProfil(JSON.parse(corps || "{}")); return json(); }
   if (chemin === "/pesee" && post) { await jeu.ajouterPesee(parseFloat(p.get("kg").replace(",", "."))); return json(); }
+  if (chemin === "/export" && post) return json(await sauvegarde.enregistrerExport());
+  if (chemin === "/import" && post) {
+    await seance.sauver();
+    try { return json(await sauvegarde.fusionner(JSON.parse(corps || "{}"), p.get("profil") === "1")); }
+    catch (e) { return json({ erreur: String(e.message || e), message: String(e.message || e) }); }
+  }
   if (chemin === "/version") return json({ version: 3, plateforme: "android" });
   if (chemin === "/recettes") return stock.fichierAppli("recettes.json");
   if (chemin === "/programmes") return stock.fichierAppli("programmes.json");
   return null;
 }
 
-const ADRESSES = /^\/(historique|seance\/|nouvelle|fin|exercice|parler|jeu|profil|pesee|version|recettes|programmes)/;
+const ADRESSES = /^\/(historique|seance\/|nouvelle|fin|exercice|parler|jeu|profil|pesee|version|recettes|programmes|export|import)/;
 const vraiFetch = window.fetch.bind(window);
 
 window.fetch = async (entree, options = {}) => {

@@ -248,6 +248,15 @@
       Début du plan <input id="f-debut" type="date" style="width:150px">
       <button id="f-ok">Enregistrer</button></div>
   </div>
+  <div class="tuile large">
+    <div class="nom">Sauvegarde et transfert</div>
+    <div class="sous" style="margin:6px 0">Pour passer du PC au téléphone, ou l'inverse : exportez sur l'un, importez le
+      fichier sur l'autre. Rien n'est effacé : les séances déjà présentes sont gardées.</div>
+    <div class="reglage"><button id="s-export">Exporter mes données</button>
+      <button id="s-import">Importer une sauvegarde</button>
+      <input type="file" id="s-fichier" accept=".json,application/json" style="display:none"></div>
+    <div class="sous" id="s-message" style="margin-top:6px"></div>
+  </div>
 </main>
 <div id="exo">
   <div class="haut"><span id="x-etape"></span><span class="espace"></span><span id="x-titre"></span></div>
@@ -749,6 +758,34 @@ $("f-ok").onclick = async () => {
   await fetch("/profil", { method: "POST", body: JSON.stringify({ prenom: $("f-prenom").value.trim(), taille_cm: n("f-taille"),
     poids_depart_kg: n("f-depart"), poids_objectif_kg: n("f-objectif"), debut: $("f-debut").value }) });
   afficherAventure(await lireJeu());
+};
+
+// Sauvegarde : export (Téléchargements sur le PC, partage sur le téléphone) et import
+$("s-export").onclick = async () => {
+  $("s-message").textContent = "Export en cours…";
+  try {
+    const r = await (await fetch("/export", { method: "POST" })).json();
+    $("s-message").textContent = r.message || "Export terminé.";
+  } catch (e) { $("s-message").textContent = "Export impossible (serveur trop ancien ?)."; }
+};
+$("s-import").onclick = () => $("s-fichier").click();
+$("s-fichier").onchange = async () => {
+  const f = $("s-fichier").files[0];
+  $("s-fichier").value = "";
+  if (!f) return;
+  let texte, d;
+  try { texte = await f.text(); d = JSON.parse(texte); } catch (e) { d = null; }
+  if (!d || d.format !== "rameur-smartrow") { $("s-message").textContent = "Ce fichier n'est pas une sauvegarde du rameur."; return; }
+  const nb = Object.keys(d.sessions || {}).length;
+  if (!confirm(`Importer ${nb} séance(s) de la sauvegarde du ${(d.cree || "").slice(0, 10)} ?`)) return;
+  const profil = d.donnees && d.donnees["profil.json"] &&
+    confirm("Remplacer aussi le profil d'ici (prénom, poids, objectif, début du plan, récompenses) par celui de la sauvegarde ?");
+  $("s-message").textContent = "Import en cours…";
+  try {
+    const r = await (await fetch("/import?profil=" + (profil ? 1 : 0), { method: "POST", body: texte })).json();
+    $("s-message").textContent = r.message;
+    afficherAventure(jeuAvant = await lireJeu());
+  } catch (e) { $("s-message").textContent = "Import impossible : " + e; }
 };
 
 // Célébration : compare l'état du jeu avant et après

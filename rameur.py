@@ -30,6 +30,7 @@ sys.path.insert(0, ICI)
 
 from bleak.exc import BleakError  # noqa: E402
 import jeu  # noqa: E402
+import sauvegarde  # noqa: E402
 import smartrow_ble as sr  # noqa: E402
 
 PORT = 8765
@@ -163,7 +164,7 @@ async def serveur_web(seance, capteur, hote):
             while (entete := await lecteur.readline()) not in (b"\r\n", b"\n", b""):
                 if entete.lower().startswith(b"content-length:"):
                     longueur = int(entete.split(b":")[1])
-            donnees = await lecteur.readexactly(longueur) if 0 < longueur < 100000 else b""
+            donnees = await lecteur.readexactly(longueur) if 0 < longueur < 64_000_000 else b""  # import : quelques Mo
             chemin, _, requete = (ligne[1] if len(ligne) > 1 else "/").partition("?")
             params = urllib.parse.parse_qs(requete)
             if chemin == "/flux":
@@ -214,6 +215,15 @@ async def serveur_web(seance, capteur, hote):
             elif chemin == "/pesee" and ligne[0] == "POST":
                 jeu.ajouter_pesee(float(params["kg"][0].replace(",", ".")))
                 corps, type_ = b"{}", "application/json"
+            elif chemin == "/export" and ligne[0] == "POST":  # fichier dans Téléchargements
+                corps, type_ = json.dumps(sauvegarde.enregistrer_export(), ensure_ascii=False).encode(), "application/json"
+            elif chemin == "/import" and ligne[0] == "POST":
+                seance.sauver()
+                try:
+                    res = sauvegarde.fusionner(json.loads(donnees or b"{}"), params.get("profil", ["0"])[0] == "1")
+                except ValueError as e:
+                    res = {"erreur": str(e), "message": str(e)}
+                corps, type_ = json.dumps(res, ensure_ascii=False).encode(), "application/json"
             elif chemin == "/illustrations.js":
                 with open(os.path.join(ICI, "illustrations.js"), "rb") as f:
                     corps, type_ = f.read(), "text/javascript; charset=utf-8"

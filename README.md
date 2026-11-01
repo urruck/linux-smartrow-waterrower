@@ -183,8 +183,8 @@ Télécharger `rameur-smartrow_*_all.deb` dans les
 ou le construire, puis l'installer :
 
 ```
-bash construire_deb.sh                                  # crée dist/rameur-smartrow_0.1.0_all.deb
-sudo apt install ./dist/rameur-smartrow_0.1.0_all.deb
+bash construire_deb.sh                                  # crée dist/rameur-smartrow_0.2.0_all.deb
+sudo apt install ./dist/rameur-smartrow_0.2.0_all.deb
 ```
 
 L'application **Rameur** apparaît dans le menu (commande : `rameur`). Elle
@@ -206,6 +206,15 @@ téléphone, sans PC ni Internet : mêmes écrans, séances guidées, voix
 d'Android, aventure. L'écran reste allumé pendant qu'elle est ouverte. Les
 séances sont gardées dans le téléphone, au même format que sur Linux.
 Désinstaller l'application les efface.
+
+**Passer ses séances du PC au téléphone (ou l'inverse)** : dans **Aventure**,
+en bas, **Exporter mes données** sur l'un, puis **Importer une sauvegarde**
+sur l'autre. Sur le PC, le fichier `rameur-sauvegarde-AAAA-MM-JJ.json` est
+enregistré dans Téléchargements. Sur le téléphone, il va dans Documents et
+le menu de partage s'ouvre (Nextcloud, courriel, Drive, Quick Share…).
+L'import n'efface rien : il ajoute les séances et les pesées qui manquent.
+Il propose aussi de remplacer le profil (prénom, poids, début du plan,
+récompenses). C'est aussi une bonne sauvegarde avant de désinstaller.
 
 Pour reconstruire l'APK (Node.js, kit Android et Java 21, sans sudo) :
 `bash mobile/construire_apk.sh`. Le dossier `mobile/` contient
@@ -259,6 +268,7 @@ python3 rameur.py --rejouer exemples/seance-260m.log
 | `rameur_app.py` | application de bureau : fenêtre GTK 4 + WebKit qui lance `rameur.py` |
 | `rameur.py` | serveur : Bluetooth, petit serveur web, enregistrement |
 | `chemins.py` | emplacement des données (`~/.local/share/rameur-smartrow`) |
+| `sauvegarde.py` | export et import des données (transfert PC ↔ téléphone) |
 | `construire_deb.sh` | construit le paquet `.deb` |
 | `page.html` | l'affichage dans le navigateur, avec les séances guidées |
 | `programmes.json` | les séances guidées |
