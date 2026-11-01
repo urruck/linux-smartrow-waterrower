@@ -123,6 +123,35 @@ async def trouver(nom="SmartRow", duree=15.0):
     return None
 
 
+async def _bluetoothctl(*args):
+    try:
+        p = await asyncio.create_subprocess_exec(
+            "bluetoothctl", *args, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.DEVNULL)
+        sortie, _ = await asyncio.wait_for(p.communicate(), 10)
+        return sortie.decode(errors="replace")
+    except (OSError, asyncio.TimeoutError):
+        return ""
+
+
+async def oublier_appairages(nom="SmartRow"):
+    """Un appairage BlueZ gardé en mémoire (fait depuis les réglages Bluetooth)
+    fait échouer la connexion au SmartRow : on retire ceux des appareils dont
+    le nom contient « SmartRow » (les autres appareils ne sont pas touchés).
+    Renvoie le nombre d'appairages retirés."""
+    import re
+    retires = 0
+    for ligne in (await _bluetoothctl("devices", "Paired")).splitlines():
+        m = re.match(r"Device ((?:[0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}) (.*)", ligne.strip())
+        if not m or nom.lower() not in m.group(2).lower():
+            continue
+        infos = await _bluetoothctl("info", m.group(1))
+        if "Paired: yes" in infos or "Bonded: yes" in infos:
+            await _bluetoothctl("remove", m.group(1))
+            print(f"Appairage du SmartRow {m.group(1)} retiré : il empêche la connexion.")
+            retires += 1
+    return retires
+
+
 class SmartRow:
     """Connexion au capteur. Appelle rappel(horodatage, octets bruts, type, valeurs)."""
 

@@ -265,6 +265,8 @@ class Capteur:
         while not arret.is_set():
             self.seance.etat["connexion"] = "recherche"
             self.seance.diffuser()
+            if await sr.oublier_appairages():
+                await asyncio.sleep(3)   # BlueZ doit oublier l'appareil avant de le retrouver
             appareil = await sr.trouver(duree=10.0)
             if appareil is None:
                 continue
@@ -277,6 +279,9 @@ class Capteur:
                 self.premiere = False
             except (BleakError, TimeoutError, asyncio.TimeoutError, OSError) as e:
                 print(f"Bluetooth : {e or type(e).__name__} ; nouvelle tentative...")
+                self.seance.etat["connexion"] = ("Connexion impossible, nouvel essai… (fermez l'appli SmartRow "
+                                                 "du téléphone, tirez sur la poignée)")
+                self.seance.diffuser()
             self.lien = None
             self.seance.sauver()
             await asyncio.sleep(2)

@@ -242,7 +242,8 @@ bash rameur.sh         # ou : dans le navigateur, http://localhost:8765
 - Tirez sur la poignée pour réveiller le capteur. Le programme le trouve et
   s'y reconnecte tout seul.
 - **Ne l'appairez pas** dans les réglages Bluetooth. Sous Linux, un
-  appairage gardé en mémoire fait échouer la connexion. Pour le retirer :
+  appairage gardé en mémoire fait échouer la connexion. L'application le
+  retire d'elle-même (seulement celui du SmartRow). À la main :
   `bluetoothctl remove <adresse>`.
 - `rameur --reseau` (ou `bash rameur.sh --reseau`) rend la page visible depuis une tablette ou un
   téléphone du même Wi-Fi, à l'adresse `http://<ip-du-pc>:8765`.
