@@ -9,7 +9,8 @@
     "badge": 100,
     "precision_cadence_max": 100,
     "seance_renfo": 80,
-    "par_km_course": 100
+    "par_km_course": 100,
+    "defi": 200
   },
   "niveaux": [
     "Moussaillon",
@@ -182,7 +183,7 @@
       "id": "reprise",
       "icone": "🩹",
       "nom": "Reprise réussie",
-      "texte": "Les 2 semaines de reprise du plan terminées"
+      "texte": "Les 2 premières semaines du plan terminées"
     },
     {
       "id": "fractionne",
@@ -303,34 +304,43 @@
       "icone": "🔱",
       "nom": "Duathlète",
       "texte": "Ramer et courir la même semaine"
+    },
+    {
+      "id": "sentier",
+      "icone": "🥾",
+      "nom": "Au bout du sentier",
+      "texte": "Finir le sentier de course à pied"
+    },
+    {
+      "id": "defi1",
+      "icone": "🎯",
+      "nom": "Défi relevé",
+      "texte": "Réussir un défi du mois"
+    },
+    {
+      "id": "defis5",
+      "icone": "🏵️",
+      "nom": "Chasseur de défis",
+      "texte": "Réussir 5 défis du mois"
     }
   ],
   "plan": {
     "nom": "Retour en forme : 12 semaines",
-    "_note": "3 séances de rame par semaine (un jour de repos entre deux) + 2 séances hors rameur (renfo, cheville) les autres jours. Semaines 1-2 : reprise douce après l'entorse de cheville. Course à pied à partir de la semaine 3 (cheville) : une sortie par semaine, en alternant course et marche.",
+    "_note": "3 séances de rame par semaine (un jour de repos entre deux), 1 sortie de course à pied (marche-course puis footing) et 2 séances hors rameur (renfo, cheville). Les jours se choisissent dans le profil ; chaque séance du plan peut être remplacée.",
     "semaines": [
       {
-        "theme": "Reprise douce",
+        "theme": "Remise en route",
         "seances": [
-          "reprise15",
-          "reprise15",
-          "reprise15"
+          "reprise20",
+          "technique",
+          "endurance20"
         ],
         "renfo": [
           "cheville",
           "ventre1"
-        ]
-      },
-      {
-        "theme": "Reprise douce",
-        "seances": [
-          "reprise20",
-          "reprise20",
-          "reprise20"
         ],
-        "renfo": [
-          "cheville",
-          "ventre1"
+        "course": [
+          "marchecourse1"
         ]
       },
       {
@@ -341,7 +351,7 @@
           "endurance20"
         ],
         "renfo": [
-          "ventre1",
+          "cheville",
           "ventre1"
         ],
         "course": [
@@ -357,10 +367,10 @@
         ],
         "renfo": [
           "ventre1",
-          "ventre1"
+          "ventre2"
         ],
         "course": [
-          "marchecourse1"
+          "marchecourse2"
         ]
       },
       {
@@ -390,7 +400,7 @@
           "ventre2"
         ],
         "course": [
-          "marchecourse2"
+          "marchecourse3"
         ]
       },
       {
@@ -420,7 +430,7 @@
           "ventre2"
         ],
         "course": [
-          "marchecourse3"
+          "footing20"
         ]
       },
       {
@@ -450,7 +460,7 @@
           "ventre2"
         ],
         "course": [
-          "footing20"
+          "footing25"
         ]
       },
       {
@@ -466,6 +476,21 @@
         ],
         "course": [
           "fartlek"
+        ]
+      },
+      {
+        "theme": "Costaud",
+        "seances": [
+          "endurance40",
+          "4x500",
+          "endurance40"
+        ],
+        "renfo": [
+          "ventre2",
+          "ventre2"
+        ],
+        "course": [
+          "footing25"
         ]
       },
       {
@@ -511,5 +536,74 @@
       "texte": "Tenir la cadence cible 75 % du temps sur 2 séances"
     }
   ],
-  "_xp": "precision_cadence_max : XP en plus selon le % du temps passé dans la cadence cible (100 % = tout le bonus) ; par_km_course : XP par km couru (course à pied, GPS du téléphone)"
+  "_xp": "precision_cadence_max : XP en plus selon le % du temps passé dans la cadence cible (100 % = tout le bonus) ; par_km_course : XP par km couru (course à pied, GPS du téléphone) ; defi : XP par défi du mois réussi",
+  "defis": [
+    {
+      "id": "km_rame",
+      "texte": "Ramer {but} km dans le mois",
+      "but": 30
+    },
+    {
+      "id": "km_course",
+      "texte": "Courir {but} km dans le mois",
+      "but": 12
+    },
+    {
+      "id": "seances",
+      "texte": "Faire {but} séances dans le mois (rame, course ou renfo)",
+      "but": 16
+    },
+    {
+      "id": "cadence",
+      "texte": "{but} séances guidées avec 80 % de cadence tenue",
+      "but": 3
+    }
+  ],
+  "_defis": "Défis du mois civil : chacun réussi rapporte l'XP « defi » (aussi pour les mois passés depuis le début de l'aventure).",
+  "parcours_course": {
+    "nom": "Le sentier du Layon à la Loire, à pied",
+    "_note": "distances approximatives, le long des chemins",
+    "escales": [
+      {
+        "km": 0,
+        "nom": "Chemillé",
+        "texte": "Départ au pays des plantes médicinales. En foulées !"
+      },
+      {
+        "km": 7,
+        "nom": "La Jumellière",
+        "texte": "Premiers chemins creux entre les haies."
+      },
+      {
+        "km": 14,
+        "nom": "Saint-Lambert-du-Lattay",
+        "texte": "Les vignes du Layon apparaissent."
+      },
+      {
+        "km": 20,
+        "nom": "Beaulieu-sur-Layon",
+        "texte": "Belvédère sur les coteaux : la vue se mérite."
+      },
+      {
+        "km": 27,
+        "nom": "Rochefort-sur-Loire",
+        "texte": "Voici la Loire ! Le sentier longe la boire."
+      },
+      {
+        "km": 33,
+        "nom": "Savennières",
+        "texte": "Les vignes face au fleuve, et une petite église romane."
+      },
+      {
+        "km": 38,
+        "nom": "Bouchemaine",
+        "texte": "Confluence de la Maine et de la Loire."
+      },
+      {
+        "km": 46,
+        "nom": "Angers",
+        "texte": "Le château et ses 17 tours : bravo, vous êtes à Angers à pied !"
+      }
+    ]
+  }
 }

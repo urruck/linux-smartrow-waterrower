@@ -231,6 +231,10 @@ async def serveur_web(seance, capteur, hote):
             elif chemin == "/profil" and ligne[0] == "POST":
                 jeu.enregistrer_profil(json.loads(donnees or b"{}"))
                 corps, type_ = b"{}", "application/json"
+            elif chemin == "/aventure/redemarrer" and ligne[0] == "POST":
+                d = json.loads(donnees or b"{}")
+                jeu.redemarrer(d.get("debut"), d.get("poids_depart_kg"), d.get("poids_objectif_kg"))
+                corps, type_ = b"{}", "application/json"
             elif chemin == "/pesee" and ligne[0] == "POST":
                 jeu.ajouter_pesee(float(params["kg"][0].replace(",", ".")))
                 corps, type_ = b"{}", "application/json"

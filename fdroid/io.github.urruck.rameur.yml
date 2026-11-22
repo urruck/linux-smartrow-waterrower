@@ -28,7 +28,21 @@ Builds:
       - npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - node construire_www.mjs --android
 
+  - versionName: 0.4.0
+    versionCode: 400
+    commit: v0.4.0
+    subdir: mobile/android/app
+    sudo:
+      - apt-get update
+      - apt-get install -y npm
+    gradle:
+      - yes
+    build:
+      - cd ../..
+      - npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - node construire_www.mjs --android
+
 AutoUpdateMode: Version
 UpdateCheckMode: Tags ^v[0-9.]+$
-CurrentVersion: 0.3.0
-CurrentVersionCode: 300
+CurrentVersion: 0.4.0
+CurrentVersionCode: 400

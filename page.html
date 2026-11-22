@@ -179,6 +179,39 @@
     #rm-cadence { font-size: clamp(56px, 16vh, 110px); }
     .rm-chiffres b { font-size: clamp(24px, 8vh, 44px); }
   }
+  /* Aventure : agenda, bilan, défis, records, menu */
+  .agenda { display: grid; gap: 6px; }
+  .champ { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .recomp input { min-width: 0; }
+  .jour { display: grid; grid-template-columns: 92px 1fr auto; gap: 8px; align-items: center; background: #1f2a33; border-radius: 10px; padding: 8px 10px; }
+  .jour.aujourdhui { outline: 2px solid var(--eau); }
+  .jour .date { color: var(--doux); font-size: 13px; line-height: 1.2; }
+  .jour .date b { color: var(--texte); font-size: 15px; display: block; }
+  .jour .quoi { min-width: 0; }
+  .jour .quoi .sous { font-size: 12px; }
+  .jour.fait .quoi { opacity: .6; }
+  .jour .actions { display: flex; gap: 6px; }
+  .jour .actions button { padding: 6px 10px; }
+  .coche-ok { color: var(--ok); font-weight: 800; font-size: 20px; }
+  .legende { display: flex; gap: 14px; font-size: 12px; color: var(--doux); }
+  .legende i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; }
+  #rec-liste td { padding: 5px 6px; font-size: 14px; }
+  #rec-liste td:nth-child(2) { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .semainier { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin-top: 6px; }
+  .semainier label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--doux); }
+  .semainier select { padding: 6px 2px; font-size: 13px; width: 100%; }
+  .menu { display: grid; gap: 6px; }
+  .menu-jour { display: grid; grid-template-columns: 92px 1fr; gap: 8px; background: #1f2a33; border-radius: 10px; padding: 8px 10px; }
+  .menu-jour .plats { display: grid; gap: 3px; font-size: 14px; }
+  .menu-jour a { color: var(--texte); text-decoration: underline dotted; cursor: pointer; }
+  .menu-jour .moment { color: var(--doux); font-size: 12px; display: inline-block; width: 64px; }
+  @media (max-width: 640px) {
+    .semainier { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .jour, .menu-jour { grid-template-columns: 70px 1fr auto; }
+    .menu-jour { grid-template-columns: 70px 1fr; }
+    .menu-jour .moment { width: 54px; }
+    .recomp .cond { width: 92px; font-size: 12px; }
+  }
   /* Course à pied */
   #vue-course { grid-template-columns: repeat(2, 1fr); }
   #vue-course .large { grid-column: span 2 / span 2; }
@@ -289,16 +322,35 @@
       <div style="flex:1;min-width:220px"><h2 id="a-nom">Moussaillon</h2>
         <div class="sous" id="a-xp"></div><div class="xpbarre"><div id="a-xpbarre"></div></div></div></div>
     <div class="chiffres">
-      <div><b id="a-km">0</b><span>km ramés</span></div><div><b id="a-seances">0</b><span>séances de rame</span></div><div><b id="a-renfo">0</b><span>séances de renfo</span></div>
-      <div><b id="a-kcal">0</b><span>kcal dépensées (estimation)</span></div><div><b id="a-temps">0</b><span>de rame</span></div>
-      <div><b id="a-course">0</b><span>km courus</span></div>
+      <div><b id="a-km">0</b><span>km ramés</span></div><div><b id="a-course">0</b><span>km courus</span></div>
+      <div><b id="a-seances">0</b><span>séances de rame</span></div><div><b id="a-courses">0</b><span>sorties de course</span></div>
+      <div><b id="a-renfo">0</b><span>séances de renfo</span></div>
+      <div><b id="a-kcal">0</b><span>kcal dépensées (estimation)</span></div><div><b id="a-temps">0</b><span>d'effort</span></div>
     </div>
+    <div class="sous" id="a-depuis" style="margin-top:8px"></div>
+  </div>
+  <div class="tuile large">
+    <div class="reglage" style="margin-top:0"><span class="nom" id="a-semaine">Cette semaine</span><span class="espace"></span>
+      <span class="sous" id="a-jours-actifs"></span></div>
+    <h3 id="a-theme" style="margin:6px 0 10px"></h3>
+    <div id="a-agenda" class="agenda"></div>
+    <div class="sous" id="a-agenda-aide" style="margin-top:6px">✎ remplace une séance de cette semaine. Les jours se choisissent dans le profil, en bas.</div>
+    <div id="a-quetes" style="margin-top:12px"></div>
   </div>
   <div class="tuile">
-    <div class="nom" id="a-semaine">Cette semaine</div>
-    <h3 id="a-theme" style="margin:6px 0 10px"></h3>
-    <div id="a-afaire"></div>
-    <div id="a-quetes" style="margin-top:10px"></div>
+    <div class="nom">Bilan des semaines</div>
+    <svg id="bi-graphe" viewBox="0 0 480 170" style="width:100%;height:170px;margin-top:6px"></svg>
+    <div class="legende"><span><i style="background:#3fb6e8"></i>rame</span><span><i style="background:#4cc38a"></i>course</span><span><i style="background:#b38cff"></i>renfo</span></div>
+    <div id="bi-texte" style="margin-top:6px"></div>
+  </div>
+  <div class="tuile">
+    <div class="nom" id="d-titre">Défis du mois</div>
+    <div id="d-liste" style="margin-top:6px"></div>
+    <div class="sous" style="margin-top:6px">Chaque défi réussi rapporte 200 XP. De nouveaux défis chaque mois.</div>
+  </div>
+  <div class="tuile">
+    <div class="nom">Records personnels</div>
+    <table style="margin-top:6px"><tbody id="rec-liste"></tbody></table>
   </div>
   <div class="tuile">
     <div class="nom">Poids</div>
@@ -307,13 +359,28 @@
       <div><b id="p-reste">–</b><span>restant pour l'objectif</span></div></div>
     <div class="xpbarre" style="margin-top:10px"><div id="p-barre" style="background:var(--ok)"></div></div>
     <svg id="p-graphe" viewBox="0 0 480 150" style="width:100%;height:150px;margin-top:8px"></svg>
-    <div class="reglage">Pesée du jour : <input id="p-kg" placeholder="75,5"> kg <button id="p-ok">Enregistrer</button></div>
+    <div class="reglage">Pesée du jour : <input id="p-kg" placeholder="75,5" inputmode="decimal"> kg <button id="p-ok">Enregistrer</button></div>
     <div class="sous" id="p-conseil" style="margin-top:6px"></div>
   </div>
   <div class="tuile large">
     <div class="nom" id="r-nom">Parcours</div>
     <svg id="r-carte" viewBox="0 0 1000 150" style="width:100%;height:auto;margin-top:6px"></svg>
     <div id="r-texte" style="margin-top:4px"></div>
+  </div>
+  <div class="tuile large">
+    <div class="nom" id="sc-nom">Sentier</div>
+    <svg id="sc-carte" viewBox="0 0 1000 150" style="width:100%;height:auto;margin-top:6px"></svg>
+    <div id="sc-texte" style="margin-top:4px"></div>
+  </div>
+  <div class="tuile large" id="repas">
+    <div class="reglage" style="margin-top:0"><span class="nom">🍲 Menu de la semaine</span><span class="espace"></span>
+      <button id="menu-autre">🔀 Autre menu</button><button id="menu-courses">🛒 Liste de courses</button><button id="repas-tout">Toutes les recettes</button></div>
+    <div class="sous" style="margin:6px 0">Adapté à vos jours : plus de féculents complets les jours de rame ou de course, plus léger les jours de repos. Touchez un plat pour la recette.</div>
+    <div id="menu"></div>
+    <div id="menu-liste" style="display:none"></div>
+    <div id="repas-jour"></div>
+    <div id="repas-liste" style="display:none"></div>
+    <div class="sous" id="repas-conseil" style="margin-top:8px"></div>
   </div>
   <div class="tuile">
     <div class="nom">Mes récompenses</div>
@@ -325,22 +392,18 @@
     <div class="nom">Dernières séances</div>
     <table><tbody id="a-journal"></tbody></table>
   </div>
-  <div class="tuile large" id="repas">
-    <div class="reglage" style="margin-top:0"><span class="nom">🍲 Idée repas protéiné de saison</span><span class="espace"></span>
-      <button id="repas-autre">Une autre idée</button><button id="repas-tout">Toutes les recettes</button></div>
-    <div id="repas-jour"></div>
-    <div id="repas-liste" style="display:none"></div>
-    <div class="sous" id="repas-conseil" style="margin-top:8px"></div>
-  </div>
   <div class="tuile large"><div class="nom" id="b-titre">Badges</div><div class="badges" id="badges"></div></div>
   <div class="tuile large">
     <div class="nom">Profil</div>
-    <div class="reglage">Prénom <input id="f-prenom" style="width:120px">
-      Taille <input id="f-taille" style="width:60px"> cm
-      Poids de départ <input id="f-depart" style="width:60px"> kg
-      Objectif <input id="f-objectif" style="width:60px"> kg
-      Début du plan <input id="f-debut" type="date" style="width:150px">
-      <button id="f-ok">Enregistrer</button></div>
+    <div class="reglage"><label class="champ">Prénom <input id="f-prenom" style="width:120px"></label>
+      <label class="champ">Taille <input id="f-taille" style="width:60px" inputmode="decimal"> cm</label>
+      <label class="champ">Poids de départ <input id="f-depart" style="width:60px" inputmode="decimal"> kg</label>
+      <label class="champ">Objectif <input id="f-objectif" style="width:60px" inputmode="decimal"> kg</label>
+      <label class="champ">Début du plan <input id="f-debut" type="date" style="width:150px"></label></div>
+    <div class="sous" style="margin-top:10px">Mes jours d'entraînement :</div>
+    <div class="semainier" id="f-semainier"></div>
+    <div class="reglage"><button id="f-ok">Enregistrer</button><span class="espace"></span>
+      <button id="f-redemarrer" class="fort">🔄 Redémarrer l'aventure</button></div>
   </div>
   <div class="tuile large">
     <div class="nom">Sauvegarde et transfert</div>
@@ -352,6 +415,20 @@
     <div class="sous" id="s-message" style="margin-top:6px"></div>
   </div>
 </main>
+<div id="redem" class="modale"><div class="boite" style="max-width:520px">
+  <h2 style="margin:0 0 8px">🔄 Redémarrer l'aventure</h2>
+  <p style="margin:0 0 10px">XP, niveau, badges, parcours, défis, records et plan de 12 semaines repartent de zéro à la date choisie.
+    <b>Les séances et sorties restent dans l'historique</b> ; le prénom, les récompenses et vos jours sont gardés.</p>
+  <div class="reglage">À partir du <input id="rd-debut" type="date" style="width:160px"></div>
+  <div class="reglage">Poids de départ <input id="rd-poids" style="width:70px" inputmode="decimal"> kg ·
+    Objectif <input id="rd-objectif" style="width:70px" inputmode="decimal"> kg</div>
+  <div class="reglage"><label><input type="checkbox" id="rd-export" checked style="width:auto"> faire d'abord une sauvegarde (export)</label></div>
+  <div class="reglage" style="margin-top:14px"><span class="espace"></span><button id="rd-annuler">Annuler</button>
+    <button id="rd-ok" class="fort">Redémarrer</button></div></div></div>
+<div id="choixprog" class="modale"><div class="boite" style="max-width:560px;max-height:85vh;overflow:auto">
+  <h3 id="cp-titre" style="margin:0 0 8px">Remplacer la séance</h3>
+  <div class="progs" id="cp-liste"></div>
+  <div class="reglage" style="margin-top:12px"><button id="cp-retablir">Remettre la séance du plan</button><span class="espace"></span><button id="cp-fermer">Fermer</button></div></div></div>
 <main id="vue-course" class="vue-cachee">
   <div class="tuile large" id="co-prep">
     <div class="nom">Course à pied</div>
@@ -795,6 +872,7 @@ function libelleCondition(c) {
   if (g === "escale") return `Escale : ${v}`;
   if (g === "niveau") return `Niveau ${v}`;
   if (g === "km") return `${v} km au total`;
+  if (g === "sentier") return `Sentier : ${v}`;
   return c;
 }
 
@@ -810,25 +888,22 @@ async function afficherAventure(J) {
   $("a-kcal").textContent = T.kcal; $("a-temps").textContent = temps(T.temps_s);
   $("a-course").textContent = kgfr(T.course_km || 0);
 
-  // semaine
+  $("a-courses").textContent = T.courses || 0;
+  $("a-temps").textContent = temps((T.temps_s || 0) + (T.course_temps_s || 0));
+  $("a-depuis").textContent = J.profil.aventure_depuis
+    ? `Aventure commencée le ${new Date(J.profil.aventure_depuis + "T00:00").toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })} : les séances d'avant restent dans l'historique.` : "";
+
+  // semaine : agenda jour par jour
   const S = J.semaine;
   const jourDebut = new Date(S.debut + "T00:00").toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
   $("a-semaine").textContent = S.avant_debut ? `Le plan commence ${jourDebut}` : S.numero <= S.nb_semaines ? `Semaine ${S.numero} / ${S.nb_semaines} du plan` : "Plan terminé";
   $("a-theme").textContent = S.theme;
-  const bouton = id => `<button class="lancer" data-id="${id}">▶ ${esc(nomsProgrammes[id]?.nom || id)}</button>`;
-  $("a-afaire").innerHTML = (S.avant_debut ? "<div class='sous'>En attendant : la mobilité de cheville peut se faire dès maintenant. Programme de la 1re semaine :</div>" : "") +
-    (S.a_faire.length
-      ? "<div class='sous'>🚣 Rame (un jour de repos entre deux) :</div>" + S.a_faire.map(bouton).join("")
-      : (S.plan.length ? "<div style='color:var(--ok)'>✔ Toutes les séances de rame du plan sont faites cette semaine !</div>" : "")) +
-    (S.renfo_a_faire.length ? "<div class='sous' style='margin-top:6px'>🧱 Hors rameur, les autres jours :</div>" + S.renfo_a_faire.map(bouton).join("") : "") +
-    ((S.course_a_faire || []).length ? "<div class='sous' style='margin-top:6px'>🏃 Course à pied (avec le téléphone) :</div>" + S.course_a_faire.map(bouton).join("") : "");
-  document.querySelectorAll(".lancer").forEach(b => b.onclick = () => {
-    fiche(nomsProgrammes[b.dataset.id], true);
-  });
+  afficherAgenda(J);
   $("a-quetes").innerHTML = (J.quetes.length ? "<div class='sous'>Quêtes de la semaine (+150 XP chacune) :</div>" : "") + J.quetes.map(q => `
     <div class="quete ${q.ok ? "ok" : ""}"><div class="coche">${q.ok ? "✓" : ""}</div>
       <div class="mini">${esc(q.texte)}<div class="xpbarre"><div style="width:${Math.min(100, 100 * q.fait / q.but)}%"></div></div></div>
       <span class="sous">${kgfr(q.fait)} / ${kgfr(q.but)}</span></div>`).join("");
+  afficherBilan(J); afficherDefis(J); afficherRecords(J);
 
   // poids
   $("p-actuel").textContent = kgfr(P.actuel);
@@ -841,8 +916,9 @@ async function afficherAventure(J) {
     ? `À un rythme sain de 0,5 kg par semaine : objectif dans environ ${semainesRestantes} semaines. Pesez-vous le même jour, le matin.`
     : "Objectif atteint ! Bravo 🎉";
 
-  // parcours
-  carte(J.parcours);
+  // parcours : la Loire en bateau (rame), le sentier à pied (course)
+  carte(J.parcours, "r", "🚣", "#2b6f8f", "#3fb6e8", ["Saumur", "Les Ponts-de-Cé", "Chalonnes-sur-Loire", "Ancenis", "Nantes", "Saint-Nazaire"]);
+  if (J.parcours_course && J.parcours_course.escales.length) carte(J.parcours_course, "sc", "🏃", "#2f4a3a", "#4cc38a", ["Chemillé", "Rochefort-sur-Loire", "Angers"]);
 
   // récompenses
   $("recomps").innerHTML = J.recompenses.map((r, i) => `
@@ -865,20 +941,23 @@ async function afficherAventure(J) {
   const Pr = J.profil;
   $("f-prenom").value = Pr.prenom || ""; $("f-taille").value = Pr.taille_cm;
   $("f-depart").value = Pr.poids_depart_kg; $("f-objectif").value = Pr.poids_objectif_kg; $("f-debut").value = Pr.debut;
+  const sem = Pr.semainier || ["rame", "renfo", "rame", "repos", "rame", "course", "renfo"];
+  $("f-semainier").innerHTML = JOURS.map((j, i) => `<label>${j}<select data-i="${i}">${Object.entries(TYPES_JOUR)
+    .map(([k, t]) => `<option value="${k}"${sem[i] === k ? " selected" : ""}>${t.icone} ${t.nom}</option>`).join("")}</select></label>`).join("");
   jeuAvant = J;
-  afficherRepas();
+  await afficherRepas();
+  afficherMenu(J);
 }
 
-function carte(R) {
+function carte(R, pre, icone, fond, couleur, principales) {
   const W = 1000, x = km => 30 + km / R.total_km * (W - 60), y = xx => 75 + 22 * Math.sin(xx / 85);
   let d = "";
   for (let xx = 20; xx <= W - 20; xx += 10) d += (d ? " L" : "M") + xx + " " + y(xx).toFixed(1);
-  const principales = ["Saumur", "Les Ponts-de-Cé", "Chalonnes-sur-Loire", "Ancenis", "Nantes", "Saint-Nazaire"];
-  let svg = `<path d="${d}" stroke="#2b6f8f" stroke-width="16" fill="none" stroke-linecap="round"/>`;
+  let svg = `<path d="${d}" stroke="${fond}" stroke-width="16" fill="none" stroke-linecap="round"/>`;
   const fait = Math.min(R.km, R.total_km);
   let d2 = "";
   for (let xx = 20; xx <= x(fait); xx += 5) d2 += (d2 ? " L" : "M") + xx + " " + y(xx).toFixed(1);
-  if (d2) svg += `<path d="${d2}" stroke="#3fb6e8" stroke-width="16" fill="none" stroke-linecap="round"/>`;
+  if (d2) svg += `<path d="${d2}" stroke="${couleur}" stroke-width="16" fill="none" stroke-linecap="round"/>`;
   R.escales.forEach((e, i) => {
     const ex = x(e.km), ey = y(ex), ok = e.km <= R.km;
     svg += `<circle cx="${ex}" cy="${ey}" r="6" fill="${ok ? "#ffd166" : "#0f1418"}" stroke="#ffd166" stroke-width="2"><title>${esc(e.nom)} (km ${e.km})</title></circle>`;
@@ -888,15 +967,245 @@ function carte(R) {
     }
   });
   const bx = x(fait);
-  svg += `<text x="${bx}" y="${y(bx) + 9}" text-anchor="middle" style="font-size:26px">🚣</text>`;
-  $("r-carte").innerHTML = svg;
-  $("r-nom").textContent = `${R.nom} · ${kgfr(R.km)} / ${R.total_km} km`;
-  $("r-texte").innerHTML = (R.derniere ? `📍 <b>${esc(R.derniere.nom)}</b> : ${esc(R.derniere.texte)} ` : "") +
-    (R.prochaine ? `<span class="sous">· Prochaine escale : ${esc(R.prochaine.nom)} dans ${kgfr(R.prochaine.km - R.km)} km</span>` : "");
+  svg += `<text x="${bx}" y="${y(bx) + 9}" text-anchor="middle" style="font-size:26px">${icone}</text>`;
+  $(pre + "-carte").innerHTML = svg;
+  $(pre + "-nom").textContent = `${icone} ${R.nom} · ${kgfr(R.km)} / ${R.total_km} km`;
+  $(pre + "-texte").innerHTML = (R.derniere ? `📍 <b>${esc(R.derniere.nom)}</b> : ${esc(R.derniere.texte)} ` : "") +
+    (R.prochaine ? `<span class="sous">· Prochaine étape : ${esc(R.prochaine.nom)} dans ${kgfr(R.prochaine.km - R.km)} km</span>` : "");
 }
 
+// --- Semaine : agenda, remplacement d'une séance -------------------------------------
+const JOURS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+const TYPES_JOUR = {
+  rame: { icone: "🚣", nom: "Rame", cle: "seances" }, course: { icone: "🏃", nom: "Course", cle: "course" },
+  renfo: { icone: "🧱", nom: "Renfo", cle: "renfo" }, repos: { icone: "😌", nom: "Repos", cle: null },
+};
+const ajoutJours = (iso, n) => { const d = new Date(iso + "T12:00"); d.setDate(d.getDate() + n); return d; };
+const isoJour = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const categorie = p => p.course ? "course" : p.sans_rameur ? "renfo" : "rame";
+
+/** Les 7 jours de la semaine du plan, avec la séance prévue chaque jour. */
+function joursSemaine(J) {
+  const S = J.semaine, sem = J.profil.semainier || ["rame", "renfo", "rame", "repos", "rame", "course", "renfo"];
+  const n = S.avant_debut ? 1 : S.numero;
+  const debut = isoJour(ajoutJours(S.debut, 7 * (n - 1)));
+  const prevues = { rame: S.plan, course: S.course_plan || [], renfo: S.renfo_plan || [] };
+  const aFaire = { rame: [...S.a_faire], course: [...(S.course_a_faire || [])], renfo: [...S.renfo_a_faire] };
+  const files = {}, faites = {};
+  for (const t of ["rame", "course", "renfo"]) {
+    files[t] = prevues[t].map((id, rang) => ({ id, rang }));
+    faites[t] = [...prevues[t]];
+    for (const x of aFaire[t]) { const i = faites[t].indexOf(x); if (i >= 0) faites[t].splice(i, 1); }
+  }
+  const marquer = (t, item) => {   // une séance faite cette semaine coche la première prévue du même programme
+    const i = faites[t].indexOf(item.id);
+    item.fait = i >= 0; if (i >= 0) faites[t].splice(i, 1);
+    item.type = t; item.cle = `${n}:${TYPES_JOUR[t].cle}:${item.rang}`;
+    return item;
+  };
+  const jours = [];
+  for (let i = 0; i < 7; i++) {
+    const d = ajoutJours(debut, i), type = sem[(d.getDay() + 6) % 7];
+    const item = type !== "repos" && files[type].length ? marquer(type, files[type].shift()) : null;
+    jours.push({ date: d, type, item });
+  }
+  const reste = [];   // plus de séances prévues que de jours choisis
+  for (const t of ["rame", "course", "renfo"]) for (const it of files[t]) reste.push(marquer(t, it));
+  return { jours, reste, n };
+}
+
+function ligneSeance(item) {
+  const p = nomsProgrammes[item.id] || { nom: item.id };
+  const t = TYPES_JOUR[item.type];
+  return `<div class="quoi">${t.icone} <b>${esc(p.nom)}</b>${item.fait ? " <span class='sous'>· fait</span>" : ""}</div>
+    <div class="actions">${item.fait ? "<span class='coche-ok'>✓</span>" :
+      `<button data-lancer="${esc(item.id)}" title="Lancer">▶</button><button data-remplacer="${esc(item.cle)}" data-type="${item.type}" title="Remplacer">✎</button>`}</div>`;
+}
+
+function afficherAgenda(J) {
+  const { jours, reste } = joursSemaine(J), auj = isoJour(new Date());
+  $("a-agenda").innerHTML = jours.map(j => {
+    const date = `<div class="date"><b>${JOURS[(j.date.getDay() + 6) % 7]}</b>${j.date.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" })}</div>`;
+    const cls = `jour${isoJour(j.date) === auj ? " aujourdhui" : ""}${j.item && j.item.fait ? " fait" : ""}`;
+    if (j.item) return `<div class="${cls}">${date}${ligneSeance(j.item)}</div>`;
+    const t = TYPES_JOUR[j.type];
+    return `<div class="${cls}">${date}<div class="quoi sous">${t.icone} ${j.type === "repos" ? "Repos : marche, étirements, sommeil" : `${t.nom} libre (rien de prévu au plan)`}</div><div></div></div>`;
+  }).join("") + (reste.length ? `<div class="sous" style="margin-top:4px">À caser quand vous voulez :</div>` +
+    reste.map(it => `<div class="jour${it.fait ? " fait" : ""}"><div class="date"><b>+</b></div>${ligneSeance(it)}</div>`).join("") : "");
+  $("a-agenda").querySelectorAll("[data-lancer]").forEach(b => b.onclick = () => fiche(nomsProgrammes[b.dataset.lancer], true));
+  $("a-agenda").querySelectorAll("[data-remplacer]").forEach(b => b.onclick = () => choisirRemplacement(J, b.dataset.remplacer, b.dataset.type));
+}
+
+let choix = null;
+function choisirRemplacement(J, cle, type) {
+  choix = { J, cle };
+  $("cp-titre").textContent = `Remplacer par une autre séance (${TYPES_JOUR[type].nom.toLowerCase()})`;
+  $("cp-liste").innerHTML = programmes.filter(p => categorie(p) === type).map(p => {
+    const tot = aplatir(p.etapes).reduce((a, e) => a + (e.temps || 0), 0);
+    return `<button class="prog" data-id="${esc(p.id)}"><b>${esc(p.nom)}</b><span>${esc(p.niveau)} · ${Math.round(tot / 60)} min</span></button>`;
+  }).join("");
+  $("cp-liste").querySelectorAll(".prog").forEach(b => b.onclick = () => remplacer(b.dataset.id));
+  $("cp-retablir").style.display = (J.profil.remplacements || {})[cle] ? "" : "none";
+  $("choixprog").style.display = "grid";
+}
+async function remplacer(id) {
+  const r = { ...(choix.J.profil.remplacements || {}) };
+  if (id) r[choix.cle] = id; else delete r[choix.cle];
+  await fetch("/profil", { method: "POST", body: JSON.stringify({ remplacements: r }) });
+  $("choixprog").style.display = "none";
+  afficherAventure(await lireJeu());
+}
+$("cp-retablir").onclick = () => remplacer(null);
+$("cp-fermer").onclick = () => $("choixprog").style.display = "none";
+
+// --- Bilan, défis, records ------------------------------------------------------------
+function afficherBilan(J) {
+  const B = J.bilan, L = B.semaines, W = 480, H = 170, bas = 145;
+  const min = s => s / 60;
+  const tot = w => min(w.rame_s + w.course_s + w.renfo_s);
+  const max = Math.max(60, ...L.map(tot));
+  const larg = Math.min(48, (W - 40) / L.length - 10);
+  let svg = "";
+  for (const g of [30, 60, 90, 120, 180, 240, 300].filter(g => g <= max)) {
+    const y = bas - g / max * 125;
+    svg += `<line x1="34" x2="${W}" y1="${y}" y2="${y}" stroke="#26313a"/><text x="0" y="${y + 4}">${g}′</text>`;
+  }
+  L.forEach((w, i) => {
+    const x = 40 + i * ((W - 40) / L.length) + 5;
+    let y = bas;
+    for (const [v, c] of [[w.rame_s, "#3fb6e8"], [w.course_s, "#4cc38a"], [w.renfo_s, "#b38cff"]]) {
+      const h = min(v) / max * 125;
+      if (h > 0) { svg += `<rect x="${x}" y="${y - h}" width="${larg}" height="${h}" fill="${c}" rx="3"><title>${Math.round(min(v))} min</title></rect>`; y -= h; }
+    }
+    svg += `<text x="${x + larg / 2}" y="${bas + 16}" text-anchor="middle">S${w.numero}</text>`;
+    if (tot(w)) svg += `<text x="${x + larg / 2}" y="${y - 4}" text-anchor="middle" style="fill:var(--texte)">${Math.round(tot(w))}</text>`;
+  });
+  $("bi-graphe").innerHTML = svg;
+  const cette = L[L.length - 1], avant = L[L.length - 2];
+  let t = `Cette semaine : <b>${Math.round(tot(cette))} min</b> d'effort (${kgfr(cette.rame_m / 1000)} km ramés, ${kgfr(cette.course_m / 1000)} km courus)`;
+  if (avant) {
+    const d = Math.round(tot(cette) - tot(avant));
+    t += d >= 0 ? `, <span style="color:var(--ok)">+${d} min</span> par rapport à la semaine d'avant.` : `, ${-d} min de moins que la semaine d'avant : il reste des jours !`;
+  } else t += ".";
+  t += `<br>🔥 Série de jours actifs : <b>${B.serie_jours}</b> (record ${B.meilleure_serie_jours}) — un jour de repos entre deux ne la casse pas. Jours actifs cette semaine : <b>${B.jours_actifs_semaine}</b>.`;
+  $("bi-texte").innerHTML = t;
+}
+
+function afficherDefis(J) {
+  const D = J.defis;
+  const mois = new Date(D.mois + "-15").toLocaleDateString("fr-FR", { month: "long" });
+  $("d-titre").textContent = `Défis de ${mois} · ${D.liste.filter(d => d.ok).length} / ${D.liste.length}`;
+  $("d-liste").innerHTML = D.liste.map(d => `<div class="quete ${d.ok ? "ok" : ""}"><div class="coche">${d.ok ? "✓" : ""}</div>
+    <div class="mini">${esc(d.texte)}<div class="xpbarre"><div style="width:${Math.min(100, 100 * d.fait / d.but)}%"></div></div></div>
+    <span class="sous">${kgfr(d.fait)} / ${kgfr(d.but)}</span></div>`).join("") +
+    `<div class="sous">${D.reussis} défi(s) réussi(s) depuis le début de l'aventure.</div>`;
+}
+
+const RECORDS = {
+  rame_500: { nom: "500 m à la rame", f: v => mmss(v) },
+  rame_1000: { nom: "1000 m à la rame", f: v => mmss(v) },
+  rame_distance: { nom: "Plus longue séance de rame", f: v => Math.round(v).toLocaleString("fr-FR") + " m" },
+  rame_watts: { nom: "Puissance moyenne (≥ 5 min)", f: v => Math.round(v) + " W" },
+  course_1km: { nom: "1 km en course", f: v => mmss(v) },
+  course_5km: { nom: "5 km en course", f: v => temps(Math.round(v)) },
+  course_distance: { nom: "Plus longue sortie", f: v => kgfr(v / 1000) + " km" },
+  course_allure: { nom: "Meilleure allure (sortie ≥ 2 km)", f: v => mmss(v) + "/km" },
+};
+function afficherRecords(J) {
+  $("rec-liste").innerHTML = Object.entries(RECORDS).map(([k, R]) => {
+    const r = J.records[k];
+    return `<tr><td style="text-align:left">${k.startsWith("rame") ? "🚣" : "🏃"} ${R.nom}</td><td>${r ? R.f(r.valeur) : "–"}</td>
+      <td class="sous">${r ? new Date(r.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" }) : ""}</td></tr>`;
+  }).join("");
+}
+
+// --- Menu de la semaine et liste de courses ------------------------------------------
+let menuGraine = 0, menuCourant = [];
+function hasard(graine) {   // suite pseudo-aléatoire reproductible (même menu toute la semaine)
+  let a = graine >>> 0;
+  return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+}
+async function afficherMenu(J) {
+  if (!recettes) recettes = await (await fetch("/recettes")).json();
+  const { jours, n } = joursSemaine(J);
+  const alea = hasard(n * 7919 + menuGraine * 104729 + 17);
+  const R = recettes.recettes;
+  const melange = l => { const c = [...l]; for (let i = c.length - 1; i > 0; i--) { const j = Math.floor(alea() * (i + 1)); [c[i], c[j]] = [c[j], c[i]]; } return c; };
+  const pile = l => { let c = melange(l), i = 0; return () => { if (i >= c.length) { c = melange(l); i = 0; } return c[i++]; }; };
+  const plats = R.filter(r => r.type === "plat");
+  const effort = pile(plats.filter(r => r.effort)), leger = pile(plats.filter(r => r.leger)), tous = pile(plats);
+  const pdjEffort = pile(R.filter(r => r.type.includes("petit-déjeuner") && r.effort).concat(R.filter(r => r.type.includes("petit-déjeuner"))));
+  const pdj = pile(R.filter(r => r.type.includes("petit-déjeuner")));
+  const apresRame = R.find(r => r.nom === "Collation après la rame"), avantCourse = R.find(r => r.nom === "Collation avant la course");
+  const deja = new Set();
+  const unique = f => { for (let k = 0; k < 6; k++) { const r = f(); if (!deja.has(r.nom)) { deja.add(r.nom); return r; } } return f(); };
+  menuCourant = jours.map(j => {
+    const actif = j.type === "rame" || j.type === "course";
+    const m = { date: j.date, type: j.type, repas: [] };
+    m.repas.push(["Matin", actif ? pdjEffort() : pdj()]);
+    m.repas.push(["Midi", unique(actif ? effort : tous)]);
+    if (j.type === "rame" && apresRame) m.repas.push(["Collation", apresRame]);
+    if (j.type === "course" && avantCourse) m.repas.push(["Collation", avantCourse]);
+    m.repas.push(["Soir", unique(leger)]);
+    return m;
+  });
+  $("menu").innerHTML = `<div class="menu">` + menuCourant.map((m, i) => `<div class="menu-jour">
+    <div class="date"><b>${JOURS[(m.date.getDay() + 6) % 7]}</b>${TYPES_JOUR[m.type].icone} ${TYPES_JOUR[m.type].nom.toLowerCase()}</div>
+    <div class="plats">${m.repas.map(([moment, r], k) => `<div><span class="moment">${moment}</span><a data-j="${i}" data-k="${k}">${esc(r.nom)}</a></div>`).join("")}</div></div>`).join("") + `</div>`;
+  $("menu").querySelectorAll("a[data-j]").forEach(a => a.onclick = () => {
+    $("repas-jour").innerHTML = ficheRecette(menuCourant[a.dataset.j].repas[a.dataset.k][1]);
+    $("repas-jour").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
+  if ($("menu-liste").style.display === "block") listeCourses();
+  const auj = menuCourant.find(m => isoJour(m.date) === isoJour(new Date()));
+  if (auj) $("repas-jour").innerHTML = `<div class="sous" style="margin-top:10px">Aujourd'hui midi :</div>` + ficheRecette(auj.repas[1][1]);
+}
+function listeCourses() {
+  const compte = new Map();
+  for (const m of menuCourant) for (const [, r] of m.repas) for (const i of r.ingredients) compte.set(i, (compte.get(i) || 0) + 1);
+  const lignes = [...compte].sort((a, b) => a[0].localeCompare(b[0], "fr")).map(([i, n]) => (n > 1 ? `${n} × ` : "") + i);
+  $("menu-liste").innerHTML = `<hr style="border-color:#26313a"><div class="reglage" style="margin-top:0"><b>🛒 Liste de courses de la semaine</b><span class="espace"></span>
+    <button id="menu-copier">Copier</button></div><ul style="columns:2 220px;margin:6px 0;padding-left:18px">${lignes.map(l => `<li>${esc(l)}</li>`).join("")}</ul>
+    <div class="sous">Quantités pour une personne et un repas ; « 3 × » = à prévoir pour trois repas.</div>`;
+  $("menu-copier").onclick = async () => {
+    const texte = "Liste de courses\n" + lignes.map(l => "- " + l).join("\n");
+    try { await navigator.clipboard.writeText(texte); $("menu-copier").textContent = "Copié ✓"; }
+    catch (e) { prompt("Copiez la liste :", texte); }
+  };
+}
+$("menu-autre").onclick = () => { menuGraine++; afficherMenu(jeuAvant); };
+$("menu-courses").onclick = () => {
+  const l = $("menu-liste");
+  if (l.style.display === "block") { l.style.display = "none"; return; }
+  listeCourses(); l.style.display = "block";
+};
+
+// --- Redémarrer l'aventure -----------------------------------------------------------
+$("f-redemarrer").onclick = () => {
+  const J = jeuAvant;
+  $("rd-debut").value = isoJour(new Date());
+  $("rd-poids").value = J ? J.poids.actuel : "";
+  $("rd-objectif").value = J ? J.poids.objectif : "";
+  $("redem").style.display = "grid";
+};
+$("rd-annuler").onclick = () => $("redem").style.display = "none";
+$("rd-ok").onclick = async () => {
+  const n = id => parseFloat(($(id).value || "").replace(",", ".")) || null;
+  if (!$("rd-debut").value) { alert("Choisissez une date."); return; }
+  if (!confirm("Redémarrer l'aventure ? XP, niveau, badges et plan repartent de zéro (l'historique est gardé).")) return;
+  if ($("rd-export").checked) {
+    try { const r = await (await fetch("/export", { method: "POST" })).json(); $("s-message").textContent = r.message || ""; }
+    catch (e) { if (!confirm("La sauvegarde n'a pas pu être faite. Redémarrer quand même ?")) return; }
+  }
+  await fetch("/aventure/redemarrer", { method: "POST", body: JSON.stringify({
+    debut: $("rd-debut").value, poids_depart_kg: n("rd-poids"), poids_objectif_kg: n("rd-objectif") }) });
+  $("redem").style.display = "none";
+  menuGraine = 0;
+  const J = await lireJeu(); jeuAvant = J; afficherAventure(J); scrollTo(0, 0);
+};
+
 function grapheP(J) {
-  const P = J.poids, pes = P.pesees, deb = new Date(J.profil.debut);
+  const P = J.poids, depuisP = J.profil.aventure_depuis || "", pes = P.pesees.filter(p => p.date >= depuisP), deb = new Date(J.profil.debut);
   const fin = new Date(deb.getTime() + 12 * 7 * 864e5);
   const dates = pes.map(p => new Date(p.date));
   const tmax = Math.max(fin, ...dates), t0 = Math.min(deb, ...dates);
@@ -927,7 +1236,8 @@ $("recomp-ok").onclick = async () => {
 $("f-ok").onclick = async () => {
   const n = id => parseFloat(($(id).value || "").replace(",", "."));
   await fetch("/profil", { method: "POST", body: JSON.stringify({ prenom: $("f-prenom").value.trim(), taille_cm: n("f-taille"),
-    poids_depart_kg: n("f-depart"), poids_objectif_kg: n("f-objectif"), debut: $("f-debut").value }) });
+    poids_depart_kg: n("f-depart"), poids_objectif_kg: n("f-objectif"), debut: $("f-debut").value,
+    semainier: [...document.querySelectorAll("#f-semainier select")].map(x => x.value) }) });
   afficherAventure(await lireJeu());
 };
 
@@ -971,6 +1281,13 @@ function celebrer(A, B, titre) {
   const recA = new Set(A.recompenses.filter(r => r.obtenue).map(r => r.condition));
   B.recompenses.filter(r => r.obtenue && !recA.has(r.condition)).forEach(r => gains.push(`🎁 Récompense débloquée : <b>${esc(r.texte)}</b>`));
   B.quetes.forEach((q, i) => { if (q.ok && !(A.quetes[i] || {}).ok) gains.push(`✅ Quête réussie : ${esc(q.texte)}`); });
+  if (B.parcours_course && B.parcours_course.derniere && (!A.parcours_course || !A.parcours_course.derniere || B.parcours_course.derniere.nom !== A.parcours_course.derniere.nom))
+    gains.push(`🥾 Étape à <b>${esc(B.parcours_course.derniere.nom)}</b> : ${esc(B.parcours_course.derniere.texte)}`);
+  if (A.defis && B.defis) B.defis.liste.forEach(d => { const a = A.defis.liste.find(x => x.id === d.id); if (d.ok && a && !a.ok && A.defis.mois === B.defis.mois) gains.push(`🎯 Défi du mois réussi : ${esc(d.texte)}`); });
+  if (A.records && B.records) for (const [k, r] of Object.entries(B.records)) {
+    const a = A.records[k];
+    if (r && (!a || r.valeur !== a.valeur) && RECORDS[k]) gains.push(`🏆 ${a ? "Nouveau record" : "Premier record"} : ${RECORDS[k].nom} — <b>${RECORDS[k].f(r.valeur)}</b>`);
+  }
   const xp = B.niveau.xp - A.niveau.xp;
   if (!xp && !gains.length) return;
   $("c-titre").textContent = titre;
@@ -997,12 +1314,9 @@ async function afficherRepas() {
   if (!recettes) {
     recettes = await (await fetch("/recettes")).json();
     const j = Math.floor(Date.now() / 864e5);
-    recetteIdx = j % recettes.recettes.length;
     $("repas-conseil").textContent = "💡 " + recettes.conseils[j % recettes.conseils.length];
   }
-  $("repas-jour").innerHTML = ficheRecette(recettes.recettes[recetteIdx]);
 }
-$("repas-autre").onclick = () => { recetteIdx = (recetteIdx + 1) % recettes.recettes.length; afficherRepas(); };
 $("repas-tout").onclick = () => {
   const l = $("repas-liste");
   if (l.style.display === "block") { l.style.display = "none"; return; }
@@ -1404,7 +1718,7 @@ async function detailCourse(f) {
 
 // Bouton « retour » d'Android : ferme ce qui est ouvert, sinon revient à l'onglet Rame
 addEventListener("retour", ev => {
-  for (const id of ["celebration", "fiche"]) if ($(id).style.display && $(id).style.display !== "none") { $(id).style.display = "none"; ev.preventDefault(); return; }
+  for (const id of ["celebration", "fiche", "redem", "choixprog"]) if ($(id).style.display && $(id).style.display !== "none") { $(id).style.display = "none"; ev.preventDefault(); return; }
   if ($("rame").style.display === "flex") { $("rame").style.display = "none"; ev.preventDefault(); return; }
   if ($("exo").style.display === "flex") { $("x-stop").click(); ev.preventDefault(); return; }
   if (vue !== "rameur") { montrerVue("rameur"); ev.preventDefault(); }

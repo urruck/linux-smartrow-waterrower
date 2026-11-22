@@ -1121,6 +1121,35 @@
       ]
     },
     {
+      "id": "footing25",
+      "nom": "Footing 25 min",
+      "niveau": "Course · progression",
+      "course": true,
+      "but": "25 minutes de course continue, lentement : l'étape avant les 30 minutes. Cheville : terrain plat et régulier, bonnes chaussures. Douleur = on marche.",
+      "etapes": [
+        {
+          "temps": 300,
+          "zone": "marche",
+          "note": "Marche rapide pour s'échauffer"
+        },
+        {
+          "temps": 750,
+          "zone": "footing",
+          "note": "Footing lent, on peut parler"
+        },
+        {
+          "temps": 750,
+          "zone": "footing",
+          "note": "Même allure, relâchez les épaules"
+        },
+        {
+          "temps": 300,
+          "zone": "marche",
+          "note": "Retour au calme en marchant, puis étirements"
+        }
+      ]
+    },
+    {
       "id": "fartlek",
       "nom": "Fartlek doux",
       "niveau": "Course · progression",

@@ -1,0 +1,5 @@
+• Aventure : bouton pour la redémarrer à une date choisie (l'historique est gardé).
+• Plan de 12 semaines avec une sortie de course à pied chaque semaine.
+• Agenda de la semaine selon vos jours d'entraînement ; chaque séance peut être remplacée.
+• Sentier de course à pied du Layon à la Loire, défis du mois, records personnels, bilan des semaines et série de jours actifs.
+• Menu de la semaine adapté aux jours d'effort, et liste de courses.

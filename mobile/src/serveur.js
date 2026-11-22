@@ -308,6 +308,11 @@ async function repondre(chemin, methode, p, corps) {
   if (chemin === "/parler" && post) { parler(String(corps || "").slice(0, 300)); return json(); }
   if (chemin === "/jeu") return json(await jeu.etat());
   if (chemin === "/profil" && post) { await jeu.enregistrerProfil(JSON.parse(corps || "{}")); return json(); }
+  if (chemin === "/aventure/redemarrer" && post) {
+    const d = JSON.parse(corps || "{}");
+    await jeu.redemarrer(d.debut, d.poids_depart_kg, d.poids_objectif_kg);
+    return json();
+  }
   if (chemin === "/pesee" && post) { await jeu.ajouterPesee(parseFloat(p.get("kg").replace(",", "."))); return json(); }
   if (chemin === "/export" && post) return json(await sauvegarde.enregistrerExport());
   if (chemin === "/import" && post) {
@@ -327,7 +332,7 @@ async function repondre(chemin, methode, p, corps) {
   return null;
 }
 
-const ADRESSES = /^\/(historique|seance\/|nouvelle|fin|exercice|parler|jeu|profil|pesee|version|recettes|programmes|export|import|courses|course\/|ecran)/;
+const ADRESSES = /^\/(historique|seance\/|nouvelle|fin|exercice|parler|jeu|profil|pesee|version|recettes|programmes|export|import|courses|course\/|ecran|aventure\/)/;
 const vraiFetch = window.fetch.bind(window);
 
 window.fetch = async (entree, options = {}) => {

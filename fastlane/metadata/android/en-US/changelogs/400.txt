@@ -1,0 +1,5 @@
+• Adventure: restart it from a chosen date (history is kept).
+• 12-week plan with one run every week.
+• Weekly agenda based on your training days; any session can be swapped.
+• Running trail, monthly challenges, personal records, weekly summary and active-day streak.
+• Weekly meal plan matched to training days, with a shopping list.

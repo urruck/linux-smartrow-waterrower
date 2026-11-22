@@ -168,30 +168,46 @@ facilement.
 *Capture faite avec des données d'exemple.*
 
 - **XP et niveaux**, de *Moussaillon* à *Légende de la Loire*. On gagne de
-  l'XP avec la distance, les séances terminées, les séances du plan, la
-  cadence tenue, les quêtes et les badges.
-- **La descente de la Loire** : les kilomètres ramés font avancer un bateau
-  de Saumur à Saint-Nazaire, en 190 km et 16 escales (distances
-  approximatives).
-- **Plan « Retour en forme » sur 12 semaines** :
-  - 3 séances de rame par semaine, plus 2 séances hors rameur les autres
-    jours ;
-  - **2 semaines de reprise douce** au début, prévues pour un retour de
-    blessure ;
-  - puis de l'endurance de plus en plus longue, la plus efficace pour
-    perdre du poids, et un peu de fractionné ;
-  - les séances de la semaine se lancent en un clic.
-- **Quêtes de la semaine** : faire les 3 séances du plan, une distance qui
-  augmente chaque semaine, tenir la cadence, se peser.
-- **24 badges** : distance, régularité, lève-tôt, record au test 1000 m,
-  kilos perdus, escales…
-- **Poids** :
-  - pesée hebdomadaire ;
-  - courbe comparée à un rythme sain de 0,5 kg par semaine ;
-  - estimation des kcal dépensées (formule ACSM).
+  l'XP avec la distance ramée ou courue, les séances terminées, les séances
+  du plan, la cadence tenue, les quêtes, les défis et les badges.
+- **Deux voyages** (distances approximatives) :
+  - **la descente de la Loire** en bateau avec les km ramés, de Saumur à
+    Saint-Nazaire (190 km, 16 escales) ;
+  - **le sentier du Layon à la Loire** à pied avec les km courus, de
+    Chemillé à Angers (46 km, 8 étapes).
+- **Plan « Retour en forme » sur 12 semaines** : chaque semaine 3 séances de
+  rame, 1 sortie de course à pied (de la marche-course 1-1 au footing de
+  30 min) et 2 séances hors rameur.
+- **Agenda de la semaine** : chaque séance du plan est placée sur un jour,
+  selon **vos jours d'entraînement** (choisis dans le profil : rame, course,
+  renfo ou repos pour chaque jour). Elle se lance d'un clic (▶), se
+  **remplace** par une autre du même genre (✎), et se coche toute seule une
+  fois faite, quel que soit le jour.
+- **Quêtes de la semaine** : les 3 séances de rame du plan, la sortie de
+  course, le renfo, une distance qui augmente chaque semaine, la cadence, la
+  pesée.
+- **Défis du mois** : 30 km ramés, 12 km courus, 16 séances, 3 séances à
+  80 % de cadence. Chaque défi réussi rapporte 200 XP.
+- **Bilan des semaines** : minutes de rame, de course et de renfo des 8
+  dernières semaines, comparaison avec la semaine d'avant, **série de jours
+  actifs** (un jour de repos entre deux ne la casse pas).
+- **Records personnels** : meilleurs 500 m et 1000 m à la rame, plus longue
+  séance, puissance ; meilleur km et meilleurs 5 km en course, plus longue
+  sortie, meilleure allure. Un nouveau record est fêté avec des confettis.
+- **35 badges** : distance, régularité, course, défis, kilos perdus, escales…
+- **Poids** : pesée hebdomadaire, courbe comparée à un rythme sain de 0,5 kg
+  par semaine, estimation des kcal dépensées.
+- **Menu de la semaine** : matin, midi, collation et soir pour chaque jour,
+  adaptés à vos jours (plus de féculents complets les jours de rame ou de
+  course, plus léger les jours de repos), protéinés, de saison, sans poisson.
+  🔀 donne un autre menu, 🛒 la **liste de courses** de la semaine (à copier).
 - **Mes récompenses** : vous écrivez ce que vous vous offrirez à −2 kg, à
   l'escale de Chalonnes, au niveau 5… Elles se débloquent toutes seules,
   avec des confettis.
+- **Redémarrer l'aventure** (bouton dans le profil) : XP, niveau, badges,
+  voyages, défis, records et plan repartent de zéro à la date choisie, avec
+  un nouveau poids de départ. Les séances restent dans l'historique ; une
+  sauvegarde est faite avant.
 
 Le profil et les pesées restent sur l'ordinateur, dans
 `~/.local/share/rameur-smartrow/donnees/`, qui n'est pas publié. Les règles du jeu sont dans [`jeu.json`](jeu.json) et faciles à
