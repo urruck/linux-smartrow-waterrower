@@ -1,0 +1,34 @@
+# Recette F-Droid (à proposer dans https://gitlab.com/fdroid/fdroiddata,
+# fichier metadata/io.github.urruck.rameur.yml).
+Categories:
+  - Sports & Health
+License: GPL-3.0-or-later
+AuthorName: urruck
+SourceCode: https://github.com/urruck/linux-smartrow-waterrower
+IssueTracker: https://github.com/urruck/linux-smartrow-waterrower/issues
+Changelog: https://github.com/urruck/linux-smartrow-waterrower/releases
+
+AutoName: Rameur
+
+RepoType: git
+Repo: https://github.com/urruck/linux-smartrow-waterrower.git
+
+Builds:
+  - versionName: 0.3.0
+    versionCode: 300
+    commit: v0.3.0
+    subdir: mobile/android/app
+    sudo:
+      - apt-get update
+      - apt-get install -y npm
+    gradle:
+      - yes
+    build:
+      - cd ../..
+      - npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - node construire_www.mjs --android
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags ^v[0-9.]+$
+CurrentVersion: 0.3.0
+CurrentVersionCode: 300

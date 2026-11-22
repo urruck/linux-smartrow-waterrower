@@ -2,12 +2,9 @@
 // page.html reste identique à la version Linux et appelle toujours /flux,
 // /historique, /nouvelle, /jeu… ; ces adresses sont servies ici, sans réseau.
 //
-// Chargé avant le script de page.html (voir construire_www.mjs).
-import { Capacitor } from "@capacitor/core";
-import { App } from "@capacitor/app";
-import { BleClient } from "@capacitor-community/bluetooth-le";
-import { KeepAwake } from "@capacitor-community/keep-awake";
-import { TextToSpeech } from "@capacitor-community/text-to-speech";
+// Module chargé avant le script de page.html, lui aussi module (voir construire_www.mjs).
+import { App, BleClient, Capacitor, KeepAwake, TextToSpeech } from "./capacitor.js";
+import * as course from "./course.js";
 import * as sr from "./smartrow.js";
 import * as jeu from "./jeu.js";
 import * as sauvegarde from "./sauvegarde.js";
@@ -268,7 +265,7 @@ async function historique() {
   for (const nom of (await stock.lister("sessions")).sort().reverse()) {
     if (!nom.endsWith(".json")) continue;
     const d = await stock.lire("sessions/" + nom, null);
-    if (!d || d.type === "renfo" || !d.resume || !d.debut) continue;
+    if (!d || d.type === "renfo" || d.type === "course" || !d.resume || !d.debut) continue;
     res.push({ fichier: nom, debut: d.debut, programme: d.programme ?? null, ...d.resume });
   }
   return res;
@@ -318,13 +315,19 @@ async function repondre(chemin, methode, p, corps) {
     try { return json(await sauvegarde.fusionner(JSON.parse(corps || "{}"), p.get("profil") === "1")); }
     catch (e) { return json({ erreur: String(e.message || e), message: String(e.message || e) }); }
   }
-  if (chemin === "/version") return json({ version: 3, plateforme: "android" });
+  if (chemin === "/version") return json({ version: 4, plateforme: NATIF ? "android" : "demo", course: true });
+  if (chemin === "/courses") return json(await course.historique());
+  if (chemin === "/ecran" && post) {   // écran allumé pour ramer ; libre de s'éteindre pour courir
+    if (NATIF) await (p.get("eveille") === "0" ? KeepAwake.allowSleep() : KeepAwake.keepAwake()).catch(() => {});
+    return json();
+  }
+  if (chemin.startsWith("/course/")) return json(await course.commande(chemin.slice(8), p, corps));
   if (chemin === "/recettes") return stock.fichierAppli("recettes.json");
   if (chemin === "/programmes") return stock.fichierAppli("programmes.json");
   return null;
 }
 
-const ADRESSES = /^\/(historique|seance\/|nouvelle|fin|exercice|parler|jeu|profil|pesee|version|recettes|programmes|export|import)/;
+const ADRESSES = /^\/(historique|seance\/|nouvelle|fin|exercice|parler|jeu|profil|pesee|version|recettes|programmes|export|import|courses|course\/|ecran)/;
 const vraiFetch = window.fetch.bind(window);
 
 window.fetch = async (entree, options = {}) => {
@@ -371,5 +374,11 @@ setInterval(() => seance.sauver(), 10000);
 if (NATIF) {
   KeepAwake.keepAwake().catch(() => {});        // l'écran reste allumé pendant la séance
   App.addListener("pause", () => seance.sauver());
+  // bouton « retour » : la page ferme ce qui est ouvert ; sinon l'appli passe en arrière-plan
+  App.addListener("backButton", () => {
+    const ev = new Event("retour", { cancelable: true });
+    dispatchEvent(ev);
+    if (!ev.defaultPrevented) App.minimizeApp();
+  });
 }
 capteur.boucle().catch(e => { console.error(e); capteur.statut("Erreur : " + (e.message || e)); });

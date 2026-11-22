@@ -1,0 +1,4 @@
+• Course à pied suivie au GPS (sans Google) : programmes marche-course, consignes vocales écran éteint, tracé et temps au kilomètre, intégrés au plan, aux badges et aux quêtes.
+• Écran de séance pour le téléphone posé sur le rameur, avec barre de rythme : coup attendu et coup réel.
+• Onglets Rame, Course, Aventure ; bouton retour d'Android.
+• Construction sans outil binaire, prête pour F-Droid.

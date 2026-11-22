@@ -127,9 +127,28 @@ def historique():
                 try:
                     with open(os.path.join(DOSSIER, nom), encoding="utf-8") as f:
                         d = json.load(f)
-                    if d.get("type") == "renfo":
+                    if d.get("type") in ("renfo", "course"):
                         continue
                     res.append({"fichier": nom, "debut": d["debut"], "programme": d.get("programme"), **d["resume"]})
+                except (OSError, ValueError, KeyError):
+                    pass
+    return res
+
+
+def courses():
+    """Sorties de course à pied (enregistrées par le téléphone, puis importées)."""
+    res = []
+    if os.path.isdir(DOSSIER):
+        for nom in sorted(os.listdir(DOSSIER), reverse=True):
+            if nom.endswith("_course.json"):
+                try:
+                    with open(os.path.join(DOSSIER, nom), encoding="utf-8") as f:
+                        d = json.load(f)
+                    if d.get("type") != "course":
+                        continue
+                    res.append({"fichier": nom, "debut": d["debut"], "programme": d.get("programme"),
+                                "termine": bool(d.get("termine")), "en_cours": bool(d.get("en_cours")),
+                                "km": d.get("km", []), **d["resume"]})
                 except (OSError, ValueError, KeyError):
                     pass
     return res
@@ -228,7 +247,11 @@ async def serveur_web(seance, capteur, hote):
                 with open(os.path.join(ICI, "illustrations.js"), "rb") as f:
                     corps, type_ = f.read(), "text/javascript; charset=utf-8"
             elif chemin == "/version":
-                corps, type_ = b'{"version": 3}', "application/json"
+                corps, type_ = b'{"version": 4, "plateforme": "linux", "course": false}', "application/json"
+            elif chemin == "/courses":
+                corps, type_ = json.dumps(courses(), ensure_ascii=False).encode(), "application/json"
+            elif chemin.startswith("/course/") or chemin == "/ecran":   # GPS : téléphone seulement
+                corps, type_ = b'{"actif": false, "disponible": false}', "application/json"
             elif chemin == "/recettes":
                 with open(os.path.join(ICI, "recettes.json"), "rb") as f:
                     corps, type_ = f.read(), "application/json"

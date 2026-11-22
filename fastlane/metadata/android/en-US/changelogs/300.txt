@@ -1,0 +1,4 @@
+• GPS running (no Google services): walk-run programmes, spoken cues with screen off, track and kilometre splits, part of the plan, badges and quests.
+• Full-screen rowing view with a rhythm bar: expected stroke and actual stroke.
+• Rowing, Running and Adventure tabs; Android back button.
+• Build without binary tools, ready for F-Droid.

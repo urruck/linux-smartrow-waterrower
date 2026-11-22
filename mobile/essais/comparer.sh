@@ -18,15 +18,20 @@ for (const f of readdirSync("../exemples").filter(f => f.endsWith(".log")))
   }
 console.log(JSON.stringify({ dec, jeu: await jeu.etat() }));
 JS
+# stockage.js remplacé par essais/stockage_node.mjs (lecture du dossier de données)
+cat > "$T/crochet.mjs" <<JS
+export async function resolve(spec, ctx, suite) {
+  if (spec.endsWith("/stockage.js")) return { url: "file://$PWD/essais/stockage_node.mjs", shortCircuit: true };
+  return suite(spec, ctx);
+}
+JS
+cat > "$T/enregistrer.mjs" <<JS
+import { register } from "node:module";
+register("file://$T/crochet.mjs");
+JS
 cp "$T/essai.mjs" ./_essai.mjs
-node -e '
-require("esbuild").build({ entryPoints: ["_essai.mjs"], bundle: true, platform: "node", format: "esm",
-  outfile: process.argv[1], logLevel: "warning",
-  plugins: [{ name: "stockage", setup(b) { b.onResolve({ filter: /stockage\.js$/ },
-    () => ({ path: require("path").resolve("essais/stockage_node.mjs") })); } }] })
-  .catch(() => process.exit(1));' "$T/b.mjs"
+node --import "$T/enregistrer.mjs" _essai.mjs > "$T/js.json" || { rm -f _essai.mjs; exit 1; }
 rm -f _essai.mjs
-node "$T/b.mjs" > "$T/js.json"
 python3 - "$T/js.json" <<'PY'
 import json, sys, os, glob, math
 sys.path.insert(0, "..")

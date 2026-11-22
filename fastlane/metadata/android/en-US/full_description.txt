@@ -1,0 +1,20 @@
+<p>Training app for the <b>WaterRower</b> rowing machine fitted with the <b>SmartRow</b> sensor, plus <b>GPS running</b>. Everything runs on the phone: no account, no ads, no Internet. The interface is in French.</p>
+
+<p><b>Rowing</b></p>
+<ul>
+<li>Direct Bluetooth connection to the SmartRow: time, distance, pace /500 m, power, stroke rate and force curve of every stroke.</li>
+<li>Guided workouts with spoken instructions.</li>
+<li>Full-screen workout view for a phone on the rower: a <b>rhythm bar</b> shows the expected stroke (fast drive, slow recovery) next to your actual stroke, with a metronome.</li>
+<li>Floor workouts (core, ankle mobility) with drawings.</li>
+</ul>
+
+<p><b>Running</b></p>
+<ul>
+<li>Phone GPS tracking without Google Play Services: distance, time, pace, track and kilometre splits.</li>
+<li>Progressive walk-run programmes up to a 30-minute jog.</li>
+<li>Spoken cues and kilometre announcements with the screen off; music is lowered during cues.</li>
+</ul>
+
+<p><b>Adventure</b>: 12-week plan, levels, badges, weekly quests, a virtual trip down the Loire river, weight tracking and personal rewards.</p>
+
+<p>Data stays on the phone. A backup file moves it to and from the Linux app of the same project.</p>

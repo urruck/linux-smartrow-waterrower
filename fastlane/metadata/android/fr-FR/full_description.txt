@@ -1,0 +1,22 @@
+<p>Application d'entraînement pour le rameur <b>WaterRower</b> équipé du capteur <b>SmartRow</b>, avec des sorties de <b>course à pied</b> suivies au GPS. Tout fonctionne sur le téléphone, sans compte, sans publicité, sans Internet.</p>
+
+<p><b>Rame</b></p>
+<ul>
+<li>Connexion Bluetooth directe au SmartRow : temps, distance, allure /500 m, puissance, cadence, courbe de force de chaque coup.</li>
+<li>Séances guidées (reprise, endurance, technique, fractionné, pyramide…) avec consignes à voix haute.</li>
+<li>Écran de séance pour le téléphone posé sur le rameur : une <b>barre de rythme</b> montre le coup attendu (poussée rapide, retour lent) et votre coup réel, avec métronome.</li>
+<li>Séances au sol (gainage, mobilité de cheville) avec illustrations.</li>
+</ul>
+
+<p><b>Course à pied</b></p>
+<ul>
+<li>Suivi GPS du téléphone, sans Google Play Services : distance, temps, allure, tracé, temps de chaque kilomètre.</li>
+<li>Programmes progressifs de marche-course jusqu'au footing de 30 minutes.</li>
+<li>Consignes vocales et annonces de chaque kilomètre, écran éteint, téléphone dans la poche (la musique baisse pendant les consignes).</li>
+</ul>
+
+<p><b>Aventure</b> : plan de 12 semaines, niveaux, badges, quêtes de la semaine, descente de la Loire de Saumur à l'océan, suivi du poids, récompenses personnelles et idées de repas.</p>
+
+<p>Les données restent dans le téléphone. Un fichier de sauvegarde permet de les passer vers l'application Linux du même projet, ou l'inverse.</p>
+
+<p>Le capteur SmartRow n'accepte qu'une connexion : fermez l'application SmartRow officielle avant d'ouvrir Rameur.</p>

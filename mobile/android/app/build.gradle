@@ -7,8 +7,8 @@ android {
         applicationId "io.github.urruck.rameur"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 200
-        versionName "0.2.0"
+        versionCode 300
+        versionName "0.3.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -31,6 +31,11 @@ android {
                 keyPassword signature.keyPassword
             }
         }
+    }
+    // F-Droid : pas de bloc de dépendances chiffré (propre à Google Play) dans l'APK
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
     }
     buildTypes {
         release {
@@ -62,12 +67,3 @@ dependencies {
 }
 
 apply from: 'capacitor.build.gradle'
-
-try {
-    def servicesJSON = file('google-services.json')
-    if (servicesJSON.text) {
-        apply plugin: 'com.google.gms.google-services'
-    }
-} catch(Exception e) {
-    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
-}

@@ -1,6 +1,6 @@
 {
   "name": "rameur-smartrow-android",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Application Android du rameur WaterRower + SmartRow (Capacitor)",
   "license": "GPL-3.0-or-later",
@@ -18,7 +18,6 @@
     "@capacitor/share": "^8.0.3"
   },
   "devDependencies": {
-    "@capacitor/cli": "^8.6.0",
-    "esbuild": "^0.28.2"
+    "@capacitor/cli": "^8.6.0"
   }
 }

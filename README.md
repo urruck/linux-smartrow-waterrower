@@ -10,8 +10,10 @@ avec consignes vocales, bips et **métronome de cadence**, ainsi qu'un **mode
 Aventure** pour rester motivé : niveaux, descente de la Loire, badges,
 quêtes, suivi du poids et récompenses personnelles. Elle propose aussi des
 séances **hors rameur** (gainage du ventre, mobilité de cheville) et des
-**idées de repas** riches en protéines. Tout est enregistré sur l'ordinateur : aucun
-compte ni service en ligne n'est nécessaire.
+**idées de repas** riches en protéines. Sur Android, elle suit aussi des
+sorties de **course à pied** au GPS, et propose un **écran de séance** pour le
+téléphone posé sur le rameur, avec une **barre de rythme**. Tout est
+enregistré sur l'appareil : aucun compte ni service en ligne n'est nécessaire.
 
 Projet non officiel, sans lien avec WaterRower ni SmartRow.
 
@@ -71,6 +73,15 @@ Comment ça marche :
     pour respecter le rythme 1/3 de poussée, 2/3 de retour ;
   - en mode *auto*, il suit la cible de chaque étape ;
   - on peut aussi choisir une cadence fixe de 18 à 30 pour une séance libre.
+- **Barre de rythme** (tuile Cadence, et en grand dans l'**écran de
+  séance**) : la poignée blanche montre le coup attendu, au même tempo que
+  le métronome. Elle part vers « fin de poussée » en un tiers du coup
+  (« TIREZ »), puis revient lentement. L'anneau vert est votre coup réel :
+  il repart à chaque coup compté par le SmartRow. S'il suit la poignée,
+  vous êtes dans le rythme.
+- **Écran de séance** (bouton 📱, ouvert tout seul sur un téléphone quand une
+  séance guidée démarre) : barre de rythme, cadence en très gros, allure,
+  temps, distance, puissance, étape en cours. En paysage, deux colonnes.
 - Pendant une séance guidée, l'application mesure le **% du temps passé
   dans la cible**. Ce pourcentage rapporte jusqu'à 100 XP, des badges
   (*Métronome*, *Horloger*) et une quête de la semaine.
@@ -86,6 +97,31 @@ Repères de cadence :
 
 Le mieux est de ramer **long et puissant** plutôt que vite : la puissance
 vient des jambes, pas du nombre de coups.
+
+## Course à pied (téléphone Android)
+
+Onglet **🏃 Course**. Le téléphone suit la sortie avec son GPS, sans Google
+Play Services ni Internet :
+
+- **programmes** progressifs : marche-course 1-1, 2-1, 4-1, footing 20 min,
+  fartlek doux, footing 30 min ; ou **sortie libre** ;
+- départ automatique dès que le signal GPS est bon (ou « Partir sans
+  attendre ») ;
+- **consignes à voix haute** à chaque changement d'étape, bips 3-2-1,
+  vibration, « encore une minute » ; **annonce de chaque kilomètre** avec son
+  temps. La musique baisse pendant les consignes ;
+- tout continue **écran éteint, téléphone dans la poche** : le suivi tourne
+  dans un service Android (notification « Course à pied ») et la sortie est
+  enregistrée toutes les 30 secondes ;
+- à l'arrivée : distance, temps, allure moyenne, tracé et temps de chaque
+  kilomètre, dans **Mes sorties**.
+
+Les sorties comptent dans l'Aventure : XP (100 par km), une sortie par
+semaine dans le plan à partir de la semaine 3, une quête, cinq badges
+(*Premières foulées*, *Cinq bornes*, *Coureur régulier*, *Semelles usées*,
+*Duathlète*) et les kcal (environ 1 kcal par kg et par km). Elles ne font pas
+avancer le bateau sur la Loire. Sur Linux, l'onglet Course affiche les
+sorties importées depuis le téléphone.
 
 ## Hors rameur : ventre et cheville
 
@@ -201,9 +237,11 @@ d'autoriser le navigateur à installer des applications). Android 7 ou plus,
 avec Bluetooth.
 
 Au premier lancement, autoriser **« Appareils à proximité »** : c'est le
-Bluetooth qui sert à trouver le SmartRow. L'application fait tout dans le
+Bluetooth qui sert à trouver le SmartRow. Pour la course, autoriser la
+**position exacte** « lorsque l'appli est utilisée » et les notifications. L'application fait tout dans le
 téléphone, sans PC ni Internet : mêmes écrans, séances guidées, voix
-d'Android, aventure. L'écran reste allumé pendant qu'elle est ouverte. Les
+d'Android, aventure, course à pied. L'écran reste allumé sur l'onglet Rame. Le
+bouton retour d'Android ferme ce qui est ouvert. Les
 séances sont gardées dans le téléphone, au même format que sur Linux.
 Désinstaller l'application les efface.
 
@@ -216,10 +254,18 @@ L'import n'efface rien : il ajoute les séances et les pesées qui manquent.
 Il propose aussi de remplacer le profil (prénom, poids, début du plan,
 récompenses). C'est aussi une bonne sauvegarde avant de désinstaller.
 
+**F-Droid** : l'application remplit les conditions de F-Droid (logiciel
+libre, aucune dépendance Google, construction depuis les sources). La recette
+et la marche à suivre sont dans [`fdroid/`](fdroid/LISEZMOI.md), la fiche
+dans `fastlane/metadata/android/`.
+
 Pour reconstruire l'APK (Node.js, kit Android et Java 21, sans sudo) :
 `bash mobile/construire_apk.sh`. Le dossier `mobile/` contient
 `src/serveur.js`, une traduction en JavaScript de `rameur.py`, `jeu.py` et
-`smartrow_ble.py`. La page `page.html` est reprise telle quelle.
+`smartrow_ble.py`, et `src/course.js`. Le suivi GPS est un service Android
+écrit en Java (`android/app/src/main/java/…/ServiceCourse.java`). La page
+`page.html` est reprise telle quelle ; `construire_www.mjs` copie les fichiers
+sans outil d'assemblage.
 `mobile/essais/comparer.sh` vérifie que les deux versions donnent les mêmes
 résultats. Pour essayer la version téléphone dans un navigateur sans rameur :
 `cd mobile/www && python3 -m http.server`, puis ouvrir
@@ -279,7 +325,8 @@ python3 rameur.py --rejouer exemples/seance-260m.log
 | `smartrow_ble.py` | connexion au SmartRow et décodage des messages |
 | `ecouter.py` | outil de diagnostic : affiche et enregistre les messages bruts |
 | `exemples/seance-260m.log` | une vraie séance enregistrée, pour les essais |
-| `mobile/` | application Android (Capacitor) : `construire_apk.sh`, `src/` |
+| `mobile/` | application Android (Capacitor) : `construire_apk.sh`, `src/`, service GPS en Java |
+| `fastlane/`, `fdroid/` | fiche et recette pour F-Droid |
 
 ## Protocole SmartRow (V2, vérifié le 27/10/2026 sur une vraie séance)
 

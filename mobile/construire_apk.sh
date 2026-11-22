@@ -15,7 +15,7 @@ CODE="$(node -p 'const [a,b,c]=require("./package.json").version.split(".").map(
 
 [ -d node_modules ] || npm ci --no-fund --no-audit
 node construire_www.mjs
-npx cap sync android
+npx cap sync android        # copie www/ et met à jour les fichiers générés (gardés dans le dépôt)
 sed -i -E "s/versionCode [0-9]+/versionCode $CODE/; s/versionName \"[^\"]*\"/versionName \"$VERSION\"/" android/app/build.gradle
 echo "sdk.dir=$ANDROID_HOME" > android/local.properties
 

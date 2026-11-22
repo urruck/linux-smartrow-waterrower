@@ -1,9 +1,7 @@
 // Sauvegarde et transfert : traduction de ../sauvegarde.py (même format de fichier).
 // Export : le fichier est enregistré dans Documents puis proposé au partage
 // (Nextcloud, courriel, Drive, Quick Share…). Import : sans rien effacer.
-import { Capacitor } from "@capacitor/core";
-import { Directory, Encoding, Filesystem } from "@capacitor/filesystem";
-import { Share } from "@capacitor/share";
+import { Capacitor, Directory, Encoding, Filesystem, Share } from "./capacitor.js";
 import { stock } from "./stockage.js";
 import { dateHeureIso, dateIso } from "./jeu.js";
 

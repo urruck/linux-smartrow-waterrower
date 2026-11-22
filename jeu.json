@@ -8,7 +8,8 @@
     "quete": 150,
     "badge": 100,
     "precision_cadence_max": 100,
-    "seance_renfo": 80
+    "seance_renfo": 80,
+    "par_km_course": 100
   },
   "niveaux": [
     "Moussaillon",
@@ -272,11 +273,41 @@
       "icone": "🌅",
       "nom": "L'océan",
       "texte": "Arriver à Saint-Nazaire"
+    },
+    {
+      "id": "course1",
+      "icone": "👟",
+      "nom": "Premières foulées",
+      "texte": "Une première sortie de course à pied"
+    },
+    {
+      "id": "course5k",
+      "icone": "🏃",
+      "nom": "Cinq bornes",
+      "texte": "5 km en une sortie de course"
+    },
+    {
+      "id": "course10",
+      "icone": "🗺️",
+      "nom": "Coureur régulier",
+      "texte": "10 sorties de course à pied"
+    },
+    {
+      "id": "course25",
+      "icone": "🥾",
+      "nom": "Semelles usées",
+      "texte": "25 km courus au total"
+    },
+    {
+      "id": "duathlon",
+      "icone": "🔱",
+      "nom": "Duathlète",
+      "texte": "Ramer et courir la même semaine"
     }
   ],
   "plan": {
     "nom": "Retour en forme : 12 semaines",
-    "_note": "3 séances de rame par semaine (un jour de repos entre deux) + 2 séances hors rameur (renfo, cheville) les autres jours. Semaines 1-2 : reprise douce après l'entorse de cheville.",
+    "_note": "3 séances de rame par semaine (un jour de repos entre deux) + 2 séances hors rameur (renfo, cheville) les autres jours. Semaines 1-2 : reprise douce après l'entorse de cheville. Course à pied à partir de la semaine 3 (cheville) : une sortie par semaine, en alternant course et marche.",
     "semaines": [
       {
         "theme": "Reprise douce",
@@ -312,6 +343,9 @@
         "renfo": [
           "ventre1",
           "ventre1"
+        ],
+        "course": [
+          "marchecourse1"
         ]
       },
       {
@@ -324,6 +358,9 @@
         "renfo": [
           "ventre1",
           "ventre1"
+        ],
+        "course": [
+          "marchecourse1"
         ]
       },
       {
@@ -336,6 +373,9 @@
         "renfo": [
           "ventre2",
           "ventre2"
+        ],
+        "course": [
+          "marchecourse2"
         ]
       },
       {
@@ -348,6 +388,9 @@
         "renfo": [
           "ventre2",
           "ventre2"
+        ],
+        "course": [
+          "marchecourse2"
         ]
       },
       {
@@ -360,6 +403,9 @@
         "renfo": [
           "ventre2",
           "ventre2"
+        ],
+        "course": [
+          "marchecourse3"
         ]
       },
       {
@@ -372,6 +418,9 @@
         "renfo": [
           "ventre2",
           "ventre2"
+        ],
+        "course": [
+          "marchecourse3"
         ]
       },
       {
@@ -384,6 +433,9 @@
         "renfo": [
           "ventre2",
           "ventre2"
+        ],
+        "course": [
+          "footing20"
         ]
       },
       {
@@ -396,6 +448,9 @@
         "renfo": [
           "ventre2",
           "ventre2"
+        ],
+        "course": [
+          "footing20"
         ]
       },
       {
@@ -408,6 +463,9 @@
         "renfo": [
           "ventre2",
           "ventre2"
+        ],
+        "course": [
+          "fartlek"
         ]
       },
       {
@@ -420,6 +478,9 @@
         "renfo": [
           "ventre2",
           "ventre2"
+        ],
+        "course": [
+          "footing30"
         ]
       }
     ]
@@ -434,6 +495,10 @@
       "texte": "Faire 2 séances hors rameur (renfo, cheville)"
     },
     {
+      "id": "course",
+      "texte": "Faire la sortie course à pied de la semaine"
+    },
+    {
       "id": "km",
       "texte": "Ramer {km} km dans la semaine"
     },
@@ -446,5 +511,5 @@
       "texte": "Tenir la cadence cible 75 % du temps sur 2 séances"
     }
   ],
-  "_xp": "precision_cadence_max : XP en plus selon le % du temps passé dans la cadence cible (100 % = tout le bonus)"
+  "_xp": "precision_cadence_max : XP en plus selon le % du temps passé dans la cadence cible (100 % = tout le bonus) ; par_km_course : XP par km couru (course à pied, GPS du téléphone)"
 }

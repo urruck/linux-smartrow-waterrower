@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fabrique un historique fictif (séances, renfo, pesées) dans le dossier donné,
+"""Fabrique un historique fictif (séances, renfo, course, pesées) dans le dossier donné,
 pour comparer les versions Python et JavaScript de l'aventure sur tous les cas."""
 import datetime, json, os, random, sys
 d = sys.argv[1]; graine = int(sys.argv[2]) if len(sys.argv) > 2 else 1
@@ -18,7 +18,8 @@ t = datetime.datetime.combine(debut - datetime.timedelta(days=5), datetime.time(
 for i in range(random.randint(5, 70)):
     t += datetime.timedelta(hours=random.randint(5, 60), minutes=random.randint(0, 59))
     p = random.choice(progs + [None] * 3)
-    renfo = p is not None and random.random() < 0.3
+    course = (p is not None and p.get("course")) or (p is None and random.random() < 0.2)
+    renfo = not course and p is not None and random.random() < 0.3
     dist = 0 if renfo else random.randint(0, 7000)
     duree = random.randint(60, 2400)
     points = [{"t": k, "watts": random.randint(0, 200)} for k in range(0, duree, 7)]
@@ -28,4 +29,9 @@ for i in range(random.randint(5, 70)):
          "points": [] if renfo else points, "coups": []}
     if renfo:
         s["type"] = "renfo"
-    json.dump(s, open(f"{d}/sessions/{t:%Y-%m-%d_%H%M%S}{'_renfo' if renfo else ''}.json", "w"))
+    if course:
+        s["type"] = "course"
+        s["points"] = []
+        s["resume"]["distance_m"] = random.randint(0, 9000) + random.random()
+    suffixe = "_renfo" if renfo else "_course" if course else ""
+    json.dump(s, open(f"{d}/sessions/{t:%Y-%m-%d_%H%M%S}{suffixe}.json", "w"))

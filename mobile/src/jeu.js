@@ -66,6 +66,9 @@ export async function ajouterPesee(kg, date) {
   await stock.ecrire("donnees/pesees.json", liste);
 }
 
+/** Course à pied (et marche rapide) : environ 1 kcal par kg et par km. */
+export const kcalCourse = (distance, poids) => distance / 1000 * poids;
+
 export function kcal(points, poids) {
   return points.reduce((s, p) => s + (0.048 * (p.watts || 0) + 1.19) * poids * 3.5 / 200 / 60, 0);
 }
@@ -79,12 +82,14 @@ async function seances(poids) {
     const d = await stock.lire("sessions/" + nom, null);
     if (!d || !("resume" in d)) continue;
     const r = d.resume;
+    const course = d.type === "course";
     res.push({
       fichier: nom, debut: new Date(d.debut), programme: d.programme ?? null,
       programme_id: noms[d.programme], termine: Boolean(d.termine),
-      precision: d.precision_cadence ?? null, renfo: d.type === "renfo",
+      precision: d.precision_cadence ?? null, renfo: d.type === "renfo", course,
       distance_m: r.distance_m || 0, temps_s: r.temps_s || 0,
-      allure_moyenne_s: r.allure_moyenne_s ?? null, kcal: kcal(d.points || [], poids),
+      allure_moyenne_s: r.allure_moyenne_s ?? null,
+      kcal: course ? kcalCourse(r.distance_m || 0, poids) : kcal(d.points || [], poids),
     });
   }
   return res;
@@ -120,14 +125,30 @@ export async function etat() {
     if (!parSemaine.has(n)) parSemaine.set(n, []);
     parSemaine.get(n).push(s);
   }
-  const planFait = new Map(), renfoFaits = new Map();
+  const planFait = new Map(), renfoFaits = new Map(), courseFaites = new Map();
   for (const [n, ss] of parSemaine) {
     const dansPlan = n > 0 && n <= plan.length;
     const attendues = dansPlan ? [...plan[n - 1].seances] : [];
     const renfoAtt = dansPlan ? [...(plan[n - 1].renfo || [])] : [];
+    const courseAtt = dansPlan ? [...(plan[n - 1].course || [])] : [];
     const faites = [];
     renfoFaits.set(n, []);
+    courseFaites.set(n, []);
     for (const s of ss) {
+      if (s.course) {
+        let gain = Math.trunc(s.distance_m / 1000 * xr("par_km_course", 100));
+        if (s.temps_s >= 600) gain += xr("seance_10min", 50);
+        if (s.programme && s.termine) {
+          gain += xr("seance_guidee_terminee", 100);
+          if (retirer(courseAtt, s.programme_id)) {
+            courseFaites.get(n).push(s.programme_id);
+            gain += xr("seance_du_plan", 50);
+          }
+        }
+        s.xp = gain;
+        xp += gain;
+        continue;
+      }
       if (s.renfo) {
         s.xp = s.termine ? xr("seance_renfo", 80) : 0;
         if (retirer(renfoAtt, s.programme_id)) renfoFaits.get(n).push(s.programme_id);
@@ -152,19 +173,28 @@ export async function etat() {
   const journal = liste.slice(-15).reverse().map(s => ({
     date: dateHeureIso(s.debut, false), programme: s.programme || "Séance libre",
     distance_m: s.distance_m, temps_s: s.temps_s, kcal: Math.round(s.kcal),
-    precision: s.precision, renfo: s.renfo, xp: s.xp,
+    precision: s.precision, renfo: s.renfo, course: s.course, xp: s.xp,
   }));
 
   const renfos = liste.filter(s => s.renfo && s.termine);
-  liste = liste.filter(s => !s.renfo);
-  parSemaine = new Map([...parSemaine].map(([n, ss]) => [n, ss.filter(s => !s.renfo)]));
+  const courses = liste.filter(s => s.course);
+  const rame = s => !s.renfo && !s.course;
+  liste = liste.filter(rame);
+  const rameSemaines = new Set([...parSemaine].filter(([, ss]) => ss.some(rame)).map(([n]) => n));
+  const courseSemaine = new Map();
+  for (const s of courses) {
+    if (!courseSemaine.has(s.semaine)) courseSemaine.set(s.semaine, []);
+    courseSemaine.get(s.semaine).push(s);
+  }
+  parSemaine = new Map([...parSemaine].map(([n, ss]) => [n, ss.filter(rame)]));
   const renfoSemaine = new Map();
   for (const s of renfos) {
     if (!renfoSemaine.has(s.semaine)) renfoSemaine.set(s.semaine, []);
     renfoSemaine.get(s.semaine).push(s);
   }
   const totalM = somme(liste, s => s.distance_m);
-  const totalKcal = somme(liste, s => s.kcal);
+  const courseM = somme(courses, s => s.distance_m);
+  const totalKcal = somme(liste, s => s.kcal) + somme(courses, s => s.kcal);
   const perdu = arrondi(P.poids_depart_kg - poidsActuel, 1);
   const aPerdre = arrondi(P.poids_depart_kg - P.poids_objectif_kg, 1);
 
@@ -204,6 +234,9 @@ export async function etat() {
     record1000: record, kcal1000: totalKcal >= 1000, kcal5000: totalKcal >= 5000,
     poids1: perdu >= 1, poids3: perdu >= 3, poids_obj: pes.length > 0 && poidsActuel <= P.poids_objectif_kg,
     chalonnes: km >= 68, nantes: km >= 135, ocean: km >= 190,
+    course1: courses.length >= 1, course5k: courses.some(s => s.distance_m >= 5000),
+    course10: courses.length >= 10, course25: courseM >= 25000,
+    duathlon: [...courseSemaine.keys()].some(n => rameSemaines.has(n)),
   };
   const badges = (R.badges || []).map(b => ({ ...b, obtenu: Boolean(conditions[b.id]) }));
   xp += compte(badges, b => b.obtenu) * xr("badge", 100);
@@ -231,6 +264,8 @@ export async function etat() {
       fait = compte(ss, s => (s.precision || 0) >= 75); but = 2;
     } else if (q.id === "pesee") {
       fait = peseeSemaine ? 1 : 0; but = 1;
+    } else if (q.id === "course" && planSemaine && (planSemaine.course || []).length) {
+      fait = (courseFaites.get(semaine) || []).length; but = planSemaine.course.length;
     } else continue;
     quetes.push({ texte: q.texte.replaceAll("{km}", strPy(kmCible, brut < 20)), fait, but, ok: fait >= but });
   }
@@ -239,6 +274,8 @@ export async function etat() {
     const kmN = somme(parSemaine.get(n) || [], s => s.distance_m) / 1000;
     if (kmN >= Math.min(20, 3 + 1.2 * (n - 1))) xp += xr("quete", 150);
     if (n > 0 && n <= plan.length && (planFait.get(n) || []).length >= plan[n - 1].seances.length) xp += xr("quete", 150);
+    if (n > 0 && n <= plan.length && (plan[n - 1].course || []).length &&
+        (courseFaites.get(n) || []).length >= plan[n - 1].course.length) xp += xr("quete", 150);
   }
   if (avantDebut) quetes = [];
   xp += somme(quetes.filter(q => q.ok && !q.texte.includes("pesee")), () => xr("quete", 150));
@@ -263,20 +300,23 @@ export async function etat() {
   const recompenses = (P.recompenses || []).map(r => ({ ...r, obtenue: debloquee(r.condition) }));
 
   // --- Séances du plan restant à faire cette semaine
-  let aFaire = [], renfoAFaire = [];
+  let aFaire = [], renfoAFaire = [], courseAFaire = [];
   if (planSemaine) {
     aFaire = [...planSemaine.seances];
     renfoAFaire = [...(planSemaine.renfo || [])];
+    courseAFaire = [...(planSemaine.course || [])];
     if (!avantDebut) {
       for (const f of (planFait.get(semaine) || [])) retirer(aFaire, f);
       for (const f of (renfoFaits.get(semaine) || [])) retirer(renfoAFaire, f);
+      for (const f of (courseFaites.get(semaine) || [])) retirer(courseAFaire, f);
     }
   }
 
   return {
     profil: P, niveau, xp_total: xp,
     totaux: { km: arrondi(km, 2), seances: liste.length, renfo: renfos.length, kcal: Math.round(totalKcal),
-      temps_s: somme(liste, s => s.temps_s) },
+      temps_s: somme(liste, s => s.temps_s),
+      course_km: arrondi(courseM / 1000, 2), courses: courses.length, course_temps_s: somme(courses, s => s.temps_s) },
     poids: { depart: P.poids_depart_kg, objectif: P.poids_objectif_kg, actuel: poidsActuel,
       perdu, a_perdre: aPerdre, pesees: pes },
     parcours: { nom: (R.parcours || {}).nom ?? null, km: arrondi(km, 2), escales: esc,
@@ -284,6 +324,7 @@ export async function etat() {
       total_km: esc.length ? esc[esc.length - 1].km : 0 },
     badges,
     semaine: { numero: semaine, avant_debut: avantDebut, debut: P.debut, renfo_a_faire: renfoAFaire,
+      course_a_faire: courseAFaire,
       theme: planSemaine ? planSemaine.theme : "Plan terminé : continuez à votre rythme",
       nb_semaines: plan.length, plan: planSemaine ? planSemaine.seances : [],
       a_faire: aFaire, km: arrondi(kmSemaine, 1), nb_seances: ss.length },

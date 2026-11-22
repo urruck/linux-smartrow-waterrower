@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rameur SmartRow</title>
 <style>
   :root { color-scheme: dark;
@@ -132,12 +132,94 @@
   #celebration li { margin: 8px 0; font-size: 17px; }
   .confetti { position: fixed; top: -40px; font-size: 26px; animation: tombe linear forwards; z-index: 11; pointer-events: none; }
   @keyframes tombe { to { transform: translateY(110vh) rotate(540deg); } }
+  /* Onglets : en haut sur l'ordinateur, en bas de l'écran sur le téléphone */
+  body { padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left); }
+  #onglets { display: flex; gap: 6px; }
+  .onglet { font-size: 15px; }
+  .onglet.actif { border-color: var(--eau); background: #1d3442; }
+  .outils { grid-column: span 3 / span 3; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .outils .etat { gap: 4px; }
+  /* Barre de rythme : la poignée va vers « tirez » (poussée, 1/3 du coup) puis revient lentement */
+  .rythme { margin-top: 10px; }
+  .r-piste { position: relative; height: 26px; border-radius: 13px; background: #26313a; overflow: hidden; }
+  .r-rempli { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--eau); }
+  .r-rempli.pousse { background: var(--force); }
+  .r-poignee, .r-fantome { position: absolute; top: 50%; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; left: 0; }
+  .r-poignee { background: var(--texte); box-shadow: 0 0 0 3px rgba(0,0,0,.35); }
+  .r-fantome { border: 3px solid var(--ok); background: transparent; display: none; }
+  .r-piste.attaque { box-shadow: inset 0 0 0 3px var(--force); }
+  .r-legende { display: flex; justify-content: space-between; color: var(--doux); font-size: 12px; margin-top: 3px; }
+  .r-mot { font-weight: 800; color: var(--texte); letter-spacing: .08em; }
+  .rythme.repos .r-poignee { opacity: .25; }
+  /* Écran de séance plein écran (téléphone posé sur le rameur) */
+  #rame { position: fixed; inset: 0; z-index: 8; background: var(--fond); display: none; flex-direction: column; gap: 10px;
+          padding: calc(10px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left));
+          border-top: 8px solid var(--zone, var(--eau)); overflow: auto; }
+  #rame .rm-haut, #rame .rm-bas { display: flex; align-items: center; gap: 8px; color: var(--doux); font-size: 15px; flex-wrap: wrap; }
+  #rame .rm-corps { flex: 1; display: grid; gap: 12px; grid-template-columns: 1fr; align-content: start; }
+  #rm-zone { font-size: clamp(26px, 8vw, 54px); font-weight: 800; color: var(--zone, var(--eau)); }
+  #rm-reste { font-size: clamp(30px, 10vw, 64px); font-weight: 800; font-variant-numeric: tabular-nums; margin-left: auto; }
+  #rame .rm-ligne { display: flex; align-items: baseline; gap: 10px; }
+  #rm-note { font-size: 17px; margin-top: 4px; }
+  #rame .rythme .r-piste { height: clamp(56px, 14vh, 110px); border-radius: 18px; }
+  #rame .rythme .r-poignee, #rame .rythme .r-fantome { width: 44px; height: 44px; margin: -22px 0 0 -22px; }
+  #rame .r-legende { font-size: 14px; }
+  #rame .r-mot { font-size: clamp(20px, 6vw, 34px); }
+  .rm-cad { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  #rm-cadence { font-size: clamp(64px, 22vw, 140px); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+  #rm-conseil { font-size: 20px; font-weight: 700; }
+  .rm-chiffres { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .rm-chiffres > div, .co-chiffres > div { background: var(--carte); border-radius: 12px; padding: 8px 12px; }
+  .rm-chiffres span, .co-chiffres span { display: block; color: var(--doux); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+  .rm-chiffres b, .co-chiffres b { font-size: clamp(28px, 9vw, 52px); font-variant-numeric: tabular-nums; }
+  .co-chiffres small { color: var(--doux); margin-left: 4px; }
+  #rame button { font-size: 17px; padding: 10px 14px; }
+  @media (orientation: landscape) and (max-height: 560px) {
+    #rame .rm-corps { grid-template-columns: 1.2fr 1fr; }
+    #rm-cadence { font-size: clamp(56px, 16vh, 110px); }
+    .rm-chiffres b { font-size: clamp(24px, 8vh, 44px); }
+  }
+  /* Course à pied */
+  #vue-course { grid-template-columns: repeat(2, 1fr); }
+  #vue-course .large { grid-column: span 2 / span 2; }
+  .ligne-etape { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  #co-zone { font-size: clamp(28px, 7vw, 56px); font-weight: 800; color: var(--zone, var(--eau)); }
+  #co-reste { font-size: clamp(30px, 9vw, 60px); font-weight: 800; font-variant-numeric: tabular-nums; margin-left: auto; }
+  #co-direct { border-left: 8px solid var(--zone, var(--eau)); }
+  #co-direct .barre div { background: var(--zone, var(--eau)); }
+  .co-chiffres { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+  .carte-course { width: 100%; height: 220px; display: block; margin-top: 10px; background: #121a20; border-radius: 10px; }
+  #co-lignes tr { cursor: pointer; }
+  button.fort { border-color: var(--alerte); }
+  .cache { display: none !important; }
+  @media (max-width: 640px) {
+    #onglets { position: fixed; left: 0; right: 0; bottom: 0; z-index: 7; background: #121a20; border-top: 1px solid #26313a;
+               padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); gap: 6px; }
+    .onglet { flex: 1; padding: 10px 4px; font-size: 16px; }
+    body { padding-bottom: calc(70px + env(safe-area-inset-bottom)); }
+    header { padding: 8px 12px; }
+    header h1 { font-size: 16px; }
+    main { padding: 0 12px 12px; gap: 10px; }
+    .outils { grid-column: span 2 / span 2; }
+    .outils button { padding: 8px 10px; font-size: 14px; }
+    .tuile { padding: 10px 12px; }
+    .val { font-size: clamp(32px, 11vw, 60px); }
+    .grande { grid-template-columns: 1fr 1fr !important; }
+    .grande .val { font-size: clamp(34px, 11vw, 64px); }
+    .outils label.etat { order: 5; flex-basis: 100%; }
+    .outils select { flex: 1; }
+    #co-lignes td { padding: 6px 4px; font-size: 14px; white-space: nowrap; }
+    #co-lignes td:nth-child(2) { white-space: normal; }
+    #vue-course { grid-template-columns: 1fr; }
+    #vue-course .large { grid-column: auto; }
+    .co-chiffres { grid-template-columns: 1fr 1fr; }
+    .courbe canvas { height: 150px; }
+  }
   @media (max-width: 640px) {
     #vue-aventure { grid-template-columns: 1fr; }
     #vue-aventure .large { grid-column: auto; }
     main { grid-template-columns: 1fr 1fr; }
-    #guide, #choix, .grande, .courbe, #historique { grid-column: span 2 / span 2; }
-    .grande { grid-template-columns: 1fr; }
+    #guide, #choix, .grande, .courbe, #historique, #t-cadence { grid-column: span 2 / span 2; }
   }
 </style>
 </head>
@@ -148,17 +230,26 @@
   <h1>🚣 Rameur</h1>
   <div class="etat"><span class="pastille" id="pastille"></span><span id="connexion">Recherche du SmartRow…</span></div>
   <div class="espace"></div>
-  <label class="etat">🥁 Métronome
-    <select id="metro">
-      <option value="auto">auto (séance guidée)</option><option value="0">coupé</option>
-      <option>18</option><option>20</option><option>22</option><option>24</option><option>26</option><option>28</option><option>30</option>
-    </select></label>
-  <button id="btn-aventure">🏆 Aventure</button>
-  <button id="btn-seances">Séances guidées</button>
-  <button id="btn-histo">Historique</button>
-  <button id="btn-nouvelle">Nouvelle séance</button>
+  <nav id="onglets">
+    <button class="onglet actif" data-vue="rameur">🚣 <span>Rame</span></button>
+    <button class="onglet" data-vue="course">🏃 <span>Course</span></button>
+    <button class="onglet" data-vue="aventure">🏆 <span>Aventure</span></button>
+  </nav>
 </header>
 <main id="vue-rameur">
+  <div class="outils">
+    <button id="btn-seances">Séances guidées</button>
+    <button id="btn-plein">📱 Écran de séance</button>
+    <label class="etat">🥁
+      <select id="metro">
+        <option value="auto">métronome auto (séance guidée)</option><option value="0">métronome coupé</option>
+        <option value="18">18 c/min</option><option value="20">20 c/min</option><option value="22">22 c/min</option><option value="24">24 c/min</option>
+        <option value="26">26 c/min</option><option value="28">28 c/min</option><option value="30">30 c/min</option>
+      </select></label>
+    <span class="espace"></span>
+    <button id="btn-histo">Historique</button>
+    <button id="btn-nouvelle">Nouvelle séance</button>
+  </div>
   <div class="tuile" id="choix"><div class="nom">Choisir une séance guidée</div>
     <div class="reglage">Allure de référence /500 m :
       <input id="ref" placeholder="2:45"> <span id="ref-aide"></span></div>
@@ -184,7 +275,9 @@
   <div class="tuile" id="t-cadence"><div class="nom">Cadence</div><div class="val"><span id="cadence">0</span><small>c/min</small></div>
     <div class="sous"><span id="coups">0</span> coups · cible <span id="c-cible">libre</span></div>
     <div class="jauge"><div class="zone" id="c-zone"></div><div class="aiguille" id="c-aiguille"></div></div>
-    <div id="c-conseil"></div></div>
+    <div id="c-conseil"></div>
+    <div class="rythme"><div class="r-piste"><div class="r-rempli"></div><div class="r-fantome"></div><div class="r-poignee"></div></div>
+      <div class="r-legende"><span>attaque</span><span class="r-mot"></span><span>fin de poussée</span></div></div></div>
   <div class="tuile courbe"><div class="nom">Courbe de force du dernier coup</div><canvas id="toile"></canvas></div>
   <div class="tuile" id="historique"><div class="nom">Séances enregistrées</div>
     <table><thead><tr><th>Date</th><th>Séance</th><th>Distance</th><th>Temps</th><th>Allure moy.</th><th>Watts moy.</th><th>Coups</th></tr></thead>
@@ -198,6 +291,7 @@
     <div class="chiffres">
       <div><b id="a-km">0</b><span>km ramés</span></div><div><b id="a-seances">0</b><span>séances de rame</span></div><div><b id="a-renfo">0</b><span>séances de renfo</span></div>
       <div><b id="a-kcal">0</b><span>kcal dépensées (estimation)</span></div><div><b id="a-temps">0</b><span>de rame</span></div>
+      <div><b id="a-course">0</b><span>km courus</span></div>
     </div>
   </div>
   <div class="tuile">
@@ -258,6 +352,66 @@
     <div class="sous" id="s-message" style="margin-top:6px"></div>
   </div>
 </main>
+<main id="vue-course" class="vue-cachee">
+  <div class="tuile large" id="co-prep">
+    <div class="nom">Course à pied</div>
+    <div class="sous" id="co-gps" style="margin:6px 0"></div>
+    <div class="progs" id="co-progs"></div>
+    <div class="reglage"><label><input type="checkbox" id="co-voix" checked style="width:auto"> consignes à voix haute</label>
+      <label><input type="checkbox" id="co-km" checked style="width:auto"> annonce de chaque kilomètre</label></div>
+    <div class="sous" id="co-message" style="margin-top:6px"></div>
+  </div>
+  <div class="tuile large cache" id="co-direct">
+    <div class="ligne-etape"><span id="co-zone"></span><span id="co-etape" class="sous"></span><span id="co-reste"></span></div>
+    <div class="barre"><div id="co-barre"></div></div>
+    <div id="co-note" style="font-size:18px;margin-top:6px"></div>
+    <div class="sous" id="co-suite" style="margin-top:4px"></div>
+    <div class="co-chiffres">
+      <div><span>Temps</span><b id="co-temps">0:00</b></div>
+      <div><span>Distance</span><b id="co-dist">0,00</b><small>km</small></div>
+      <div><span>Allure moyenne</span><b id="co-allure">–</b><small>/km</small></div>
+      <div><span>Allure actuelle</span><b id="co-inst">–</b><small>/km</small></div>
+    </div>
+    <div class="sous" id="co-gpsdirect" style="margin-top:6px"></div>
+    <svg id="co-carte" class="carte-course" viewBox="0 0 300 200" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="reglage"><button id="co-forcer">▶ Partir sans attendre le GPS</button><button id="co-pause">⏸ Pause</button>
+      <button id="co-suivante">⏭ Étape suivante</button><span class="espace"></span><button id="co-fin" class="fort">⏹ Terminer</button></div>
+    <div class="sous" style="margin-top:8px">L'écran peut s'éteindre : le suivi et la voix continuent, téléphone dans la poche.</div>
+  </div>
+  <div class="tuile large" id="co-histo">
+    <div class="nom">Mes sorties</div>
+    <div class="chiffres" id="co-totaux"></div>
+    <table style="margin-top:8px"><tbody id="co-lignes"></tbody></table>
+  </div>
+  <div class="tuile large cache" id="co-detail">
+    <div class="nom" id="co-d-titre"></div>
+    <svg id="co-d-carte" class="carte-course" viewBox="0 0 300 200" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="sous" id="co-d-km" style="margin-top:6px"></div>
+  </div>
+</main>
+<div id="rame">
+  <div class="rm-haut"><span class="pastille" id="rm-pastille"></span><span id="rm-etape"></span><span class="espace"></span>
+    <button id="rm-fermer">✕ Fermer</button></div>
+  <div class="rm-corps">
+    <div>
+      <div class="rm-ligne"><span id="rm-zone">Rame libre</span><span id="rm-reste"></span></div>
+      <div class="barre"><div id="rm-barre"></div></div>
+      <div id="rm-note"></div>
+      <div class="rythme"><div class="r-piste"><div class="r-rempli"></div><div class="r-fantome"></div><div class="r-poignee"></div></div>
+        <div class="r-legende"><span>attaque</span><span class="r-mot"></span><span>fin de poussée</span></div></div>
+    </div>
+    <div>
+      <div class="rm-cad"><b id="rm-cadence">0</b><span class="sous">c/min · cible <span id="rm-cible">libre</span></span></div>
+      <div id="rm-conseil"></div>
+      <div class="rm-chiffres" style="margin-top:10px">
+        <div><span>Allure /500 m</span><b id="rm-allure">–:––</b></div><div><span>Temps</span><b id="rm-temps">0:00</b></div>
+        <div><span>Distance</span><b id="rm-dist">0</b></div><div><span>Puissance</span><b id="rm-watts">0</b></div>
+      </div>
+    </div>
+  </div>
+  <div class="rm-bas"><span id="rm-suite"></span><span class="espace"></span>
+    <button id="rm-son">🥁 Son</button><button id="rm-stop">⏹ Arrêter la séance</button></div>
+</div>
 <div id="exo">
   <div class="haut"><span id="x-etape"></span><span class="espace"></span><span id="x-titre"></span></div>
   <div class="milieu">
@@ -325,6 +479,7 @@ flux.onmessage = ev => {
   $("coups").textContent = e.coups || 0;
   ciblesEnDirect(e, arret);
   jaugeCadence(e.cadence, arret);
+  majRame(e, arret);
   const cle = JSON.stringify(e.courbe || []);
   if (cle !== derniereCourbe) {
     derniereCourbe = cle;
@@ -413,12 +568,12 @@ async function chargerProgrammes() {
   if (programmes) return;
   const d = await (await fetch("/programmes")).json();
   programmes = d.programmes; zones = d.zones;
-  $("progs").innerHTML = programmes.map((p, i) => {
+  $("progs").innerHTML = programmes.map((p, i) => p.course ? "" : (() => {
     const et = aplatir(p.etapes), tot = et.filter(e => e.temps).reduce((a, e) => a + e.temps, 0);
     const dist = et.filter(e => e.distance).reduce((a, e) => a + e.distance, 0);
     return `<button class="prog" data-i="${i}"><b>${p.nom}</b><span>${p.niveau} · ${Math.round(tot / 60)} min${dist ? " + " + dist + " m" : ""}</span><br><span>${p.but}</span></button>`;
-  }).join("");
-  document.querySelectorAll(".prog").forEach(b => b.onclick = () => fiche(programmes[b.dataset.i]));
+  })()).join("");
+  document.querySelectorAll("#progs .prog").forEach(b => b.onclick = () => fiche(programmes[b.dataset.i]));
   // allure de référence : celle choisie, sinon la moyenne de la dernière séance d'au moins 500 m
   let ref = relire("allure_ref");
   if (!ref) {
@@ -452,6 +607,7 @@ async function demarrer(p) {
   afficherEtape();
   $("g-reste").textContent = "Prêt";
   $("g-note").textContent = "Commencez à ramer : la séance démarre au premier coup.";
+  if (petitEcran()) ouvrirRame();
   dire(`${p.nom}. Commencez à ramer quand vous êtes prêt. Première étape : ${texteEtape(guide.etapes[0])}`);
 }
 
@@ -611,14 +767,27 @@ async function lireJeu() {
   try { return await (await fetch("/jeu")).json(); }
   catch (e) { $("bandeau").style.display = "block"; return null; }
 }
-fetch("/version").then(r => r.json()).catch(() => { $("bandeau").style.display = "block"; });
+let plateforme = "linux";
+fetch("/version").then(r => r.json()).then(v => {
+  plateforme = v.plateforme || "linux";
+  if (v.course) verifierCourse(true);
+}).catch(() => { $("bandeau").style.display = "block"; });
 
-$("btn-aventure").onclick = async () => {
-  const av = $("vue-aventure").classList.toggle("vue-cachee") === false;
-  $("vue-rameur").classList.toggle("vue-cachee", av);
-  $("btn-aventure").textContent = av ? "🚣 Rameur" : "🏆 Aventure";
-  if (av) afficherAventure(await lireJeu());
-};
+// --- Onglets : Rame, Course, Aventure ------------------------------------------------
+let vue = "rameur";
+async function montrerVue(v) {
+  vue = v;
+  for (const x of ["rameur", "course", "aventure"]) $("vue-" + x).classList.toggle("vue-cachee", x !== v);
+  document.querySelectorAll(".onglet").forEach(b => b.classList.toggle("actif", b.dataset.vue === v));
+  stocker("vue", v);
+  scrollTo(0, 0);
+  // l'écran reste allumé pour ramer ; pour courir, il peut s'éteindre (le suivi continue)
+  fetch("/ecran?eveille=" + (v === "course" ? 0 : 1), { method: "POST" }).catch(() => {});
+  if (v === "aventure") afficherAventure(await lireJeu());
+  if (v === "course") { afficherCoursePrep(); afficherCourses(); }
+  if (v === "rameur") dessiner();
+}
+document.querySelectorAll(".onglet").forEach(b => b.onclick = () => montrerVue(b.dataset.vue));
 
 function libelleCondition(c) {
   const [g, v] = c.split(":");
@@ -639,6 +808,7 @@ async function afficherAventure(J) {
   $("a-xpbarre").style.width = (100 * (N.xp - N.xp_debut) / (N.xp_suivant - N.xp_debut)) + "%";
   $("a-km").textContent = kgfr(T.km); $("a-seances").textContent = T.seances; $("a-renfo").textContent = T.renfo;
   $("a-kcal").textContent = T.kcal; $("a-temps").textContent = temps(T.temps_s);
+  $("a-course").textContent = kgfr(T.course_km || 0);
 
   // semaine
   const S = J.semaine;
@@ -650,7 +820,8 @@ async function afficherAventure(J) {
     (S.a_faire.length
       ? "<div class='sous'>🚣 Rame (un jour de repos entre deux) :</div>" + S.a_faire.map(bouton).join("")
       : (S.plan.length ? "<div style='color:var(--ok)'>✔ Toutes les séances de rame du plan sont faites cette semaine !</div>" : "")) +
-    (S.renfo_a_faire.length ? "<div class='sous' style='margin-top:6px'>🧱 Hors rameur, les autres jours :</div>" + S.renfo_a_faire.map(bouton).join("") : "");
+    (S.renfo_a_faire.length ? "<div class='sous' style='margin-top:6px'>🧱 Hors rameur, les autres jours :</div>" + S.renfo_a_faire.map(bouton).join("") : "") +
+    ((S.course_a_faire || []).length ? "<div class='sous' style='margin-top:6px'>🏃 Course à pied (avec le téléphone) :</div>" + S.course_a_faire.map(bouton).join("") : "");
   document.querySelectorAll(".lancer").forEach(b => b.onclick = () => {
     fiche(nomsProgrammes[b.dataset.id], true);
   });
@@ -681,7 +852,7 @@ async function afficherAventure(J) {
 
   // journal
   $("a-journal").innerHTML = J.journal.map(j => `<tr><td>${new Date(j.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}</td>
-    <td style="text-align:left">${j.renfo ? "🧱 " : ""}${esc(j.programme)}</td><td>${j.renfo ? temps(j.temps_s) : kgfr(j.distance_m / 1000) + " km"}</td><td>${j.renfo ? "" : j.kcal + " kcal"}</td>
+    <td style="text-align:left">${j.renfo ? "🧱 " : j.course ? "🏃 " : ""}${esc(j.course && j.programme === "Séance libre" ? "Sortie libre" : j.programme)}</td><td>${j.renfo ? temps(j.temps_s) : kgfr(j.distance_m / 1000) + " km"}</td><td>${j.renfo ? "" : j.kcal + " kcal"}</td>
     <td>${j.precision != null ? "🥁 " + j.precision + " %" : ""}</td><td style="color:#ffd166">+${j.xp} XP</td></tr>`).join("") || "<tr><td>Aucune séance pour l'instant.</td></tr>";
 
   // badges
@@ -847,7 +1018,9 @@ function fiche(p, depuisAventure = false) {
   const et = aplatir(p.etapes), tot = et.reduce((a, e) => a + (e.temps || 0), 0);
   const dist = et.reduce((a, e) => a + (e.distance || 0), 0);
   $("f-titre").textContent = p.nom;
-  $("f-info").textContent = `${p.niveau} · ${temps(tot)}${dist ? " + " + dist + " m" : ""} · ${et.length} étapes` + (p.sans_rameur ? " · au sol, sans rameur" : "");
+  $("f-info").textContent = `${p.niveau} · ${temps(tot)}${dist ? " + " + dist + " m" : ""} · ${et.length} étapes` +
+    (p.sans_rameur ? " · au sol, sans rameur" : "") + (p.course ? " · dehors, suivi GPS du téléphone" : "");
+  $("f-go").textContent = p.course ? "▶ Partir courir" : "▶ Démarrer";
   $("f-but").textContent = p.but || "";
   $("f-etapes").innerHTML = et.map(e => {
     const z = zones[e.zone] || { nom: e.zone };
@@ -861,7 +1034,8 @@ function fiche(p, depuisAventure = false) {
 $("f-fermer").onclick = () => $("fiche").style.display = "none";
 $("f-go").onclick = () => {
   $("fiche").style.display = "none";
-  if (ficheDepuisAventure && !$("vue-aventure").classList.contains("vue-cachee")) $("btn-aventure").click();
+  if (ficheProg.course) { montrerVue("course"); demarrerCourse(ficheProg); return; }
+  if (ficheDepuisAventure && vue === "aventure") montrerVue("rameur");
   demarrer(ficheProg);
 };
 
@@ -903,7 +1077,13 @@ setInterval(() => {
   if (dernier.cadence >= e.cadence[0] - .5 && dernier.cadence <= e.cadence[1] + .5) precision.dans++;
 }, 1000);
 
-// Métronome : « tic » à l'attaque, « toc » doux à la fin de la poussée (1/3 du cycle)
+// Métronome et barre de rythme, sur la même horloge : « tic » à l'attaque,
+// « toc » doux à la fin de la poussée (1/3 du cycle). Sur la barre, la poignée
+// blanche part vers « fin de poussée » (rapide) puis revient lentement : c'est
+// le coup attendu. L'anneau vert est votre coup réel (il repart à chaque coup
+// compté par le SmartRow) : s'il suit la poignée, vous êtes dans le rythme.
+const maintenantS = () => performance.now() / 1000;
+let rythme = { periode: null, origine: 0 };
 let metroProchain = 0;
 function son(t, freq, vol, ms) {
   const o = audio.createOscillator(), g = audio.createGain();
@@ -911,21 +1091,328 @@ function son(t, freq, vol, ms) {
   g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + ms / 1000);
   o.start(t); o.stop(t + ms / 1000 + .02);
 }
-setInterval(() => {
+function periodeCible() {
   const c = cibleCadence();
-  const actif = c && $("metro").value !== "0" && !(guide && guide.etapes && guide.etapes[guide.i]?.zone === "repos");
-  if (!actif) { metroProchain = 0; return; }
+  const repos = guide && guide.etapes && guide.etapes[guide.i]?.zone === "repos";
+  return c && !repos ? 60 / ((c[0] + c[1]) / 2) : null;
+}
+function majRythme() {
+  const per = periodeCible();
+  if (per !== rythme.periode) {
+    rythme = { periode: per, origine: maintenantS() + .1 };
+    metroProchain = rythme.origine;
+  }
+}
+// l'audio du navigateur ne démarre qu'après un geste : on le réveille au premier toucher
+addEventListener("pointerdown", () => { try { audio = audio || new AudioContext(); audio.resume(); } catch (e) {} });
+setInterval(() => {
+  majRythme();
+  const per = rythme.periode;
+  if (!per || $("metro").value === "0") return;
   try { audio = audio || new AudioContext(); } catch (e) { return; }
-  const periode = 60 / ((c[0] + c[1]) / 2);
-  if (metroProchain < audio.currentTime) metroProchain = audio.currentTime + .05;
-  while (metroProchain < audio.currentTime + .3) {
-    son(metroProchain, 1200, .35, 60);                 // attaque
-    son(metroProchain + periode / 3, 600, .15, 50);    // fin de poussée, début du retour
-    metroProchain += periode;
+  if (audio.state !== "running") return;
+  const now = maintenantS();
+  if (metroProchain < now) metroProchain = rythme.origine + Math.ceil((now - rythme.origine) / per) * per;
+  while (metroProchain < now + .3) {
+    const t = audio.currentTime + (metroProchain - now);
+    son(t, 1200, .35, 60);                 // attaque
+    son(t + per / 3, 600, .15, 50);        // fin de poussée, début du retour
+    metroProchain += per;
   }
 }, 100);
+
+// position de la poignée (0 = attaque, 1 = fin de poussée) pour une phase du coup (0 à 1)
+const posPoignee = ph => ph < 1 / 3 ? 1 - Math.pow(1 - ph * 3, 2) : 1 - (ph - 1 / 3) * 1.5;
+let coupsVus = null, dernierCoupT = 0, periodeReelle = null;
+function noterCoup(e, arret) {
+  if (e.coups == null) return;
+  if (coupsVus !== null && e.coups > coupsVus) dernierCoupT = maintenantS();
+  coupsVus = e.coups;
+  periodeReelle = !arret && e.cadence ? 60 / e.cadence : null;
+}
+function dessinerRythmes() {
+  requestAnimationFrame(dessinerRythmes);
+  if (document.hidden) return;
+  const now = maintenantS(), per = rythme.periode;
+  const ph = per ? (((now - rythme.origine) / per) % 1 + 1) % 1 : null;
+  const fantome = periodeReelle && dernierCoupT && now - dernierCoupT < 2.5 * periodeReelle
+    ? posPoignee(Math.min(1, (now - dernierCoupT) / periodeReelle)) : null;
+  const ecran = $("rame").style.display === "flex";
+  for (const b of document.querySelectorAll(".rythme")) {
+    if (ecran !== Boolean(b.closest("#rame"))) continue;    // seule la barre visible est animée
+    const piste = b.querySelector(".r-piste"), mot = b.querySelector(".r-mot");
+    b.classList.toggle("repos", ph === null);
+    const x = ph === null ? 0 : posPoignee(ph), pousse = ph !== null && ph < 1 / 3;
+    b.querySelector(".r-poignee").style.left = (x * 100) + "%";
+    const r = b.querySelector(".r-rempli");
+    r.style.width = (x * 100) + "%"; r.classList.toggle("pousse", pousse);
+    piste.classList.toggle("attaque", ph !== null && ph < .06);
+    const f = b.querySelector(".r-fantome");
+    f.style.display = fantome === null ? "none" : "block";
+    if (fantome !== null) f.style.left = (fantome * 100) + "%";
+    mot.textContent = ph === null ? (guide && guide.etapes && guide.etapes[guide.i]?.zone === "repos" ? "repos" : "cadence libre")
+      : pousse ? "TIREZ" : "revenez…";
+  }
+  if (ecran) copierGuide();
+}
+requestAnimationFrame(dessinerRythmes);
+
+// --- Écran de séance (téléphone posé sur le rameur) ------------------------------------
+const petitEcran = () => matchMedia("(max-width: 760px), (max-height: 560px)").matches;
+function ouvrirRame() { $("rame").style.display = "flex"; majRame(dernier, dernier.arret !== false); }
+$("btn-plein").onclick = ouvrirRame;
+$("rm-fermer").onclick = () => { $("rame").style.display = "none"; };
+$("rm-stop").onclick = () => {
+  if (guide && !guide.fini) $("btn-stop").click();
+  else if (confirm("Fermer l'écran de séance ?")) $("rame").style.display = "none";
+};
+function majSon() {
+  const coupe = $("metro").value === "0";
+  $("rm-son").textContent = coupe ? "🔇 Son coupé" : "🥁 Son";
+}
+$("rm-son").onclick = () => {
+  if ($("metro").value === "0") $("metro").value = relire("metro_avant") || "auto";
+  else { stocker("metro_avant", $("metro").value); $("metro").value = "0"; }
+  try { audio = audio || new AudioContext(); audio.resume(); } catch (e) {}
+  majSon();
+};
+$("metro").addEventListener("change", majSon);
+function majRame(e, arret) {
+  noterCoup(e, arret);
+  if ($("rame").style.display !== "flex") return;
+  $("rm-pastille").className = "pastille " + (e.connexion || "");
+  $("rm-cadence").textContent = arret ? 0 : Math.round(e.cadence || 0);
+  $("rm-allure").textContent = arret ? "–:––" : mmss(e.allure_500m_s);
+  $("rm-temps").textContent = temps(e.temps_s);
+  $("rm-dist").textContent = Math.round(e.distance_m || 0) + " m";
+  $("rm-watts").textContent = (arret ? 0 : (e.watts || 0)) + " W";
+  $("rm-cible").textContent = $("c-cible").textContent;
+  $("rm-conseil").textContent = $("c-conseil").textContent || (arret ? "Tirez sur la poignée pour commencer" : "");
+  $("rm-conseil").style.color = $("c-conseil").style.color;
+  majSon();
+}
+const copie = {};
+function copierGuide() {    // reprend dans l'écran de séance ce qu'affiche la tuile de séance guidée
+  const actif = guide && (guide.fini || guide.etapes);
+  const val = {
+    "rm-zone": actif ? $("g-zone").textContent : "Rame libre",
+    "rm-reste": actif ? $("g-reste").textContent : "",
+    "rm-note": actif ? $("g-note").textContent : rythme.periode
+      ? "Suivez la poignée blanche : l'anneau vert, c'est votre coup." : "Choisissez une cadence avec 🥁 ou lancez une séance guidée.",
+    "rm-etape": actif ? $("g-etape").textContent : ($("connexion").textContent || ""),
+    "rm-suite": actif ? $("g-suite").textContent : "",
+  };
+  for (const [id, t] of Object.entries(val)) if (copie[id] !== t) { copie[id] = t; $(id).textContent = t; }
+  const w = actif ? $("g-barre").style.width : "0%";
+  if (copie.barre !== w) { copie.barre = w; $("rm-barre").style.width = w; }
+  const z = actif ? $("guide").style.getPropertyValue("--zone") : "";
+  if (copie.zone !== z) { copie.zone = z; $("rame").style.setProperty("--zone", z || "var(--eau)"); }
+  $("rm-stop").classList.toggle("cache", !(guide && !guide.fini && guide.etapes));
+}
+
+// --- Course à pied (GPS du téléphone) ---------------------------------------------------
+// Le suivi (GPS, voix, enregistrement) tourne dans un service Android qui continue
+// écran éteint ; la page ne fait que l'afficher en l'interrogeant chaque seconde.
+let courseSuivi = null, coursePoints = [], courseEtapes = [], courseEnvoi = false;
+const kmfr = m => (m / 1000).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const allureKm = s => (s ? mmss(s) : "–");
+const dureeParlee = s => s >= 60
+  ? `${Math.floor(s / 60)} minute${s >= 120 ? "s" : ""}${s % 60 ? " " + (s % 60) : ""}` : `${s} secondes`;
+const postJson = async (url, corps) => (await fetch(url, { method: "POST", body: corps })).json();
+
+function etapesCourse(p) {
+  return aplatir(p.etapes).map(e => {
+    const z = zones[e.zone] || { nom: e.zone };
+    const serie = e.serie ? `, ${e.serie.replace("/", " sur ")}` : "";
+    return { duree_s: e.temps || 0, distance_m: e.distance || 0, zone: e.zone, nom: z.nom, couleur: z.couleur || "",
+      note: e.note || "", serie: e.serie || "",
+      texte: `${z.nom}, ${e.temps ? dureeParlee(e.temps) : e.distance + " mètres"}${serie}. ${e.note || ""}` };
+  });
+}
+
+async function afficherCoursePrep() {
+  await chargerProgrammes();
+  const natif = plateforme !== "linux";
+  const liste = programmes.map((p, i) => [p, i]).filter(([p]) => p.course);
+  $("co-progs").innerHTML = (natif ? `<button class="prog" id="co-libre"><b>🏃 Sortie libre</b><span>Sans consignes : distance, temps, allure et annonce de chaque kilomètre.</span></button>` : "") +
+    liste.map(([p, i]) => {
+      const tot = aplatir(p.etapes).reduce((a, e) => a + (e.temps || 0), 0);
+      return `<button class="prog" data-i="${i}"><b>${esc(p.nom)}</b><span>${esc(p.niveau)} · ${Math.round(tot / 60)} min</span><br><span>${esc(p.but)}</span></button>`;
+    }).join("");
+  $("co-progs").querySelectorAll(".prog[data-i]").forEach(b => b.onclick = () => fiche(programmes[b.dataset.i]));
+  if ($("co-libre")) $("co-libre").onclick = () => demarrerCourse(null);
+  $("co-gps").textContent = natif
+    ? "Le téléphone suit la sortie au GPS (sans Google ni Internet). Les consignes sont dites à voix haute : écouteurs ou haut-parleur, téléphone dans la poche."
+    : "Les sorties se font avec l'application Android (GPS du téléphone). Elles arrivent ici avec Aventure → Exporter (téléphone) puis Importer (PC).";
+  $("co-voix").closest(".reglage").classList.toggle("cache", !natif);
+  $("co-voix").checked = relire("course_voix") !== "0";
+  $("co-km").checked = relire("course_km") !== "0";
+}
+$("co-voix").onchange = () => { stocker("course_voix", $("co-voix").checked ? 1 : 0); fetch("/course/voix?active=" + ($("co-voix").checked ? 1 : 0), { method: "POST" }).catch(() => {}); };
+$("co-km").onchange = () => stocker("course_km", $("co-km").checked ? 1 : 0);
+
+async function demarrerCourse(p) {
+  if (plateforme === "linux") { alert("La course se suit avec le GPS du téléphone : lancez-la depuis l'application Android."); return; }
+  if (courseEnvoi) return;
+  courseEnvoi = true;
+  await chargerProgrammes();
+  courseEtapes = p ? etapesCourse(p) : [];
+  stocker("course_etapes", JSON.stringify({ programme: p ? p.nom : null, etapes: courseEtapes }));
+  $("co-message").textContent = "Démarrage…";
+  jeuAvant = await lireJeu();
+  const r = await postJson("/course/demarrer", JSON.stringify({
+    programme: p ? p.nom : null, etapes: courseEtapes.map(({ duree_s, distance_m, texte }) => ({ duree_s, distance_m, texte })),
+    voix: $("co-voix").checked, annonceKm: $("co-km").checked,
+    intro: (p ? p.nom + ". " : "Sortie libre. ") + "Recherche du signal GPS : restez dehors, à découvert, quelques secondes.",
+  })).catch(e => ({ erreur: String(e) }));
+  courseEnvoi = false;
+  if (r.erreur) {
+    $("co-message").innerHTML = "⚠️ " + esc(r.erreur) +
+      (r.code === "GPS_OFF" ? ` <button id="co-reglages">Activer la localisation</button>` : "");
+    if ($("co-reglages")) $("co-reglages").onclick = () => fetch("/course/reglages", { method: "POST" });
+    return;
+  }
+  $("co-message").textContent = "";
+  coursePoints = [];
+  suivreCourse(r);
+}
+
+async function verifierCourse(auDemarrage) {
+  const e = await (await fetch("/course/etat")).json().catch(() => ({}));
+  if (e.actif) {
+    try {
+      const m = JSON.parse(relire("course_etapes") || "{}");
+      courseEtapes = m.programme === e.programme && Array.isArray(m.etapes) ? m.etapes : [];
+    } catch (x) { courseEtapes = []; }
+    if (auDemarrage) { await chargerProgrammes(); montrerVue("course"); }
+    suivreCourse(e);
+  }
+}
+
+function suivreCourse(e) {
+  majCourse(e);
+  if (courseSuivi) return;
+  courseSuivi = setInterval(async () => {
+    if (document.hidden) return;
+    let e;
+    try { e = await (await fetch("/course/etat")).json(); } catch (x) { return; }
+    majCourse(e);
+  }, 1000);
+}
+
+let traceEnCours = false;
+async function majCourse(e) {
+  if (!e || !e.actif) {
+    clearInterval(courseSuivi); courseSuivi = null;
+    $("co-direct").classList.add("cache"); $("co-prep").classList.remove("cache");
+    return;
+  }
+  $("co-direct").classList.remove("cache"); $("co-prep").classList.add("cache");
+  const et = courseEtapes[e.etape];
+  const zone = !e.enregistrement ? "Recherche du GPS…" : e.termine ? "Terminé 👏" : et ? et.nom : "Sortie libre";
+  $("co-direct").style.setProperty("--zone", e.enregistrement && et && !e.termine ? et.couleur : "");
+  $("co-zone").textContent = e.pause ? "En pause" : zone;
+  $("co-etape").textContent = e.nb_etapes && e.etape >= 0 && !e.termine ? `Étape ${e.etape + 1}/${e.nb_etapes}${et && et.serie ? " · série " + et.serie : ""}` : "";
+  $("co-reste").textContent = e.etape_reste == null || e.termine ? "" :
+    e.etape_unite === "s" ? temps(Math.ceil(e.etape_reste)) : Math.ceil(e.etape_reste) + " m";
+  $("co-barre").style.width = (e.termine ? 100 : 100 * (e.etape_fait || 0)) + "%";
+  $("co-note").textContent = !e.enregistrement
+    ? "Restez à découvert. Le départ se fait tout seul dès que le signal est bon."
+    : e.termine ? "Séance terminée : marchez pour récupérer, puis touchez « Terminer »." : (et ? et.note : "");
+  const s = courseEtapes[e.etape + 1];
+  $("co-suite").textContent = e.enregistrement && !e.termine && courseEtapes.length
+    ? (s ? `Ensuite : ${s.nom} ${s.duree_s ? temps(s.duree_s) : s.distance_m + " m"}` : "Dernière étape") : "";
+  $("co-temps").textContent = temps(Math.floor(e.temps_s || 0));
+  $("co-dist").textContent = kmfr(e.distance_m || 0);
+  $("co-allure").textContent = allureKm(e.allure_km_s);
+  $("co-inst").textContent = allureKm(e.allure_inst_km_s);
+  $("co-gpsdirect").textContent = e.precision_m == null ? "GPS : en attente du signal…"
+    : `GPS : précision ${e.precision_m} m${e.gps_age_s > 5 ? ` · aucun point depuis ${e.gps_age_s} s` : ""}`;
+  $("co-forcer").classList.toggle("cache", Boolean(e.enregistrement));
+  $("co-pause").classList.toggle("cache", !e.enregistrement);
+  $("co-pause").textContent = e.pause ? "▶ Reprendre" : "⏸ Pause";
+  $("co-suivante").classList.toggle("cache", !e.enregistrement || e.termine || !e.nb_etapes);
+  $("co-fin").style.background = e.termine ? "var(--ok)" : "";
+  if (e.nb_points > coursePoints.length && !traceEnCours) {
+    traceEnCours = true;
+    try {
+      const t = await (await fetch("/course/trace?depuis=" + coursePoints.length)).json();
+      coursePoints = coursePoints.concat(t.points || []);
+      dessinerTrace($("co-carte"), coursePoints, true);
+    } finally { traceEnCours = false; }
+  }
+}
+
+function dessinerTrace(svg, pts, enDirect) {
+  if (!pts.length) { svg.innerHTML = `<text x="150" y="104" text-anchor="middle">Le tracé apparaîtra ici</text>`; return; }
+  const lat0 = pts[0][1] * Math.PI / 180;
+  const xy = pts.map(p => [p[2] * Math.cos(lat0), -p[1]]);
+  const xs = xy.map(p => p[0]), ys = xy.map(p => p[1]);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const ech = Math.min(280 / Math.max(x1 - x0, 1e-5), 180 / Math.max(y1 - y0, 1e-5));
+  const dx = (300 - (x1 - x0) * ech) / 2, dy = (200 - (y1 - y0) * ech) / 2;
+  const P = xy.map(([x, y]) => [(dx + (x - x0) * ech).toFixed(1), (dy + (y - y0) * ech).toFixed(1)]);
+  // repères de chaque kilomètre
+  let km = "", n = 1;
+  pts.forEach((p, i) => { if (p[4] >= n * 1000) { km += `<circle cx="${P[i][0]}" cy="${P[i][1]}" r="7" fill="#182027" stroke="#ffd166" stroke-width="2"/><text x="${P[i][0]}" y="${+P[i][1] + 4}" text-anchor="middle" style="font-size:9px;fill:#ffd166">${n}</text>`; n++; } });
+  const fin = P[P.length - 1];
+  svg.innerHTML = `<polyline points="${P.map(p => p.join(",")).join(" ")}" fill="none" stroke="#3fb6e8" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${P[0][0]}" cy="${P[0][1]}" r="6" fill="#4cc38a"/>${km}
+    <circle cx="${fin[0]}" cy="${fin[1]}" r="${enDirect ? 8 : 6}" fill="${enDirect ? "#f2a33a" : "#e5675a"}" stroke="#0f1418" stroke-width="2"/>`;
+}
+
+$("co-forcer").onclick = async () => majCourse(await postJson("/course/forcer"));
+$("co-pause").onclick = async () => majCourse(await postJson($("co-pause").textContent.includes("Reprendre") ? "/course/reprendre" : "/course/pause"));
+$("co-suivante").onclick = async () => majCourse(await postJson("/course/suivante"));
+$("co-fin").onclick = async () => {
+  if (!confirm("Terminer la sortie et l'enregistrer ?")) return;
+  const r = await postJson("/course/arreter?garder=1");
+  clearInterval(courseSuivi); courseSuivi = null;
+  majCourse({ actif: false });
+  $("co-message").textContent = r.fichier
+    ? `Sortie enregistrée : ${kmfr(r.distance_m || 0)} km en ${temps(Math.round(r.temps_s || 0))}.`
+    : "Sortie trop courte (moins de 50 m et d'une minute) : elle n'est pas enregistrée.";
+  await afficherCourses();
+  if (r.fichier) { const J = await lireJeu(); celebrer(jeuAvant, J, "Sortie terminée !"); jeuAvant = J; }
+};
+
+async function afficherCourses() {
+  let liste = [];
+  try { liste = await (await fetch("/courses")).json(); } catch (e) { /* ancienne version */ }
+  const tot = liste.reduce((a, c) => a + (c.distance_m || 0), 0), tps = liste.reduce((a, c) => a + (c.temps_s || 0), 0);
+  $("co-totaux").innerHTML = `<div><b>${liste.length}</b><span>sorties</span></div><div><b>${kmfr(tot)}</b><span>km courus</span></div>
+    <div><b>${temps(Math.round(tps))}</b><span>de course</span></div>`;
+  $("co-lignes").innerHTML = liste.length ? liste.map(c => {
+    const d = new Date(c.debut);
+    return `<tr data-f="${esc(c.fichier)}"><td>${d.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" })}</td>
+      <td style="text-align:left">${esc(c.programme || "Sortie libre")}${c.en_cours ? " <span class='sous'>(interrompue)</span>" : ""}</td>
+      <td>${kmfr(c.distance_m || 0)} km</td><td>${temps(Math.round(c.temps_s || 0))}</td><td>${allureKm(c.allure_km_s)}/km</td></tr>`;
+  }).join("") : `<tr><td>Aucune sortie pour l'instant.</td></tr>`;
+  $("co-lignes").querySelectorAll("tr[data-f]").forEach(tr => tr.onclick = () => detailCourse(tr.dataset.f));
+}
+
+async function detailCourse(f) {
+  const d = await (await fetch("/seance/" + encodeURIComponent(f))).json();
+  const r = d.resume || {};
+  $("co-detail").classList.remove("cache");
+  $("co-d-titre").textContent = `${d.programme || "Sortie libre"} · ${new Date(d.debut).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })} · ${kmfr(r.distance_m || 0)} km en ${temps(Math.round(r.temps_s || 0))}`;
+  dessinerTrace($("co-d-carte"), d.trace || [], false);
+  const km = d.km || [];
+  $("co-d-km").textContent = km.length ? "Temps de chaque kilomètre : " + km.map((t, i) => `km ${i + 1} : ${mmss(t - (km[i - 1] || 0))}`).join(" · ") : "";
+  $("co-detail").scrollIntoView({ behavior: "smooth" });
+}
+
+// Bouton « retour » d'Android : ferme ce qui est ouvert, sinon revient à l'onglet Rame
+addEventListener("retour", ev => {
+  for (const id of ["celebration", "fiche"]) if ($(id).style.display && $(id).style.display !== "none") { $(id).style.display = "none"; ev.preventDefault(); return; }
+  if ($("rame").style.display === "flex") { $("rame").style.display = "none"; ev.preventDefault(); return; }
+  if ($("exo").style.display === "flex") { $("x-stop").click(); ev.preventDefault(); return; }
+  if (vue !== "rameur") { montrerVue("rameur"); ev.preventDefault(); }
+});
+
 lireJeu().then(J => jeuAvant = J);
 dessiner();
+{ const v = relire("vue"); if (v && v !== "rameur" && $("vue-" + v)) montrerVue(v); }
 </script>
 </body>
 </html>

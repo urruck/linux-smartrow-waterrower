@@ -1,7 +1,7 @@
 // Données personnelles dans le stockage privé de l'application
 // (même organisation que ~/.local/share/rameur-smartrow sur Linux :
 // sessions/*.json et donnees/profil.json, donnees/pesees.json).
-import { Directory, Encoding, Filesystem } from "@capacitor/filesystem";
+import { Directory, Encoding, Filesystem } from "./capacitor.js";
 
 const vraiFetch = window.fetch.bind(window);
 const D = { directory: Directory.Data };

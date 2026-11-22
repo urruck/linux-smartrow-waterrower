@@ -1,5 +1,5 @@
 {
-  "_aide": "Séances guidées. Chaque étape dure un temps (secondes) ou une distance (mètres). Zones d'effort : calme, facile, modere, soutenu, fort ; l'allure visée est calculée à partir de l'allure de référence choisie dans l'appli. cadence = [min, max] en coups/min.",
+  "_aide": "Séances guidées. Chaque étape dure un temps (secondes) ou une distance (mètres). Zones d'effort : calme, facile, modere, soutenu, fort ; l'allure visée est calculée à partir de l'allure de référence choisie dans l'appli. cadence = [min, max] en coups/min. Course à pied (\"course\": true) : séances suivies au GPS du téléphone, zones marche, footing, course, vite ; les consignes sont dites à voix haute, écran éteint.",
   "zones": {
     "calme": {
       "nom": "Calme",
@@ -35,6 +35,26 @@
       "nom": "Exercice",
       "ecart_allure_s": null,
       "couleur": "#b38cff"
+    },
+    "marche": {
+      "nom": "Marche",
+      "ecart_allure_s": null,
+      "couleur": "#7d8f9c"
+    },
+    "footing": {
+      "nom": "Footing",
+      "ecart_allure_s": null,
+      "couleur": "#4cc38a"
+    },
+    "course": {
+      "nom": "Course",
+      "ecart_allure_s": null,
+      "couleur": "#3fb6e8"
+    },
+    "vite": {
+      "nom": "Plus vite",
+      "ecart_allure_s": null,
+      "couleur": "#f2a33a"
     }
   },
   "programmes": [
@@ -966,6 +986,205 @@
           "zone": "exercice",
           "exercice": "Respiration abdominale",
           "note": "Inspirez en gonflant le ventre, soufflez longuement en rentrant le nombril"
+        }
+      ]
+    },
+    {
+      "id": "marchecourse1",
+      "nom": "Marche-course 1-1",
+      "niveau": "Course · débutant",
+      "course": true,
+      "but": "Alterner 1 min de course très lente et 1 min de marche. On doit pouvoir parler en courant. Cheville : terrain plat et régulier, bonnes chaussures. Douleur = on marche.",
+      "etapes": [
+        {
+          "temps": 300,
+          "zone": "marche",
+          "note": "Marche rapide pour s'échauffer"
+        },
+        {
+          "repeter": 8,
+          "etapes": [
+            {
+              "temps": 60,
+              "zone": "footing",
+              "note": "Course très lente, petites foulées, on peut parler"
+            },
+            {
+              "temps": 60,
+              "zone": "marche",
+              "note": "Marche, respirez"
+            }
+          ]
+        },
+        {
+          "temps": 240,
+          "zone": "marche",
+          "note": "Retour au calme en marchant"
+        }
+      ]
+    },
+    {
+      "id": "marchecourse2",
+      "nom": "Marche-course 2-1",
+      "niveau": "Course · débutant",
+      "course": true,
+      "but": "2 min de course lente, 1 min de marche. Toujours en aisance respiratoire. Cheville : terrain plat et régulier, bonnes chaussures. Douleur = on marche.",
+      "etapes": [
+        {
+          "temps": 300,
+          "zone": "marche",
+          "note": "Marche rapide pour s'échauffer"
+        },
+        {
+          "repeter": 6,
+          "etapes": [
+            {
+              "temps": 120,
+              "zone": "footing",
+              "note": "Course lente et régulière"
+            },
+            {
+              "temps": 60,
+              "zone": "marche",
+              "note": "Marche, respirez"
+            }
+          ]
+        },
+        {
+          "temps": 180,
+          "zone": "marche",
+          "note": "Retour au calme en marchant"
+        }
+      ]
+    },
+    {
+      "id": "marchecourse3",
+      "nom": "Marche-course 4-1",
+      "niveau": "Course · progression",
+      "course": true,
+      "but": "4 min de course, 1 min de marche : on s'approche du footing continu. Cheville : terrain plat et régulier, bonnes chaussures. Douleur = on marche.",
+      "etapes": [
+        {
+          "temps": 300,
+          "zone": "marche",
+          "note": "Marche rapide pour s'échauffer"
+        },
+        {
+          "repeter": 4,
+          "etapes": [
+            {
+              "temps": 240,
+              "zone": "footing",
+              "note": "Course lente, relâchez les épaules"
+            },
+            {
+              "temps": 60,
+              "zone": "marche",
+              "note": "Marche, respirez"
+            }
+          ]
+        },
+        {
+          "temps": 180,
+          "zone": "marche",
+          "note": "Retour au calme en marchant"
+        }
+      ]
+    },
+    {
+      "id": "footing20",
+      "nom": "Footing 20 min",
+      "niveau": "Course · progression",
+      "course": true,
+      "but": "20 minutes de course continue, lentement. Si c'est dur, marchez 1 minute puis repartez. Cheville : terrain plat et régulier, bonnes chaussures. Douleur = on marche.",
+      "etapes": [
+        {
+          "temps": 300,
+          "zone": "marche",
+          "note": "Marche rapide pour s'échauffer"
+        },
+        {
+          "temps": 600,
+          "zone": "footing",
+          "note": "Footing lent, on peut parler"
+        },
+        {
+          "temps": 600,
+          "zone": "footing",
+          "note": "Toujours lent et régulier"
+        },
+        {
+          "temps": 300,
+          "zone": "marche",
+          "note": "Retour au calme en marchant, puis étirements"
+        }
+      ]
+    },
+    {
+      "id": "fartlek",
+      "nom": "Fartlek doux",
+      "niveau": "Course · progression",
+      "course": true,
+      "but": "Footing avec de courtes accélérations, pour varier. Les accélérations restent contrôlées. Cheville : terrain plat et régulier, bonnes chaussures. Douleur = on marche.",
+      "etapes": [
+        {
+          "temps": 300,
+          "zone": "marche",
+          "note": "Marche rapide pour s'échauffer"
+        },
+        {
+          "temps": 600,
+          "zone": "footing",
+          "note": "Footing lent"
+        },
+        {
+          "repeter": 6,
+          "etapes": [
+            {
+              "temps": 30,
+              "zone": "vite",
+              "note": "Un peu plus vite, foulée dynamique"
+            },
+            {
+              "temps": 90,
+              "zone": "footing",
+              "note": "Footing lent, récupérez"
+            }
+          ]
+        },
+        {
+          "temps": 240,
+          "zone": "marche",
+          "note": "Retour au calme en marchant"
+        }
+      ]
+    },
+    {
+      "id": "footing30",
+      "nom": "Footing 30 min",
+      "niveau": "Course · confirmé",
+      "course": true,
+      "but": "30 minutes de footing continu : bravo, vous êtes coureur ! Cheville : terrain plat et régulier, bonnes chaussures. Douleur = on marche.",
+      "etapes": [
+        {
+          "temps": 300,
+          "zone": "marche",
+          "note": "Marche rapide pour s'échauffer"
+        },
+        {
+          "temps": 900,
+          "zone": "footing",
+          "note": "Footing lent et régulier"
+        },
+        {
+          "temps": 900,
+          "zone": "footing",
+          "note": "Gardez la même allure, relâchez les épaules"
+        },
+        {
+          "temps": 240,
+          "zone": "marche",
+          "note": "Retour au calme en marchant, puis étirements"
         }
       ]
     }

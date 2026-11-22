@@ -1,5 +1,5 @@
 """Mode Aventure : XP, niveaux, descente de la Loire, badges, quêtes, plan
-sur 12 semaines, poids et récompenses personnelles.
+sur 12 semaines (rame, renfo, course à pied), poids et récompenses personnelles.
 
 Tout est recalculé à partir des séances enregistrées (sessions/*.json) et du
 dossier donnees/ (profil.json, pesees.json). Rien n'est stocké en double :
@@ -75,6 +75,11 @@ def ajouter_pesee(kg, date=None):
     _ecrire(os.path.join(DONNEES, "pesees.json"), sorted(liste, key=lambda x: x["date"]))
 
 
+def kcal_course(distance_m, poids_kg):
+    """Course à pied (et marche rapide) : environ 1 kcal par kg et par km."""
+    return distance_m / 1000 * poids_kg
+
+
 def kcal(points, poids_kg):
     """Dépense estimée (formule ACSM utilisée aussi par QZ) : par minute,
     (0,048 × watts + 1,19) × poids × 3,5 / 200. Un point = une seconde."""
@@ -95,12 +100,14 @@ def seances(poids_kg):
             continue
         r = d["resume"]
         debut = datetime.datetime.fromisoformat(d["debut"])
+        course = d.get("type") == "course"
         res.append({
             "fichier": nom, "debut": debut, "programme": d.get("programme"),
             "programme_id": noms.get(d.get("programme")), "termine": bool(d.get("termine")),
-            "precision": d.get("precision_cadence"), "renfo": d.get("type") == "renfo",
+            "precision": d.get("precision_cadence"), "renfo": d.get("type") == "renfo", "course": course,
             "distance_m": r.get("distance_m") or 0, "temps_s": r.get("temps_s") or 0,
-            "allure_moyenne_s": r.get("allure_moyenne_s"), "kcal": kcal(d.get("points", []), poids_kg),
+            "allure_moyenne_s": r.get("allure_moyenne_s"),
+            "kcal": kcal_course(r.get("distance_m") or 0, poids_kg) if course else kcal(d.get("points", []), poids_kg),
         })
     return res
 
@@ -131,12 +138,26 @@ def etat():
         n = semaine_de(s["debut"])
         s["semaine"] = n
         par_semaine.setdefault(n, []).append(s)
-    plan_fait, renfo_faits = {}, {}
+    plan_fait, renfo_faits, course_faites = {}, {}, {}
     for n, ss in par_semaine.items():
         attendues = list(plan[n - 1]["seances"]) if 0 < n <= len(plan) else []
         renfo_att = list(plan[n - 1].get("renfo", [])) if 0 < n <= len(plan) else []
-        faites, renfo_faits[n] = [], []
+        course_att = list(plan[n - 1].get("course", [])) if 0 < n <= len(plan) else []
+        faites, renfo_faits[n], course_faites[n] = [], [], []
         for s in ss:
+            if s["course"]:
+                gain = int(s["distance_m"] / 1000 * xp_r.get("par_km_course", 100))
+                if s["temps_s"] >= 600:
+                    gain += xp_r.get("seance_10min", 50)
+                if s["programme"] and s["termine"]:
+                    gain += xp_r.get("seance_guidee_terminee", 100)
+                    if s["programme_id"] in course_att:
+                        course_att.remove(s["programme_id"])
+                        course_faites[n].append(s["programme_id"])
+                        gain += xp_r.get("seance_du_plan", 50)
+                s["xp"] = gain
+                xp += gain
+                continue
             if s["renfo"]:
                 s["xp"] = xp_r.get("seance_renfo", 80) if s["termine"] else 0
                 if s["programme_id"] in renfo_att:
@@ -160,17 +181,23 @@ def etat():
         plan_fait[n] = faites
     journal = [{"date": s["debut"].isoformat(timespec="minutes"), "programme": s["programme"] or "Séance libre",
                 "distance_m": s["distance_m"], "temps_s": s["temps_s"], "kcal": round(s["kcal"]),
-                "precision": s["precision"], "renfo": s["renfo"],
+                "precision": s["precision"], "renfo": s["renfo"], "course": s["course"],
                 "xp": s["xp"]} for s in reversed(liste[-15:])]
 
     renfos = [s for s in liste if s["renfo"] and s["termine"]]
-    liste = [s for s in liste if not s["renfo"]]   # la suite ne concerne que la rame
-    par_semaine = {n: [s for s in ss if not s["renfo"]] for n, ss in par_semaine.items()}
+    courses = [s for s in liste if s["course"]]
+    liste = [s for s in liste if not s["renfo"] and not s["course"]]   # la suite ne concerne que la rame
+    rame_semaines = {n for n, ss in par_semaine.items() if any(not s["renfo"] and not s["course"] for s in ss)}
+    course_semaine = {}
+    for s in courses:
+        course_semaine.setdefault(s["semaine"], []).append(s)
+    par_semaine = {n: [s for s in ss if not s["renfo"] and not s["course"]] for n, ss in par_semaine.items()}
     renfo_semaine = {}
     for s in renfos:
         renfo_semaine.setdefault(s["semaine"], []).append(s)
     total_m = sum(s["distance_m"] for s in liste)
-    total_kcal = sum(s["kcal"] for s in liste)
+    course_m = sum(s["distance_m"] for s in courses)
+    total_kcal = sum(s["kcal"] for s in liste) + sum(s["kcal"] for s in courses)
     perdu = round(P["poids_depart_kg"] - poids_actuel, 1)
     a_perdre = round(P["poids_depart_kg"] - P["poids_objectif_kg"], 1)
 
@@ -209,6 +236,9 @@ def etat():
         "record1000": record, "kcal1000": total_kcal >= 1000, "kcal5000": total_kcal >= 5000,
         "poids1": perdu >= 1, "poids3": perdu >= 3, "poids_obj": pes != [] and poids_actuel <= P["poids_objectif_kg"],
         "chalonnes": km >= 68, "nantes": km >= 135, "ocean": km >= 190,
+        "course1": len(courses) >= 1, "course5k": any(s["distance_m"] >= 5000 for s in courses),
+        "course10": len(courses) >= 10, "course25": course_m >= 25000,
+        "duathlon": any(n in rame_semaines for n in course_semaine),
     }
     badges = [{**b, "obtenu": bool(conditions.get(b["id"]))} for b in R.get("badges", [])]
     xp += sum(1 for b in badges if b["obtenu"]) * xp_r.get("badge", 100)
@@ -233,6 +263,8 @@ def etat():
             fait, but = sum(1 for s in ss if (s["precision"] or 0) >= 75), 2
         elif q["id"] == "pesee":
             fait, but = int(pesee_semaine), 1
+        elif q["id"] == "course" and plan_semaine and plan_semaine.get("course"):
+            fait, but = len(course_faites.get(semaine, [])), len(plan_semaine["course"])
         else:
             continue
         quetes.append({"texte": q["texte"].format(km=km_cible), "fait": fait, "but": but, "ok": fait >= but})
@@ -242,6 +274,9 @@ def etat():
         if km_n >= min(20, 3 + 1.2 * (n - 1)):
             xp += xp_r.get("quete", 150)
         if 0 < n <= len(plan) and len(plan_fait.get(n, [])) >= len(plan[n - 1]["seances"]):
+            xp += xp_r.get("quete", 150)
+        if 0 < n <= len(plan) and plan[n - 1].get("course") and \
+                len(course_faites.get(n, [])) >= len(plan[n - 1]["course"]):
             xp += xp_r.get("quete", 150)
     if avant_debut:
         quetes = []
@@ -270,20 +305,25 @@ def etat():
     recompenses = [{**r, "obtenue": debloquee(r["condition"])} for r in P.get("recompenses", [])]
 
     # --- Séances du plan restant à faire cette semaine
-    a_faire, renfo_a_faire = [], []
+    a_faire, renfo_a_faire, course_a_faire = [], [], []
     if plan_semaine:
         a_faire = list(plan_semaine["seances"])
         renfo_a_faire = list(plan_semaine.get("renfo", []))
+        course_a_faire = list(plan_semaine.get("course", []))
         if not avant_debut:
             for f in plan_fait.get(semaine, []):
                 a_faire.remove(f)
             for f in renfo_faits.get(semaine, []):
                 renfo_a_faire.remove(f)
+            for f in course_faites.get(semaine, []):
+                course_a_faire.remove(f)
 
     return {
         "profil": P, "niveau": niveau, "xp_total": xp,
         "totaux": {"km": round(km, 2), "seances": len(liste), "renfo": len(renfos), "kcal": round(total_kcal),
-                   "temps_s": sum(s["temps_s"] for s in liste)},
+                   "temps_s": sum(s["temps_s"] for s in liste),
+                   "course_km": round(course_m / 1000, 2), "courses": len(courses),
+                   "course_temps_s": sum(s["temps_s"] for s in courses)},
         "poids": {"depart": P["poids_depart_kg"], "objectif": P["poids_objectif_kg"], "actuel": poids_actuel,
                   "perdu": perdu, "a_perdre": a_perdre, "pesees": pes},
         "parcours": {"nom": R.get("parcours", {}).get("nom"), "km": round(km, 2), "escales": esc,
@@ -291,6 +331,7 @@ def etat():
                      "total_km": esc[-1]["km"] if esc else 0},
         "badges": badges,
         "semaine": {"numero": semaine, "avant_debut": avant_debut, "debut": P["debut"], "renfo_a_faire": renfo_a_faire,
+                    "course_a_faire": course_a_faire,
                     "theme": plan_semaine["theme"] if plan_semaine else "Plan terminé : continuez à votre rythme",
                     "nb_semaines": len(plan), "plan": plan_semaine["seances"] if plan_semaine else [],
                     "a_faire": a_faire, "km": round(km_semaine, 1), "nb_seances": len(ss)},
